@@ -144,11 +144,32 @@ def data_files() -> None:
     places = json.loads((ROOT / "data" / "places.json").read_text(encoding="utf-8"))["places"]
     ids = [p["id"] for p in places]
     check("places.json", "identifiants uniques", len(ids) == len(set(ids)), True)
+    lines = {l["id"]: l for l in json.loads((ROOT / "data" / "lines.json").read_text(encoding="utf-8"))["lines"]}
+    sectors = ("ROISSY", "ORLY", "BOURGET", "BEAUVAIS")
     for p in places:
         check("places.json", f"{p['id']} parent connu", p.get("parent") in (None, *ids), True)
-        check("places.json", f"{p['id']} au moins un arrêt", bool(p["stop_areas"] or p["stop_points"]), True)
+        kind = p.get("kind")
+        check("places.json", f"{p['id']} sorte de lieu", kind in ("airport", "city"), True)
+        if kind == "airport":
+            check("places.json", f"{p['id']} secteur", p.get("sector") in sectors, True)
+            check("places.json", f"{p['id']} au moins un arrêt", bool(p.get("stop_areas") or p.get("stop_points")), True)
+            check("places.json", f"{p['id']} sans point de montée", "boarding" in p, False)
+        elif kind == "city":
+            # R-100, D-13 : un point de montée par ligne active, zone d'arrêt GTFS et nom attendu
+            check("places.json", f"{p['id']} ville sans secteur, arrêts ni parent",
+                  [k for k in ("sector", "stop_areas", "stop_points", "parent") if k in p], [])
+            boarding = p.get("boarding") or []
+            check("places.json", f"{p['id']} points de montée", bool(boarding), True)
+            codes = [b.get("line") for b in boarding]
+            check("places.json", f"{p['id']} une ligne au plus une fois", len(codes) == len(set(codes)), True)
+            for b in boarding:
+                ln = lines.get(b.get("line"), {})
+                check("places.json", f"{p['id']} {b.get('line')} ligne active", ln.get("state"), "active")
+                check("places.json", f"{p['id']} {b.get('line')} zone d'arrêt et nom",
+                      str(b.get("stop_area", "")).startswith("IDFM:") and bool(b.get("name")), True)
+    check("places.json", "un seul lieu ville, en tête (lieu par défaut de l'accueil)",
+          [p["id"] for p in places if p.get("kind") == "city"] == [places[0]["id"]], True)
     terminal_names(json.loads((ROOT / "data" / "places.json").read_text(encoding="utf-8")).get("terminal_names"), places, ids)
-    lines = {l["id"]: l for l in json.loads((ROOT / "data" / "lines.json").read_text(encoding="utf-8"))["lines"]}
     adjustments(ids_lines=lines)
     plans_sources(lines)
     design_tokens(lines)

@@ -10,6 +10,8 @@ Valide la base d'horaires produite par tools/pipeline/build_timetable.py.
 2. Règles de lecture : prochains passages, frontières de service, expiration, absence de données.
    Aménagements de desserte (R-90 à R-93) : contrôles de structure sur toute base, scénarios de la
    ligne 351 sur la base de juin 2026.
+   Accueil (R-100, décision D-13) : départs d'un lieu, contrôles de structure sur toute base,
+   scénarios réels sur la base de juin 2026 (Paris, Noctilien, terminal de CDG), conservation R-55.
 3. Performance : temps de la requête « prochains passages » sur les quais les plus chargés.
 """
 
@@ -289,6 +291,131 @@ def place_names(tt: Timetable) -> None:
         check("noms de lieux : lieu inconnu refusé", "KeyError", "KeyError")
 
 
+def _fmt_groups(groups):
+    return [(g.line, g.key, g.title, g.board.status, g.board.boundary,
+             [datetime.fromtimestamp(x.epoch, PARIS).strftime("%H:%M:%S") for x in g.board.passages]) for g in groups]
+
+
+def home_structure(tt: Timetable, db_path: Path) -> None:
+    """Accueil (R-100, D-13) : invariants valables sur toute base."""
+    places = tt.places()
+    check("accueil : Paris en tête du sélecteur, lieu ville sans secteur",
+          (places[0]["id"], places[0]["kind"], places[0]["sector"]), ("paris", "city", None))
+    check("accueil : tout lieu aéroportuaire a un secteur",
+          [p["id"] for p in places if p["kind"] == "airport" and not p["sector"]], [])
+    start = date.fromisoformat(tt.meta["validity_start"])
+    now = datetime(start.year, start.month, start.day, 8, 0, tzinfo=PARIS) if start.weekday() < 5 else \
+        datetime(start.year, start.month, start.day, 10, 0, tzinfo=PARIS)
+    groups = tt.place_departures("paris", now)
+    check("accueil Paris : une carte au moins par aéroport", sorted({g.sector for g in groups}),
+          sorted(["ROISSY", "ORLY", "BOURGET", "BEAUVAIS"]))
+    # chaque passage d'une carte Paris → secteur S part du point de montée et dessert ensuite un quai de S
+    bad = []
+    for g in groups:
+        for x in g.board.passages:
+            ok = tt.con.execute(
+                """SELECT 1 FROM pattern_stop b JOIN stop_point bp ON bp.id = b.stop_point_id
+                   JOIN stop_area a ON a.id = bp.stop_area_id
+                   JOIN pattern_stop d ON d.pattern_id = b.pattern_id AND d.seq > b.seq AND d.dropoff != 1
+                   JOIN place_stop_point ps ON ps.stop_point_id = d.stop_point_id
+                   JOIN place pl ON pl.id = ps.place_id AND pl.sector = ?
+                   WHERE b.pattern_id = ? AND b.seq = ? AND b.pickup != 1 AND a.gtfs_id = ? LIMIT 1""",
+                (g.sector, x.pattern_id, x.seq, g.stop_area)).fetchone()
+            if not ok:
+                bad.append((g.line, g.sector, x.stop_point))
+    check("accueil Paris : chaque départ mène à un aéroport du secteur de sa carte", bad, [])
+    order = [(g.sector, g.board.passages[0].epoch if g.board.passages else None) for g in groups]
+    sorted_ok = all(
+        (["ROISSY", "ORLY", "BOURGET", "BEAUVAIS"].index(a[0]), a[1] is None, a[1] or 0) <=
+        (["ROISSY", "ORLY", "BOURGET", "BEAUVAIS"].index(b[0]), b[1] is None, b[1] or 0) for a, b in zip(order, order[1:]))
+    check("accueil Paris : cartes groupées par aéroport puis triées par prochain départ", sorted_ok, True)
+    for pid in ("cdg-t2", "orly-4"):
+        gs = tt.place_departures(pid, now)
+        firsts = [g.board.passages[0].epoch for g in gs if g.board.passages]
+        check(f"accueil {pid} : cartes avec départ d'abord, par prochain départ",
+              firsts == sorted(firsts) and all(g.board.passages for g in gs[:len(firsts)]), True)
+        check(f"accueil {pid} : une carte par ligne et par sens", len({(g.line, g.key) for g in gs}), len(gs))
+    try:
+        tt.place_departures("lieu-inexistant", now)
+        check("accueil : lieu inconnu refusé", "aucune erreur", "KeyError")
+    except KeyError:
+        check("accueil : lieu inconnu refusé", "KeyError", "KeyError")
+    # point de montée que la ligne ne dessert plus vers un aéroport : cartes « Horaires indisponibles » (R-153)
+    with tempfile.TemporaryDirectory() as tmp:
+        copy = Path(tmp) / "t.sqlite"
+        shutil.copyfile(db_path, copy)
+        con = sqlite3.connect(copy)
+        other = con.execute("""SELECT pb2.stop_area_id FROM place_boarding pb2 JOIN line l2 ON l2.id = pb2.line_id
+                               WHERE l2.code = 'METRO_14'""").fetchone()[0]
+        con.execute("""UPDATE place_boarding SET stop_area_id = ?
+                       WHERE line_id = (SELECT id FROM line WHERE code = 'BUS_351')""", (other,))
+        con.commit()
+        con.close()
+        t2 = Timetable(str(copy))
+        g351 = [(g.line, g.key, g.title, g.board.status) for g in t2.place_departures("paris", now) if g.line == "BUS_351"]
+        check("accueil Paris : point de montée plus desservi → « Horaires indisponibles » par secteur de la ligne",
+              g351, [("BUS_351", "sector:ROISSY", "", "no_data")])
+        t2.con.close()
+
+
+def home_june(tt: Timetable) -> None:
+    """Accueil : scénarios réels du GTFS de juin 2026 (mercredi 1er juillet 2026)."""
+    snap = json.loads((CASES / "snapshot.json").read_text(encoding="utf-8"))
+    if snap["source_zip_sha256"] != tt.meta["source_sha256"]:
+        print("(scénarios d'accueil de juin ignorés : la base ne provient pas du GTFS de référence)")
+        return
+    cdg2 = "Aéroport Charles de Gaulle 2 (Terminal 2)"
+    got = _fmt_groups(tt.place_departures("paris", at("2026-07-01T08:00")))
+    check("accueil Paris 08:00 : cartes, destinations et premiers départs", [(l, k, t, s, b, x[:2]) for l, k, t, s, b, x in got], [
+        ("RER_B", "sector:ROISSY", cdg2, "ok", None, ["08:00:00", "08:06:00"]),
+        ("BUS_351", "sector:ROISSY", "Roissypôle", "ok", None, ["08:05:00", "08:33:00"]),
+        ("BUS_350", "sector:ROISSY", "Roissypôle", "ok", None, ["08:12:00", "08:27:00"]),
+        ("BUS_N140", "sector:ROISSY", "Gare de Roissypole - Aéroport CDG 1", "ok", "service_ended", []),
+        ("BUS_N143", "sector:ROISSY", "Gare de Roissypole - Aéroport CDG 1 (B2)", "ok", "service_ended", []),
+        ("METRO_14", "sector:ORLY", "Aéroport d'Orly", "ok", None, ["08:00:28", "08:02:08"]),
+        ("BUS_N131", "sector:ORLY", "Gare de Brétigny Place", "ok", "service_ended", []),
+        ("BUS_N139", "sector:ORLY", "Gare de Corbeil-Essonnes Henri Barbusse", "ok", "service_ended", []),
+        ("BUS_N22", "sector:ORLY", "Juvisy RER", "ok", "service_ended", []),
+        ("BUS_N31", "sector:ORLY", "Aéroport Orly 4", "ok", "service_ended", []),
+        ("RER_B", "sector:BOURGET", cdg2, "ok", None, ["08:00:00", "08:03:00"]),
+        ("BUS_152", "sector:BOURGET", "ZAC Les Tulipes Nord", "ok", None, ["08:10:00", "08:20:00"]),
+        ("BUS_350", "sector:BOURGET", "Roissypôle", "ok", None, ["08:12:00", "08:27:00"]),
+        ("BUS_N42", "sector:BOURGET", "Garonor", "ok", "service_ended", []),
+        ("BUS_A01", "sector:BEAUVAIS", "Aéroport Paris Beauvais", "ok", None, ["08:00:00", "08:30:00"]),
+        ("BUS_A04", "sector:BEAUVAIS", "Aéroport Paris Beauvais", "ok", None, ["09:00:00", "11:00:00"]),
+    ])
+    # RER B depuis la gare du Nord : la carte Roissy ne garde que les trains de l'aéroport ; la carte Le Bourget
+    # garde tous les trains qui s'y arrêtent (aéroport, Mitry-Claye, Aulnay-sous-Bois) et écarte les autres (R-43)
+    rer = {k: x for l, k, t, s, b, x in got if l == "RER_B"}
+    dests = {k: sorted({tt.terminus(p.pattern_id) for p in g.board.passages}) for g in tt.place_departures(
+        "paris", at("2026-07-01T08:00")) if g.line == "RER_B" for k in [g.key]}
+    check("accueil Paris : RER B vers Roissy, trains de l'aéroport seulement", dests["sector:ROISSY"], [cdg2])
+    check("accueil Paris : RER B vers Le Bourget, trains de l'aéroport, de Mitry-Claye et d'Aulnay-sous-Bois",
+          dests["sector:BOURGET"], sorted([cdg2, "Mitry - Claye", "Aulnay-sous-Bois"]))
+    check("accueil Paris : RER B, quatre départs vers chaque aéroport",
+          (rer["sector:ROISSY"], rer["sector:BOURGET"]),
+          (["08:00:00", "08:06:00", "08:12:00", "08:18:00"], ["08:00:00", "08:03:00", "08:06:00", "08:09:00"]))
+    # Noctilien : depuis Paris, les départs de la carte suivent le cas réel de l'étape 1 (spec R-70)
+    noct = json.loads((CASES / "noctilien_boarding.json").read_text(encoding="utf-8"))
+    night = {g.line: [datetime.fromtimestamp(x.epoch, PARIS).strftime("%H:%M") for x in g.board.passages]
+             for g in tt.place_departures("paris", at("2026-07-02T01:30")) if g.line in noct["lines"]}
+    for line, v in noct["lines"].items():
+        expected = [t for t in v["nights"]["semaine"]["gtfs"] if t >= "01:30"][:4]
+        check(f"accueil Paris 01:30 : {line} comme la grille GTFS de l'étape 1", night.get(line), expected)
+    # Terminal 5 (ex-2E) : la N2 ne le dessert que le soir (R-61) ; la règle v1 dit « Service terminé » (D-6)
+    check("accueil Terminal 5 à 08:00", _fmt_groups(tt.place_departures("cdg-t2e", at("2026-07-01T08:00"))), [
+        ("BUS_N1", "direction:1", "Terminal 2 F", "ok", None, ["08:07:00", "08:15:00", "08:23:00", "08:31:00"]),
+        ("BUS_N2", "direction:0", "Terminal 2 F", "ok", "service_ended", []),
+        ("BUS_N2", "direction:1", "Terminal 2 G", "ok", "service_ended", []),
+    ])
+    # R-55 : un passage théorique reste affiché jusqu'à 59 s après son heure (« 0 min »), puis disparaît
+    def first(iso):
+        g = [g for g in tt.place_departures("paris", at(iso)) if g.key == "sector:ROISSY" and g.line == "RER_B"][0]
+        return datetime.fromtimestamp(g.board.passages[0].epoch, PARIS).strftime("%H:%M:%S")
+    check("R-55 : départ de 08:00:00 encore affiché à 08:00:59", first("2026-07-01T08:00:59"), "08:00:00")
+    check("R-55 : départ de 08:00:00 retiré à 08:01:00", first("2026-07-01T08:01:00"), "08:06:00")
+
+
 # --------------------------------------------------------------------------- 3. performance
 def performance(tt: Timetable) -> dict:
     busiest = tt.con.execute(
@@ -322,6 +449,8 @@ def main() -> int:
         adjustments_structure(tt)
         adjustments_351(tt, db)
         place_names(tt)
+        home_structure(tt, db)
+        home_june(tt)
         perf = performance(tt)
         tt.con.close()
     for f in failures:

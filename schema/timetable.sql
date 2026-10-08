@@ -1,6 +1,9 @@
--- Base d'horaires Airport Connect — schéma 1 (pas encore publié : il peut encore changer sans montée de version)
+-- Base d'horaires Airport Connect — schéma 2
 -- Fichier SQLite en lecture seule, produit côté serveur par tools/pipeline/build_timetable.py,
 -- téléchargé par l'application (spec § 17). PRAGMA user_version = version du schéma.
+-- Historique : 1 (8 octobre 2026), première publication ; 2 (8 octobre 2026), lieu « ville » (Paris) et ses
+-- points de montée (place.kind, place.sort_order, place_boarding ; spec R-100, décision D-13).
+-- L'application lit exactement une version : une base d'une autre version n'est jamais adoptée (ADR-2).
 -- Conventions :
 --   * identifiants internes INTEGER compacts, attribués de façon déterministe (tri des identifiants GTFS) ;
 --   * identifiants externes conservés tels quels (route_id, stop_id GTFS) pour PRIM/Navitia
@@ -8,7 +11,7 @@
 --   * heures en secondes depuis « midi moins 12 h » du jour de service (norme GTFS), > 86 400 autorisé ;
 --   * jours de service : bit i de service.days = actif le jour meta.base_date + i (fenêtre ≤ 62 jours).
 
-PRAGMA user_version = 1;
+PRAGMA user_version = 2;
 
 CREATE TABLE meta (
   key   TEXT PRIMARY KEY,
@@ -71,12 +74,15 @@ CREATE INDEX stop_point_area ON stop_point(stop_area_id);
 CREATE TABLE place (
   id          TEXT PRIMARY KEY,
   parent_id   TEXT REFERENCES place(id),
-  sector      TEXT NOT NULL CHECK (sector IN ('ROISSY','ORLY','BOURGET','BEAUVAIS')),
+  kind        TEXT NOT NULL CHECK (kind IN ('airport','city')),
+  sector      TEXT CHECK (sector IN ('ROISSY','ORLY','BOURGET','BEAUVAIS')),   -- NULL pour un lieu « ville »
+  sort_order  INTEGER NOT NULL UNIQUE,               -- ordre du sélecteur de l'accueil (ordre de data/places.json)
   label_fr    TEXT NOT NULL,
   label_en    TEXT NOT NULL,
   short_label TEXT NOT NULL,
   former_fr   TEXT,                                  -- ancien nom affiché en second (R-35), ex. « ex-Terminal 2E »
   former_en   TEXT,
+  CHECK ((kind = 'airport') = (sector IS NOT NULL)),
   CHECK ((former_fr IS NULL) = (former_en IS NULL))
 ) WITHOUT ROWID;
 
@@ -86,6 +92,15 @@ CREATE TABLE place_stop_point (
   PRIMARY KEY (place_id, stop_point_id)
 ) WITHOUT ROWID;
 -- un rattachement par zone d'arrêt est développé en ses quais à la génération
+
+-- Lieu « ville » (Paris) : un point de montée par ligne (spec R-100, décision D-13). Les départs retenus à
+-- l'accueil sont ceux qui desservent ensuite, en descente autorisée, un quai d'un lieu aéroportuaire.
+CREATE TABLE place_boarding (
+  place_id     TEXT    NOT NULL REFERENCES place(id),
+  line_id      INTEGER NOT NULL REFERENCES line(id),
+  stop_area_id INTEGER NOT NULL REFERENCES stop_area(id),
+  PRIMARY KEY (place_id, line_id)
+) WITHOUT ROWID;
 
 CREATE TABLE service (
   id   INTEGER PRIMARY KEY,

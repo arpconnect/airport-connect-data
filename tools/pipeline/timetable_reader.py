@@ -1,10 +1,12 @@
 """
-Lecteur de référence de la base d'horaires (schéma 1).
+Lecteur de référence de la base d'horaires (schéma 2).
 
-Il fixe, en Python exécutable, les requêtes que l'application Kotlin devra reproduire :
-prochains passages à un ou plusieurs quais pour une ligne, avec la règle de frontière de
-service R-56, la règle d'absence de données R-153, l'expiration R-173 et les aménagements
-de desserte R-90 à R-93.
+Il fixe, en Python exécutable, les requêtes que l'application Kotlin reproduit à l'identique
+(app/src/main/java/com/airportconnect/app/data/timetable/TimetableReader.kt, vérifié par les cas de
+tools/app/reader_goldens.py) : prochains passages à un ou plusieurs quais pour une ligne, avec la règle
+de frontière de service R-56, la conservation des passages théoriques R-55, la règle d'absence de données
+R-153, l'expiration R-173 et les aménagements de desserte R-90 à R-93 ; départs d'un lieu pour l'accueil
+(R-100, décision D-13).
 
 Toutes les heures sont calculées selon la norme GTFS : midi local moins 12 h + secondes (R-58).
 """
@@ -12,6 +14,7 @@ Toutes les heures sont calculées selon la norme GTFS : midi local moins 12 h + 
 from __future__ import annotations
 
 import sqlite3
+from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from typing import Iterable, Optional
@@ -20,6 +23,13 @@ from zoneinfo import ZoneInfo
 REVEAL_MIN = 15          # R-56
 NOT_STARTED_MIN = 60     # R-56
 LIMIT = 4                # R-56
+RETAIN_S = 59            # R-55 : un passage théorique reste affiché (« 0 min ») jusqu'à 59 s après son heure
+SECTORS = ("ROISSY", "ORLY", "BOURGET", "BEAUVAIS")
+
+
+def kept(epoch: float, now_s: float) -> bool:
+    """R-55 : s, secondes avant le départ tronquées vers zéro ; un passage théorique est retiré si s < -59."""
+    return int(epoch - now_s) >= -RETAIN_S
 
 
 @dataclass(frozen=True)
@@ -27,10 +37,11 @@ class Passage:
     epoch: float                 # secondes Unix
     service_date: date
     departure_s: int             # secondes GTFS dans le jour de service (clé de rattachement temps réel, R-152)
-    headsign: str
+    headsign: str                # trip_headsign GTFS : nom de mission pour les RER (« ELFE »), destination pour les bus
     stop_point: str              # stop_id GTFS
     pattern_id: int
     seq: int
+    destination: str             # nom GTFS du dernier quai de la mission : la destination affichée (R-30)
 
 
 @dataclass(frozen=True)
@@ -68,6 +79,17 @@ class StopBoard:
     replacements: list = field(default_factory=list)   # list[Replacement] si status == "not_served"
 
 
+@dataclass
+class DepartureGroup:
+    """Une carte de l'accueil : une ligne et un sens (lieu aéroportuaire) ou un aéroport desservi (lieu ville)."""
+    line: str                    # code de la ligne (RER_B…)
+    key: str                     # "direction:0", "direction:1", "direction:none" ; "sector:ROISSY"… pour un lieu ville
+    sector: Optional[str]        # aéroport desservi (lieu ville), None pour un lieu aéroportuaire
+    stop_area: Optional[str]     # point de montée (lieu ville, parent_station GTFS), None sinon
+    title: str                   # destination du premier passage affiché, sinon la plus fréquente des missions retenues
+    board: StopBoard
+
+
 class Timetable:
     def __init__(self, path: str) -> None:
         self.con = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
@@ -77,6 +99,19 @@ class Timetable:
         self.valid_start = date.fromisoformat(meta["validity_start"])
         self.valid_end = date.fromisoformat(meta["validity_end"])
         self.meta = meta
+        self._terminus = None
+
+    def terminus(self, pattern_id: int) -> str:
+        """Nom GTFS du dernier quai d'une mission : destination affichée (R-30). Les girouettes GTFS des RER
+        sont des noms de mission (« ELFE », « EPAU ») et ne sont jamais affichées."""
+        if self._terminus is None:
+            self._terminus = dict(self.con.execute(
+                """SELECT ps.pattern_id, sp.name FROM pattern_stop ps JOIN stop_point sp ON sp.id = ps.stop_point_id
+                   WHERE ps.seq = (SELECT MAX(seq) FROM pattern_stop z WHERE z.pattern_id = ps.pattern_id)"""))
+        return self._terminus[pattern_id]
+
+    def trip_count(self, pattern_id: int) -> int:
+        return self.con.execute("SELECT COUNT(*) FROM trip WHERE pattern_id = ?", (pattern_id,)).fetchone()[0]
 
     # -- conversions -------------------------------------------------------------------
     def service_day_origin(self, d: date) -> float:
@@ -112,6 +147,12 @@ class Timetable:
         label_fr, label_en, short, former_fr, former_en = row
         return {"label_fr": label_fr, "label_en": label_en, "short_label": short,
                 "secondary_fr": former_fr, "secondary_en": former_en}
+
+    def places(self) -> list:
+        """Lieux du sélecteur de l'accueil, dans l'ordre de data/places.json (sort_order)."""
+        cols = ("id", "parent_id", "kind", "sector", "label_fr", "label_en", "short_label", "former_fr", "former_en")
+        return [dict(zip(cols, r)) for r in self.con.execute(
+            f"SELECT {', '.join(cols)} FROM place ORDER BY sort_order")]
 
     def stop_points_named(self, name: str, line_code: str) -> list:
         return [r[0] for r in self.con.execute(
@@ -190,11 +231,14 @@ class Timetable:
                   AND ((s.days >> ?) & 1) = 1
                   {"AND ps.pickup != 1" if pickup_only else ""}""",
             (*sps, line_code, idx)).fetchall()
-        return [Passage(self.epoch(d, dep), d, dep, h, sp, pid, seq) for dep, h, sp, pid, seq in rows]
+        return [Passage(self.epoch(d, dep), d, dep, h, sp, pid, seq, self.terminus(pid)) for dep, h, sp, pid, seq in rows]
 
     def board(self, line_code: str, stop_points: Iterable[str], now: datetime, limit: int = LIMIT,
-              headsign_filter=None) -> StopBoard:
-        """Prochains passages à afficher pour un quai (ou un groupe de quais) d'une ligne."""
+              headsign_filter=None, allowed: Optional[frozenset] = None) -> StopBoard:
+        """Prochains passages à afficher pour un quai (ou un groupe de quais) d'une ligne.
+
+        allowed : si fourni, seuls les passages dont le couple (mission, rang) y figure sont retenus
+        (départs d'un lieu, R-100) ; la ligne n'est alors « desservie » que par ces couples."""
         today = now.astimezone(self.tz).date()
         if today < self.valid_start or today > self.valid_end:
             return StopBoard(status="base_expired")                               # R-173
@@ -216,7 +260,7 @@ class Timetable:
             sps = [sp for sp in sps if sp not in {r.stop_point for r in dropped}]
             if not sps:
                 return StopBoard(status="not_served", adjustment_id=first_adj, replacements=dropped)
-        board = self._timetable_board(line_code, sps, days, now_s, limit, headsign_filter)
+        board = self._timetable_board(line_code, sps, days, now_s, limit, headsign_filter, allowed)
         if board.status in ("ok", "no_service_soon"):
             # R-92 : des missions du GTFS contournent encore ces quais. Si l'une circule sur la plage
             # couverte par l'affichage, la liste peut manquer des bus : on le signale, et on ne conclut
@@ -233,36 +277,43 @@ class Timetable:
         return board
 
     def _timetable_board(self, line_code: str, sps: list, days: list, now_s: float, limit: int,
-                         headsign_filter) -> StopBoard:
+                         headsign_filter, allowed: Optional[frozenset] = None) -> StopBoard:
         events = []
         for d in days:
             events += self.passages_on_service_day(line_code, sps, d)
+        if allowed is not None:
+            events = [e for e in events if (e.pattern_id, e.seq) in allowed]
         if headsign_filter:
             events = [e for e in events if headsign_filter(e.headsign)]
-        # dé-doublonnage d'affichage (R-62) : même quai, même heure, même girouette
+        # dé-doublonnage d'affichage (R-62) : même quai, même heure, même girouette ; le passage gardé est le
+        # premier dans un ordre total (heure, quai, girouette, mission, rang), indépendant du plan de requête
         uniq = {}
-        for e in events:
+        for e in sorted(events, key=lambda e: (e.epoch, e.stop_point, e.headsign, e.pattern_id, e.seq)):
             uniq.setdefault((e.stop_point, e.epoch, e.headsign), e)
-        events = sorted(uniq.values(), key=lambda e: (e.epoch, e.stop_point, e.headsign))
+        events = list(uniq.values())
         if not events:
             # Base valide : soit la ligne ne dessert pas ces quais (donnée absente, R-153),
             # soit elle les dessert mais aucun passage n'est prévu sur la fenêtre J-1 → J+1.
-            marks = ",".join("?" * len(sps)) or "''"
-            served = self.con.execute(
-                f"""SELECT 1 FROM stop_point sp JOIN pattern_stop ps ON ps.stop_point_id = sp.id
-                    JOIN pattern p ON p.id = ps.pattern_id JOIN line l ON l.id = p.line_id
-                    WHERE sp.gtfs_id IN ({marks}) AND l.code = ? LIMIT 1""", (*sps, line_code)).fetchone()
+            if allowed is not None:
+                served = bool(allowed)
+            else:
+                marks = ",".join("?" * len(sps)) or "''"
+                served = self.con.execute(
+                    f"""SELECT 1 FROM stop_point sp JOIN pattern_stop ps ON ps.stop_point_id = sp.id
+                        JOIN pattern p ON p.id = ps.pattern_id JOIN line l ON l.id = p.line_id
+                        WHERE sp.gtfs_id IN ({marks}) AND l.code = ? LIMIT 1""", (*sps, line_code)).fetchone() is not None
             return StopBoard(status="no_service_soon" if served else "no_data")
         blocks = {}
         for e in events:
             blocks.setdefault(e.service_date, []).append(e)
         ordered = sorted(blocks.values(), key=lambda b: b[0].epoch)
         reveal, window = REVEAL_MIN * 60, NOT_STARTED_MIN * 60
-        active = next((b for b in ordered if b[0].epoch - reveal <= now_s <= b[-1].epoch), None)
+        # R-55 : un passage théorique reste visible jusqu'à 59 s après son heure (« 0 min »)
+        active = next((b for b in ordered if b[0].epoch - reveal <= now_s and kept(b[-1].epoch, now_s)), None)
         upcoming = next((b for b in ordered if now_s < b[0].epoch), None)
-        past = next((b for b in reversed(ordered) if now_s > b[-1].epoch), None)
+        past = next((b for b in reversed(ordered) if not kept(b[-1].epoch, now_s)), None)
         selected = active or (upcoming if upcoming and upcoming[0].epoch - now_s <= reveal else None)
-        visible = [e for e in selected if e.epoch >= now_s][:limit] if selected else []
+        visible = [e for e in selected if kept(e.epoch, now_s)][:limit] if selected else []
         board = StopBoard(status="ok", passages=visible)
         if not visible:
             if upcoming is not None:
@@ -271,3 +322,91 @@ class Timetable:
             elif past is not None:
                 board.boundary = "service_ended"
         return board
+
+    # -- accueil : départs d'un lieu (R-100, décision D-13) ------------------------------------
+    def place_departures(self, place_id: str, now: datetime) -> list:
+        """Cartes de l'accueil pour un lieu, dans l'ordre d'affichage.
+
+        - Lieu aéroportuaire : une carte par ligne et par sens (direction_id GTFS), pour les missions qui
+          permettent de monter à un quai du lieu ou de ses sous-lieux ; triées par prochain départ.
+        - Lieu ville (Paris) : pour chaque point de montée (ligne, zone d'arrêt), une carte par aéroport
+          desservi ensuite en descente autorisée ; groupées par aéroport (ROISSY, ORLY, BOURGET, BEAUVAIS),
+          puis triées par prochain départ. Un point de montée que la ligne ne dessert plus vers un aéroport
+          garde ses cartes (une par secteur de la ligne), en « Horaires indisponibles » (R-153).
+        Une carte sans passage visible vient après celles qui en ont, dans l'ordre des lignes du secteur."""
+        row = self.con.execute("SELECT kind, sector FROM place WHERE id = ?", (place_id,)).fetchone()
+        if row is None:
+            raise KeyError(f"lieu inconnu dans la base : {place_id}")
+        kind, place_sector = row
+        groups = {}      # (code, key) -> {"sector", "stop_area", "allowed": {(mission, rang)}, "sps": {quai}, "patterns": {mission}}
+
+        def add(code, key, sector, area, pid, seq, sp):
+            g = groups.setdefault((code, key), {"sector": sector, "stop_area": area, "allowed": set(),
+                                                "sps": set(), "patterns": set()})
+            if pid is not None:
+                g["allowed"].add((pid, seq))
+                g["sps"].add(sp)
+                g["patterns"].add(pid)
+
+        if kind == "airport":
+            for code, direction, pid, seq, sp in self.con.execute(
+                    """SELECT DISTINCT l.code, p.direction, ps.pattern_id, ps.seq, sp.gtfs_id
+                       FROM place_stop_point x JOIN stop_point sp ON sp.id = x.stop_point_id
+                       JOIN pattern_stop ps ON ps.stop_point_id = sp.id AND ps.pickup != 1
+                       JOIN pattern p ON p.id = ps.pattern_id JOIN line l ON l.id = p.line_id
+                       WHERE x.place_id = ? OR x.place_id IN (SELECT id FROM place WHERE parent_id = ?)""",
+                    (place_id, place_id)):
+                add(code, f"direction:{'none' if direction is None else direction}", None, None, pid, seq, sp)
+        else:
+            boarding = self.con.execute(
+                """SELECT l.code, a.gtfs_id FROM place_boarding pb JOIN line l ON l.id = pb.line_id
+                   JOIN stop_area a ON a.id = pb.stop_area_id WHERE pb.place_id = ?""", (place_id,)).fetchall()
+            for code, area in boarding:
+                found = False
+                for sector, pid, seq, sp in self.con.execute(
+                        """SELECT DISTINCT pl.sector, b.pattern_id, b.seq, bp.gtfs_id
+                           FROM stop_area a JOIN stop_point bp ON bp.stop_area_id = a.id
+                           JOIN pattern_stop b ON b.stop_point_id = bp.id AND b.pickup != 1
+                           JOIN pattern p ON p.id = b.pattern_id JOIN line l ON l.id = p.line_id
+                           JOIN pattern_stop d ON d.pattern_id = p.id AND d.seq > b.seq AND d.dropoff != 1
+                           JOIN place_stop_point ps ON ps.stop_point_id = d.stop_point_id
+                           JOIN place pl ON pl.id = ps.place_id AND pl.kind = 'airport'
+                           WHERE a.gtfs_id = ? AND l.code = ?""", (area, code)):
+                    found = True
+                    add(code, f"sector:{sector}", sector, area, pid, seq, sp)
+                if not found:
+                    for (sector,) in self.con.execute(
+                            """SELECT s.sector FROM line_sector s JOIN line l ON l.id = s.line_id
+                               WHERE l.code = ? ORDER BY s.sector""", (code,)):
+                        add(code, f"sector:{sector}", sector, area, None, None, None)
+
+        out = []
+        for (code, key), g in groups.items():
+            board = self.board(code, sorted(g["sps"]), now, allowed=frozenset(g["allowed"]))
+            if board.passages:
+                title = board.passages[0].destination
+            elif g["patterns"]:
+                # destination la plus fréquente des missions retenues (nombre de trajets), puis ordre alphabétique
+                weights = defaultdict(int)
+                for pid in g["patterns"]:
+                    weights[self.terminus(pid)] += self.trip_count(pid)
+                title = sorted(weights.items(), key=lambda x: (-x[1], x[0]))[0][0]
+            else:
+                title = ""
+            out.append(DepartureGroup(code, key, g["sector"], g["stop_area"], title, board))
+
+        sort_sector = place_sector
+        orders = {}
+        for code, sector, order in self.con.execute(
+                "SELECT l.code, s.sector, s.sort_order FROM line_sector s JOIN line l ON l.id = s.line_id"):
+            orders[(code, sector)] = order
+
+        def line_rank(grp):
+            order = orders.get((grp.line, grp.sector or sort_sector))
+            return (order is None, order if order is not None else 0, grp.line)
+
+        def rank(grp):
+            first = grp.board.passages[0].epoch if grp.board.passages else None
+            return (SECTORS.index(grp.sector) if grp.sector else 0,
+                    first is None, first if first is not None else 0.0, *line_rank(grp), grp.key)
+        return sorted(out, key=rank)

@@ -27,10 +27,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Vérifier les fixtures, les fichiers de données et les aménagements
+      - name: Vérifier les fixtures, les fichiers de données, les aménagements et les lieux
         run: |
           python3 -I tools/check_fixtures.py
           python3 -I tests/test_adjustments_pipeline.py
+          python3 -I tests/test_places_pipeline.py
 
       - name: Télécharger le GTFS IDFM
         run: |

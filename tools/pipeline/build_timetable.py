@@ -36,7 +36,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_PATH = ROOT / "schema" / "timetable.sql"
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 MAX_WINDOW_DAYS = 62            # bits utilisables dans un INTEGER SQLite signé (63) avec marge
 MIN_REMAINING_DAYS_WARN = 14    # alerte si la validité restante est plus courte
 MAX_TRIP_LOSS_RATIO = 0.5       # une ligne qui perd plus de la moitié de ses trajets bloque la publication
@@ -121,7 +121,7 @@ def read_feed(zip_path: Path, lines_doc: dict, places_doc: dict, report: Report)
 
     wanted_points = {st[1] for v in stop_times.values() for st in v}
     for p in places_doc["places"]:
-        wanted_points.update(p["stop_points"])
+        wanted_points.update(p.get("stop_points", []))
     stops_all = {}
     for s in _rows(z, "stops.txt"):
         stops_all[s["stop_id"]] = s
@@ -177,6 +177,7 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
 
     # Lignes (ordre déterministe : code)
     line_id = {}
+    trips_line_codes = {l["id"] for l in lines_doc["lines"] if l["state"] == "active"}
     for i, l in enumerate(sorted(lines_doc["lines"], key=lambda x: x["id"]), start=1):
         line_id[l["id"]] = i
         r = routes.get(l["idfm_route_id"]) if l["idfm_route_id"] else None
@@ -203,7 +204,8 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
         if s:
             areas_needed.add(s["parent_station"] or sp)
     for p in places_doc["places"]:
-        areas_needed.update(p["stop_areas"])
+        areas_needed.update(p.get("stop_areas", []))
+        areas_needed.update(b["stop_area"] for b in p.get("boarding", []))
     published_adj = [a for a in adjustments_doc["adjustments"] if a["status"] == "published"]
     for a in published_adj:                      # zones de report : présentes dans la base si le GTFS les connaît
         for ns in a["not_served"]:
@@ -222,7 +224,8 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
     for sid, s in stops_all.items():
         if s.get("parent_station"):
             children[s["parent_station"]].append(sid)
-    place_area_points = {sp for p in places_doc["places"] for a in p["stop_areas"] for sp in children.get(a, []) if sp in wanted_points}
+    place_area_points = {sp for p in places_doc["places"] for a in p.get("stop_areas", []) for sp in children.get(a, [])
+                         if sp in wanted_points}
     for i, sp in enumerate(sorted(wanted_points | place_area_points), start=1):
         s = stops_all.get(sp)
         if not s:
@@ -234,16 +237,50 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
         point_id[sp] = i
         cur.execute("INSERT INTO stop_point VALUES (?,?,?,?,?,?)", (i, sp, area_id[parent], s["stop_name"], float(s["stop_lat"]), float(s["stop_lon"])))
 
-    # Lieux
+    # Lieux : « airport » (quais propres) ou « city » (Paris : un point de montée par ligne, R-100, D-13).
+    # L'ordre de data/places.json est celui du sélecteur de l'accueil (sort_order).
+    order = {p["id"]: i for i, p in enumerate(places_doc["places"])}
+    city_boarding = []                                   # (lieu, code ligne, zone d'arrêt GTFS, nom attendu)
     for p in sorted(places_doc["places"], key=lambda x: x["id"]):
+        kind = p.get("kind")
+        if kind not in ("airport", "city"):
+            report.error("place_kind_invalid", {"place": p["id"], "kind": kind})
+            continue
         former = (p.get("former_fr") or None, p.get("former_en") or None)
         if (former[0] is None) != (former[1] is None):
             report.error("place_former_incomplete", p["id"])     # bloque la publication ; base écrite sans ancien nom
             former = (None, None)
-        cur.execute("INSERT INTO place VALUES (?,?,?,?,?,?,?,?)", (p["id"], p.get("parent"), p["sector"], p["label_fr"], p["label_en"],
-                    p["short_label"], *former))
-        pts = set(p["stop_points"])
-        for a in p["stop_areas"]:
+        if kind == "city" and (p.get("sector") or p.get("stop_areas") or p.get("stop_points") or p.get("parent")):
+            report.error("place_city_invalid", {"place": p["id"], "detail": "un lieu ville n'a ni secteur, ni arrêts, ni parent"})
+            continue
+        if kind == "airport" and (not p.get("sector") or p.get("boarding")):
+            report.error("place_airport_invalid", {"place": p["id"], "detail": "un lieu aéroportuaire a un secteur et pas de point de montée"})
+            continue
+        cur.execute("INSERT INTO place VALUES (?,?,?,?,?,?,?,?,?,?)", (
+            p["id"], p.get("parent"), kind, p.get("sector") if kind == "airport" else None, order[p["id"]],
+            p["label_fr"], p["label_en"], p["short_label"], *former))
+        if kind == "city":
+            boarding = p.get("boarding") or []
+            if not boarding:
+                report.error("place_without_boarding", p["id"])
+            seen = set()
+            for b in boarding:
+                code, area = b.get("line"), b.get("stop_area")
+                if code in seen:
+                    report.error("place_boarding_duplicate", {"place": p["id"], "line": code})
+                    continue
+                seen.add(code)
+                if code not in line_id or code not in trips_line_codes:
+                    report.error("place_boarding_line_unknown", {"place": p["id"], "line": code})
+                    continue
+                if area not in area_id:
+                    report.error("place_boarding_stop_missing", {"place": p["id"], "line": code, "stop_area": area})
+                    continue
+                cur.execute("INSERT INTO place_boarding VALUES (?,?,?)", (p["id"], line_id[code], area_id[area]))
+                city_boarding.append((p["id"], code, area, b.get("name")))
+            continue
+        pts = set(p.get("stop_points", []))
+        for a in p.get("stop_areas", []):
             pts.update(c for c in children.get(a, []) if c in point_id)
         if not pts:
             report.error("place_without_stop", p["id"])
@@ -308,6 +345,7 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
     # une incohérence avec le GTFS du jour produit une alerte et l'élément concerné est ignoré.
     published = apply_adjustments(cur, published_adj, line_id, area_id, point_id, stops_all, children,
                                   patterns, trip_rows, report)
+    check_city_boarding(cur, city_boarding, stops_all, report)
 
     con.commit()
     # Contrôles d'intégrité de la base produite
@@ -348,6 +386,27 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
             "trips_per_line": dict(sorted(trips_per_line.items())),
         },
     }
+
+
+def check_city_boarding(cur, city_boarding: list, stops_all: dict, report: Report) -> None:
+    """Points de montée d'un lieu « ville » (R-100, D-13), contrôlés sur le GTFS du jour, sans bloquer :
+    un point de montée que la ligne ne dessert plus vers un aéroport reste dans la base, l'accueil y affiche
+    « Horaires indisponibles » (R-153), et l'alerte « boarding_not_served » demande de corriger data/places.json."""
+    for place, code, area, name in city_boarding:
+        served = cur.execute(
+            """SELECT 1 FROM pattern p JOIN line l ON l.id = p.line_id
+               JOIN pattern_stop b ON b.pattern_id = p.id AND b.pickup != 1
+               JOIN stop_point bp ON bp.id = b.stop_point_id JOIN stop_area ba ON ba.id = bp.stop_area_id
+               JOIN pattern_stop d ON d.pattern_id = p.id AND d.seq > b.seq AND d.dropoff != 1
+               JOIN place_stop_point ps ON ps.stop_point_id = d.stop_point_id
+               JOIN place pl ON pl.id = ps.place_id AND pl.kind = 'airport'
+               WHERE l.code = ? AND ba.gtfs_id = ? LIMIT 1""", (code, area)).fetchone()
+        if not served:
+            report.warn("boarding_not_served", {"place": place, "line": code, "stop_area": area})
+        gtfs_name = stops_all.get(area, {}).get("stop_name")
+        if name and gtfs_name and name != gtfs_name:
+            report.warn("boarding_name_differs", {"place": place, "line": code, "stop_area": area,
+                                                  "data": name, "gtfs": gtfs_name})
 
 
 def _distance_m(a: dict, b: dict) -> int:
