@@ -329,6 +329,48 @@ def android_resources() -> None:
     for path, data in sorted(files.items()):
         rel = path.relative_to(gen.ROOT).as_posix()
         check("app (généré)", rel, path.exists() and path.read_bytes() == data, True)
+    app_timetable()
+
+
+def _load_tool(name: str):
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(name, ROOT / "tools" / "app" / f"{name}.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def app_timetable() -> None:
+    """Lot 1 : schéma SQLDelight et version lue par l'application à jour (ADR-3), base embarquée conforme à son
+    manifeste et au schéma, résultats attendus du lecteur calculés sur cette base, textes FR et EN appariés."""
+    import gzip
+    import re
+    import xml.etree.ElementTree as ET
+    sq = _load_tool("gen_sqldelight")
+    for path, content in sorted(sq.render().items()):
+        check("app (généré)", path.relative_to(ROOT).as_posix(),
+              path.exists() and path.read_text(encoding="utf-8") == content, True)
+    assets = ROOT / "app/src/main/assets/timetable"
+    m = json.loads((assets / "manifest.json").read_text(encoding="utf-8"))
+    gz = (assets / "timetable.sqlite.gz").read_bytes()
+    raw = gzip.decompress(gz)
+    version = int(re.search(r"^PRAGMA user_version = (\d+);$", (ROOT / "schema/timetable.sql").read_text(encoding="utf-8"), re.M).group(1))
+    check("base embarquée", "schéma du manifeste", (m["schema"], m["db_schema_version"]),
+          ("airport-connect/timetable-manifest@1", version))
+    check("base embarquée", "taille et empreinte du fichier compressé",
+          (len(gz), hashlib.sha256(gz).hexdigest()), (m["file"]["bytes_gzip"], m["file"]["sha256_gzip"]))
+    check("base embarquée", "taille et empreinte de la base",
+          (len(raw), hashlib.sha256(raw).hexdigest()), (m["file"]["bytes"], m["file"]["sha256"]))
+    check("base embarquée", "PRAGMA user_version", int.from_bytes(raw[60:64], "big"), version)
+    goldens = _load_tool("reader_goldens")
+    out = goldens.OUT
+    check("app (généré)", out.relative_to(ROOT).as_posix(),
+          out.exists() and out.read_text(encoding="utf-8") == goldens.render(), True)
+    names = {}
+    for lang in ("values", "values-en"):
+        tree = ET.parse(ROOT / "app/src/main/res" / lang / "strings.xml")
+        names[lang] = {e.get("name") for e in tree.getroot() if e.get("translatable") != "false"}
+    check("app (textes)", "français et anglais : mêmes clés", sorted(names["values"] ^ names["values-en"]), [])
 
 
 def _iso_or_none(v) -> bool:
