@@ -1,0 +1,1725 @@
+{
+  "schema": "airport-connect/plans-catalogue@1",
+  "version": "527b00f0dfee695c",
+  "generated_at": "2026-10-08T12:34:19+00:00",
+  "distribution": "link",
+  "counts": {
+    "ok": 45,
+    "kept_previous": 0,
+    "error": 4,
+    "no_plan": 2
+  },
+  "plans": [
+    {
+      "id": "BUS_133",
+      "kind": "line",
+      "lines": [
+        "BUS_133"
+      ],
+      "status": "ok",
+      "title": "Plan ligne 133",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260422T112805Z-1c4c5069-ebf7-45b1-ba73-f8b2e87be2f9.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 600847,
+        "sha256": "26e69ad332d393271947680732d6420585a76832dfc9599a92ab62d48b5d1b4a",
+        "pages": null,
+        "width": null,
+        "height": null,
+        "unit": "pt",
+        "date": "2026-04-22",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260422T112805Z-1c4c5069-ebf7-45b1-ba73-f8b2e87be2f9.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Wed, 22 Apr 2026 11:28:05 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_143",
+      "kind": "line",
+      "lines": [
+        "BUS_143"
+      ],
+      "status": "ok",
+      "title": "Plan ligne 143",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260422T113001Z-ce905428-3c57-49c8-b523-94344a5eff64.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 1246389,
+        "sha256": "8f0cba6f20fa6762c14e1f85047937b9b3dbeec3ab7108945ed5c081639b02dc",
+        "pages": null,
+        "width": null,
+        "height": null,
+        "unit": "pt",
+        "date": "2026-04-22",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260422T113001Z-ce905428-3c57-49c8-b523-94344a5eff64.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Wed, 22 Apr 2026 11:30:01 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_148",
+      "kind": "line",
+      "lines": [
+        "BUS_148"
+      ],
+      "status": "ok",
+      "title": "Plan ligne 148",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260422T113656Z-19adf904-ece8-4f54-a730-1bcf134e29cf.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 595714,
+        "sha256": "d9a93659f5f699681aebebe36d969619cea993fa7b138ebe06f14900a177ac3f",
+        "pages": null,
+        "width": null,
+        "height": null,
+        "unit": "pt",
+        "date": "2026-04-22",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260422T113656Z-19adf904-ece8-4f54-a730-1bcf134e29cf.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Wed, 22 Apr 2026 11:36:56 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_152",
+      "kind": "line",
+      "lines": [
+        "BUS_152"
+      ],
+      "status": "ok",
+      "title": "Plan ligne 152",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260422T114123Z-2e253735-8b22-471f-a1df-a670b77ef00b.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 545427,
+        "sha256": "75c44874ac933d2181e95286a741ff6a53ac0405e5d531e4e346a1e306cbebe1",
+        "pages": null,
+        "width": null,
+        "height": null,
+        "unit": "pt",
+        "date": "2026-04-22",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260422T114123Z-2e253735-8b22-471f-a1df-a670b77ef00b.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Wed, 22 Apr 2026 11:41:23 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_183",
+      "kind": "line",
+      "lines": [
+        "BUS_183"
+      ],
+      "status": "ok",
+      "title": "Plan de ligne 183",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260818T141257Z-ba5a998c-8382-4bed-a98f-7130b2d1e506.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 800932,
+        "sha256": "e220c9a61082e1d49114a23e38a33b3bc17d6851c0871ee14aa9e74f6c18f6ce",
+        "pages": 1,
+        "width": 334,
+        "height": 96,
+        "unit": "pt",
+        "date": "2026-08-18",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260818T141257Z-ba5a998c-8382-4bed-a98f-7130b2d1e506.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Tue, 18 Aug 2026 14:12:57 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_247",
+      "kind": "line",
+      "lines": [
+        "BUS_247"
+      ],
+      "status": "ok",
+      "title": "Plan ligne 247",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260422T114409Z-963d40c9-7444-4749-a416-e8817ef99db4.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 490768,
+        "sha256": "9bf52f8c2ece18b51cb8de3b71b8977ca8918e39aa00e3458ca4d42f9d875156",
+        "pages": 1,
+        "width": 3359,
+        "height": 935,
+        "unit": "pt",
+        "date": "2026-04-22",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260422T114409Z-963d40c9-7444-4749-a416-e8817ef99db4.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Wed, 22 Apr 2026 11:44:09 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_249",
+      "kind": "line",
+      "lines": [
+        "BUS_249"
+      ],
+      "status": "ok",
+      "title": "Plan ligne 249",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260422T114828Z-de31ae20-be49-4598-9e55-035c1d3a0778.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 668883,
+        "sha256": "1910ec1d11d205ac8e0f4b91175b21edc417b0d1a7520bd8df29e13b400bb64c",
+        "pages": null,
+        "width": null,
+        "height": null,
+        "unit": "pt",
+        "date": "2026-04-22",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260422T114828Z-de31ae20-be49-4598-9e55-035c1d3a0778.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Wed, 22 Apr 2026 11:48:28 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_250",
+      "kind": "line",
+      "lines": [
+        "BUS_250"
+      ],
+      "status": "ok",
+      "title": "Plan ligne 250",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260831T080306Z-9956a736-abcc-4e5c-9667-135f98782067.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 529053,
+        "sha256": "080a2f99f5a08ff4b8ffb121ad81ddb285bb9d20682c476955c0e6971c2c97a9",
+        "pages": 1,
+        "width": 9292,
+        "height": 2678,
+        "unit": "pt",
+        "date": "2026-08-31",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260831T080306Z-9956a736-abcc-4e5c-9667-135f98782067.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Mon, 31 Aug 2026 08:03:06 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_350",
+      "kind": "line",
+      "lines": [
+        "BUS_350"
+      ],
+      "status": "ok",
+      "title": "Plan ligne 350",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260819T071345Z-aed79ef1-ef58-4873-8610-4f4deb0b067d.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 757930,
+        "sha256": "62e8c786fa73c60ca894315340ce3ca0ba5a480f1513e1643fc2d29dc5a4933f",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2026-08-19",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260819T071345Z-aed79ef1-ef58-4873-8610-4f4deb0b067d.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Wed, 19 Aug 2026 07:13:45 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_351",
+      "kind": "line",
+      "lines": [
+        "BUS_351"
+      ],
+      "status": "ok",
+      "title": "Plan ligne 351",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260824T070717Z-9460187f-f06d-4953-bfba-406db64d6ea5.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 2046850,
+        "sha256": "9e76ec47cf4aaf4743ac6e1e523b8017def7731be633a4fc15b1048307db37b5",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2026-08-24",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260824T070717Z-9460187f-f06d-4953-bfba-406db64d6ea5.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Mon, 24 Aug 2026 07:07:17 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_4121",
+      "kind": "line",
+      "lines": [
+        "BUS_4121"
+      ],
+      "status": "ok",
+      "title": "Plan de la ligne 4121",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260724T101308Z-0c3e113a-ec30-4a13-bc09-d9592bd370d5.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 1883864,
+        "sha256": "6345c00523a5dedebc0a29bb184a7817b79af64f0a74f318fdebb43f82399393",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2026-07-24",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260724T101308Z-0c3e113a-ec30-4a13-bc09-d9592bd370d5.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Fri, 24 Jul 2026 10:13:08 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_480",
+      "kind": "line",
+      "lines": [
+        "BUS_480"
+      ],
+      "status": "ok",
+      "title": "Plan de ligne 480",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260430T104146Z-de751168-2644-4447-a72e-e3da9dc90efa.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 875614,
+        "sha256": "80f95c0fe6c82f299f90bb569ab4235fcec7c6c5c2e3f3ae9871fac449bd2c1b",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2026-04-30",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260430T104146Z-de751168-2644-4447-a72e-e3da9dc90efa.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Thu, 30 Apr 2026 10:41:46 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_5154",
+      "kind": "line",
+      "lines": [
+        "BUS_5154"
+      ],
+      "status": "ok",
+      "title": "Plan de la ligne 5154",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260820T091358Z-86a321a4-60c5-4d89-8c4a-07f3daf9f8f5.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 1670020,
+        "sha256": "2227a098e7af239711c203e35ff777f09a59b6a3f1859af5ff097590ff30018e",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2026-08-20",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260820T091358Z-86a321a4-60c5-4d89-8c4a-07f3daf9f8f5.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Thu, 20 Aug 2026 09:13:58 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_607",
+      "kind": "line",
+      "lines": [
+        "BUS_607"
+      ],
+      "status": "ok",
+      "title": "Plan de la ligne 607",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20240229T114001Z-7e20b425-316d-4f71-83c6-618992d04b87.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 2538417,
+        "sha256": "5318b99cde50d710734d65a084a69e0dd9042656ae9882a203acf1beb722b136",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2024-02-29",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20240229T114001Z-7e20b425-316d-4f71-83c6-618992d04b87.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Thu, 29 Feb 2024 11:40:01 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_609",
+      "kind": "line",
+      "lines": [
+        "BUS_609"
+      ],
+      "status": "ok",
+      "title": "Plan de la ligne 609",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20240229T114041Z-cfd4de35-e3fe-4544-9c76-139c12ffee78.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 2364351,
+        "sha256": "1b8db09fc64d6a6dec49a9c95c0194a4cd6cf6b3ca2ac2a60a8f356441450af6",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2024-02-29",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20240229T114041Z-cfd4de35-e3fe-4544-9c76-139c12ffee78.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Thu, 29 Feb 2024 11:40:41 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_610",
+      "kind": "line",
+      "lines": [
+        "BUS_610"
+      ],
+      "status": "ok",
+      "title": "Plan de la ligne 610",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20240602T141936Z-d3e7984f-071c-4e80-ab93-facf70b087fd.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 2172793,
+        "sha256": "c6efcf9162bac3d6824c497ed9e091055dd8912400a24e4c66f68870d7df3f72",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2024-06-02",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20240602T141936Z-d3e7984f-071c-4e80-ab93-facf70b087fd.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Sun, 02 Jun 2024 14:19:36 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_703",
+      "kind": "line",
+      "lines": [
+        "BUS_703"
+      ],
+      "status": "ok",
+      "title": "Plan de la ligne 703",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/64fed8e443923_Ligne_NORD-SEINE-SAINT-DENIS_703.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 184633,
+        "sha256": "6c4545dac4f06885b3b03aaa623db1d8b1a3c365513fe845c83e0fd1e80d739c",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2023-09-11",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/64fed8e443923_Ligne_NORD-SEINE-SAINT-DENIS_703.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Mon, 11 Sep 2023 09:07:48 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_7708",
+      "kind": "line",
+      "lines": [
+        "BUS_7708"
+      ],
+      "status": "ok",
+      "title": "Plan Ligne 7708",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20251001T090717Z-7eb9d93e-fc27-4b19-bc27-38ec86274dd7.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 1234458,
+        "sha256": "d2d793ac9ff307b86bfb81b381e3db71d12a012a7c3eefda34a7deaa42ac485a",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2025-10-01",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20251001T090717Z-7eb9d93e-fc27-4b19-bc27-38ec86274dd7.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Wed, 01 Oct 2025 09:07:17 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_7720",
+      "kind": "line",
+      "lines": [
+        "BUS_7720"
+      ],
+      "status": "ok",
+      "title": "Plan Ligne 7720",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260826T081524Z-7d03e961-a2a0-4caf-a8c4-0c326d9d7560.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 1030681,
+        "sha256": "1339814f1585568ac97c1ec4c467b5ef23165629cc81ff22d8f5922bf5dc0ff6",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2026-08-26",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260826T081524Z-7d03e961-a2a0-4caf-a8c4-0c326d9d7560.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Wed, 26 Aug 2026 08:15:24 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_9112",
+      "kind": "line",
+      "lines": [
+        "BUS_9112"
+      ],
+      "status": "ok",
+      "title": "Plan ligne 9112",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260706T084735Z-8c0bb3d9-11cc-4cd7-a47e-895fdf3eba89.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 2999722,
+        "sha256": "41e2b073d067fb55d4a1adb972995f7b127a1726d07e6cfbba364fb0f5618f28",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2026-07-06",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260706T084735Z-8c0bb3d9-11cc-4cd7-a47e-895fdf3eba89.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Mon, 06 Jul 2026 08:47:35 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_9501",
+      "kind": "line",
+      "lines": [
+        "BUS_9501"
+      ],
+      "status": "ok",
+      "title": "Plan de la ligne 1601",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260821T124612Z-0cfe6880-f737-4c12-952a-bf766f989dc6.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 828051,
+        "sha256": "70e81fe6b3a4733c7b19373ead48249c8205cee6cb10782694de36fb6621504a",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2026-08-21",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260821T124612Z-0cfe6880-f737-4c12-952a-bf766f989dc6.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Fri, 21 Aug 2026 12:46:12 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_9502",
+      "kind": "line",
+      "lines": [
+        "BUS_9502"
+      ],
+      "status": "ok",
+      "title": "Plan de la ligne 1602",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260821T124718Z-bdd75f94-9199-460a-8976-8bc84f876e36.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 1211606,
+        "sha256": "8259c3561903eac09394cdca72706646402e7eb1ad23986df7abd7c40a1d8a8f",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2026-08-21",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260821T124718Z-bdd75f94-9199-460a-8976-8bc84f876e36.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Fri, 21 Aug 2026 12:47:18 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_9504",
+      "kind": "line",
+      "lines": [
+        "BUS_9504"
+      ],
+      "status": "ok",
+      "title": "Plan de ligne 9504",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20251215T153752Z-52381d26-4f37-4253-a7e2-f0edfd8e66c7.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 251611,
+        "sha256": "bc5d11cd64a85c8a9dd657081861cdaf9d68142d85eea892d648b2fb4059d912",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2025-12-15",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20251215T153752Z-52381d26-4f37-4253-a7e2-f0edfd8e66c7.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Mon, 15 Dec 2025 15:37:52 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_9509",
+      "kind": "line",
+      "lines": [
+        "BUS_9509"
+      ],
+      "status": "ok",
+      "title": "Plan de ligne 9509",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20251103T162333Z-53d00b47-7df8-4d5b-82c9-32bd5198ae35.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 1985822,
+        "sha256": "90a0d0e38f6a180b6a89fea4835526569fe36a555dfcae3cf1bd06ce7912c43f",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2025-11-03",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20251103T162333Z-53d00b47-7df8-4d5b-82c9-32bd5198ae35.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Mon, 03 Nov 2025 16:23:33 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_9517",
+      "kind": "line",
+      "lines": [
+        "BUS_9517"
+      ],
+      "status": "ok",
+      "title": "Plan de ligne Express 9517",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260130T170327Z-658af949-c2b0-44f4-a8c7-e49492782ee0.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 2233504,
+        "sha256": "7423feb700cab8289fc1ac8271f9cdfc694395a89abdf85f4419bc71f3ab7610",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2026-01-30",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260130T170327Z-658af949-c2b0-44f4-a8c7-e49492782ee0.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Fri, 30 Jan 2026 17:03:27 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_9518",
+      "kind": "line",
+      "lines": [
+        "BUS_9518"
+      ],
+      "status": "ok",
+      "title": "Plan de ligne 9518",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20240902T155852Z-d4362d6a-c493-4d5b-a706-18a9729bf1c4.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 1919156,
+        "sha256": "9e5e590c721c5993add9bee09c96a953cae2c55c282f1c6e445a32dbda7d48a7",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2024-09-02",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20240902T155852Z-d4362d6a-c493-4d5b-a706-18a9729bf1c4.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Mon, 02 Sep 2024 15:58:52 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_A01",
+      "kind": "line",
+      "lines": [
+        "BUS_A01"
+      ],
+      "status": "no_plan",
+      "reason": "Navette Aérobus Beauvais ⇄ Paris Porte Maillot : aucun plan publié. Le jeu IDFM ne référence qu'une fiche horaire, sous forme de page web de l'aéroport.",
+      "info_url": "https://www.aeroportparisbeauvais.com/acces-et-parking/navette-aerobus-paris-aeroport/"
+    },
+    {
+      "id": "BUS_A04",
+      "kind": "line",
+      "lines": [
+        "BUS_A04"
+      ],
+      "status": "no_plan",
+      "reason": "Navette Aérobus Beauvais ⇄ Paris La Villette : aucun plan publié. Le jeu IDFM ne référence qu'une fiche horaire, sous forme de page web de l'aéroport.",
+      "info_url": "https://www.aeroportparisbeauvais.com/acces-et-parking/navette-aerobus-paris-aeroport"
+    },
+    {
+      "id": "BUS_EX100",
+      "kind": "line",
+      "lines": [
+        "BUS_EX100"
+      ],
+      "status": "ok",
+      "title": "Ligne 700 - Plan de ligne",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260710T091134Z-8af76d36-3e16-4a59-ad96-0c276a04e742.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 681954,
+        "sha256": "c0578383ed50ddadd8ba468a20672f769a7207e3bfce0a15f2a38166f406703d",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2026-07-10",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260710T091134Z-8af76d36-3e16-4a59-ad96-0c276a04e742.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Fri, 10 Jul 2026 09:11:34 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_EX19",
+      "kind": "line",
+      "lines": [
+        "BUS_EX19"
+      ],
+      "status": "ok",
+      "title": "Ligne 7719 - Plan de ligne",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260710T084933Z-c15216e5-838a-4822-a394-a76200a8fd20.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 1318872,
+        "sha256": "cb747e609fc7b9c9d2df67cc1e4408f5c895907ea843ae4e638e38dec9345134",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2026-07-10",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260710T084933Z-c15216e5-838a-4822-a394-a76200a8fd20.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Fri, 10 Jul 2026 08:49:33 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_EX93",
+      "kind": "line",
+      "lines": [
+        "BUS_EX93"
+      ],
+      "status": "ok",
+      "title": "Plan de la ligne 9301",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260821T122313Z-5d93d289-3092-4fbe-8756-48e45166be4a.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 1957522,
+        "sha256": "663bf95be7106a464fd1329285404df4ca968428d6a23bdf82d91e19274831f1",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2026-08-21",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260821T122313Z-5d93d289-3092-4fbe-8756-48e45166be4a.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Fri, 21 Aug 2026 12:23:13 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_N1",
+      "kind": "line",
+      "lines": [
+        "BUS_N1"
+      ],
+      "status": "ok",
+      "title": "Plan (mise à jour 29/12/2021)",
+      "source": {
+        "url": "https://www.parisaeroport.fr/docs/default-source/passager-fichiers/acces/acces-routiers/plan-ligne_navette_n1_v2.pdf?sfvrsn=6cfe35bd_10",
+        "via": "idfm",
+        "provider": "www.parisaeroport.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 892456,
+        "sha256": "2b73aa9fc47c3c71f1bc13b8cf96768eb8c303a9f342fbabdfb10c00067f7a13",
+        "pages": 1,
+        "width": 1199,
+        "height": 560,
+        "unit": "pt",
+        "date": "2021-12-29",
+        "date_source": "title"
+      },
+      "file": {
+        "url": "https://www.parisaeroport.fr/docs/default-source/passager-fichiers/acces/acces-routiers/plan-ligne_navette_n1_v2.pdf?sfvrsn=6cfe35bd_10"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Thu, 22 Nov 2018 13:32:55 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_N131",
+      "kind": "line",
+      "lines": [
+        "BUS_N131"
+      ],
+      "status": "ok",
+      "title": "Plan de ligne N131 à compter du 5 janvier 2026",
+      "source": {
+        "url": "https://portail-idfm-operateurs.cdn.prismic.io/portail-idfm-operateurs/aTrYk3NYClf9oENd_Ligne_COEUR_D%27ESSONNE_N13150126v2.pdf",
+        "via": "idfm",
+        "provider": "portail-idfm-operateurs.cdn.prismic.io",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 24794393,
+        "sha256": "f39973f00123737f7e16c310e074733d23e01b15594d6732f8cef7265df8fda8",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2025-12-11",
+        "date_source": "last_modified"
+      },
+      "file": {
+        "url": "https://portail-idfm-operateurs.cdn.prismic.io/portail-idfm-operateurs/aTrYk3NYClf9oENd_Ligne_COEUR_D%27ESSONNE_N13150126v2.pdf"
+      },
+      "http": {
+        "etag": "\"c012b7bbf29f6c89abb4b0fafb155d7f-5\"",
+        "last_modified": "Thu, 11 Dec 2025 14:43:32 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_N139",
+      "kind": "line",
+      "lines": [
+        "BUS_N139"
+      ],
+      "status": "ok",
+      "title": "Plan ligne N139",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260706T082656Z-3f99f447-e549-4cb2-8f45-b18f6f269f4e.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 2248618,
+        "sha256": "338b3fba0fd535c55acf16070923d7de112c9a2614dfa6df5f316ca2b369f89c",
+        "pages": 1,
+        "width": 578,
+        "height": 252,
+        "unit": "pt",
+        "date": "2026-07-06",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260706T082656Z-3f99f447-e549-4cb2-8f45-b18f6f269f4e.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Mon, 06 Jul 2026 08:26:56 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_N140",
+      "kind": "line",
+      "lines": [
+        "BUS_N140"
+      ],
+      "status": "ok",
+      "title": "Plan",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260821T131207Z-07f23a2b-6a6e-4b0d-9ba2-9e49509ac490.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 2738631,
+        "sha256": "903d12823710aabb4164084a8a9f918301a7ed1483134ec2b9286f5f6bc3cec6",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2026-08-21",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260821T131207Z-07f23a2b-6a6e-4b0d-9ba2-9e49509ac490.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Fri, 21 Aug 2026 13:12:07 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_N143",
+      "kind": "line",
+      "lines": [
+        "BUS_N143"
+      ],
+      "status": "ok",
+      "title": "Plan Ligne N143",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260821T131631Z-484e1e02-1574-49eb-a4f7-a2067c3eb53f.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 3220481,
+        "sha256": "2b3623406493c05020f07e3cf3cad98ec0c5911c36d6c3fa6bfcdb0daf8052d2",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2026-08-21",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260821T131631Z-484e1e02-1574-49eb-a4f7-a2067c3eb53f.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Fri, 21 Aug 2026 13:16:31 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_N2",
+      "kind": "line",
+      "lines": [
+        "BUS_N2"
+      ],
+      "status": "ok",
+      "title": "Plan (mise à jour 29/12/2021)",
+      "source": {
+        "url": "https://www.parisaeroport.fr/docs/default-source/passager-fichiers/acces/acces-routiers/edito_navettes-inter-terminaux-paris-cdg_plan-circuit-n2.jpg?sfvrsn=28fe35bd_6",
+        "via": "idfm",
+        "provider": "www.parisaeroport.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "image/jpeg",
+        "bytes": 68949,
+        "sha256": "7dd109c98da3f91068f314c3625a74cc803175a12aa9b5b7ea5718e82203c480",
+        "pages": 1,
+        "width": 1199,
+        "height": 560,
+        "unit": "px",
+        "date": "2021-12-29",
+        "date_source": "title"
+      },
+      "file": {
+        "url": "https://www.parisaeroport.fr/docs/default-source/passager-fichiers/acces/acces-routiers/edito_navettes-inter-terminaux-paris-cdg_plan-circuit-n2.jpg?sfvrsn=28fe35bd_6"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Thu, 22 Nov 2018 13:32:55 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_N22",
+      "kind": "line",
+      "lines": [
+        "BUS_N22"
+      ],
+      "status": "ok",
+      "title": "Plan de ligne N22",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260801T173244Z-3acbb080-b616-4d58-8631-dd3acce414e5.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 64181,
+        "sha256": "c5041f817c4aa215553385848aa54c81c09dea7c8625811db0c8d0ab69149bfd",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2026-08-01",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260801T173244Z-3acbb080-b616-4d58-8631-dd3acce414e5.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Sat, 01 Aug 2026 17:32:44 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_N31",
+      "kind": "line",
+      "lines": [
+        "BUS_N31"
+      ],
+      "status": "ok",
+      "title": "Plan de ligne N31",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260801T172952Z-398259fa-d99d-4086-a204-21f9b8897ba3.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 46222,
+        "sha256": "66cf853d47772ba62b223e811dc53e3abc46a8edd5a46294a29bfb568958a29c",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2026-08-01",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260801T172952Z-398259fa-d99d-4086-a204-21f9b8897ba3.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Sat, 01 Aug 2026 17:29:52 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_N42",
+      "kind": "line",
+      "lines": [
+        "BUS_N42"
+      ],
+      "status": "ok",
+      "title": "Plan Ligne N42",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20261001T085347Z-61626aa1-18f3-49cd-9c42-d3905ad9c8a3.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 43265,
+        "sha256": "06a4d4990e7be7c463e1fcaa8e64f1d655c68dd20c8b0da14636d4301578498e",
+        "pages": 1,
+        "width": 3359,
+        "height": 935,
+        "unit": "pt",
+        "date": "2026-10-01",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20261001T085347Z-61626aa1-18f3-49cd-9c42-d3905ad9c8a3.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Thu, 01 Oct 2026 08:53:47 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_R4",
+      "kind": "line",
+      "lines": [
+        "BUS_R4"
+      ],
+      "status": "ok",
+      "title": "Plan de la ligne 1614",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260821T123728Z-761ef2d1-a52a-427c-ae29-1071ef7b039b.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 1010358,
+        "sha256": "f582addb1f2d72125ce1fff1b08790eb255293557043ee3052451dbda4d76a4b",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2026-08-21",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260821T123728Z-761ef2d1-a52a-427c-ae29-1071ef7b039b.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Fri, 21 Aug 2026 12:37:28 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "BUS_TBUS1",
+      "kind": "line",
+      "lines": [
+        "BUS_TBUS1"
+      ],
+      "status": "ok",
+      "title": "Plan de la ligne T'bus 1",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/64fed5fc38d66_Ligne_NORD-SEINE-SAINT-DENIS_Tbus1.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 400024,
+        "sha256": "c61fced75e7f27891581c2d54f945e07507246cb5637aaba8f6623cb38deacce",
+        "pages": 1,
+        "width": 567,
+        "height": 241,
+        "unit": "pt",
+        "date": "2023-09-11",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/64fed5fc38d66_Ligne_NORD-SEINE-SAINT-DENIS_Tbus1.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Mon, 11 Sep 2023 08:55:24 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "CDGVAL",
+      "kind": "line",
+      "lines": [
+        "CDGVAL"
+      ],
+      "status": "ok",
+      "title": "Plan CDG VAL",
+      "source": {
+        "url": "https://www.parisaeroport.fr/docs/default-source/passager-fichiers/acces/acces-routiers/edito_navettes-inter-terminaux-paris-cdg_plan-cdgval.jpg?sfvrsn=b6fc35bd_8",
+        "via": "idfm",
+        "provider": "www.parisaeroport.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "image/jpeg",
+        "bytes": 141139,
+        "sha256": "f3ca135fae573ff8eeb0a403a0b1a78a7d69f0088cbfaeadfaa937579b637995",
+        "pages": 1,
+        "width": 2000,
+        "height": 934,
+        "unit": "px",
+        "date": null,
+        "date_source": null
+      },
+      "file": {
+        "url": "https://www.parisaeroport.fr/docs/default-source/passager-fichiers/acces/acces-routiers/edito_navettes-inter-terminaux-paris-cdg_plan-cdgval.jpg?sfvrsn=b6fc35bd_8"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Thu, 22 Nov 2018 13:32:55 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "METRO_14",
+      "kind": "line",
+      "lines": [
+        "METRO_14"
+      ],
+      "status": "error",
+      "problems": [
+        {
+          "url": "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/metro/plan-de-ligne_metro_ligne-14.pdf",
+          "error": "HTTP 403"
+        }
+      ]
+    },
+    {
+      "id": "ORLYVAL",
+      "kind": "line",
+      "lines": [
+        "ORLYVAL"
+      ],
+      "status": "ok",
+      "title": "Plan Orlyval",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260202T144524Z-6231dec6-b80e-4da1-9a43-036606d0a93e.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 488746,
+        "sha256": "1e4c89c297cb84afa5989fa28dfad97faf0542df1cad984948162a8602b8a4e1",
+        "pages": 1,
+        "width": 3404,
+        "height": 227,
+        "unit": "pt",
+        "date": "2026-02-02",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260202T144524Z-6231dec6-b80e-4da1-9a43-036606d0a93e.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Mon, 02 Feb 2026 14:45:24 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "RER_B",
+      "kind": "line",
+      "lines": [
+        "RER_B"
+      ],
+      "status": "error",
+      "problems": [
+        {
+          "url": "https://www.ratp.fr/plans-lignes/rer/b",
+          "error": "HTTP 403"
+        },
+        {
+          "url": "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/rer/plan-de-ligne_rer_ligne-b.pdf",
+          "error": "HTTP 403"
+        }
+      ]
+    },
+    {
+      "id": "RER_C",
+      "kind": "line",
+      "lines": [
+        "RER_C"
+      ],
+      "status": "error",
+      "problems": [
+        {
+          "url": "https://www.transilien.com/fr/page-lignes/ligne-c",
+          "error": "pas un document (page web ou format inconnu)",
+          "content_type": "text/html; charset=utf-8"
+        },
+        {
+          "url": "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/rer/plan-de-ligne_rer_ligne-c.pdf",
+          "error": "HTTP 403"
+        }
+      ]
+    },
+    {
+      "id": "T11",
+      "kind": "line",
+      "lines": [
+        "T11"
+      ],
+      "status": "ok",
+      "title": "Plan de la ligne T11",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20250314T075859Z-7e7e895f-57cb-4cc8-8a9b-43e759a6eb7c.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 744318,
+        "sha256": "cef21cb220e9bf746aae2e8137de490721506b7728bdab8acb0cb4c5ddd90206",
+        "pages": 1,
+        "width": 2083,
+        "height": 255,
+        "unit": "pt",
+        "date": "2025-03-14",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20250314T075859Z-7e7e895f-57cb-4cc8-8a9b-43e759a6eb7c.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Fri, 14 Mar 2025 07:58:59 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "T7",
+      "kind": "line",
+      "lines": [
+        "T7"
+      ],
+      "status": "error",
+      "problems": [
+        {
+          "url": "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/tram/plan-de-ligne_tram_ligne-t7.pdf",
+          "error": "HTTP 403"
+        }
+      ]
+    },
+    {
+      "id": "T9",
+      "kind": "line",
+      "lines": [
+        "T9"
+      ],
+      "status": "ok",
+      "title": "Plan du T9",
+      "source": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260720T061331Z-5a596f07-ae3a-4854-a70c-1e02297b2520.pdf",
+        "via": "idfm",
+        "provider": "ilico.iledefrance-mobilites.fr",
+        "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+        "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 353079,
+        "sha256": "0e8144d227a5766e1e93d55c7aa12e60ad2abce914ea4a9d446b87e5604e896b",
+        "pages": 1,
+        "width": 2055,
+        "height": 879,
+        "unit": "pt",
+        "date": "2026-07-20",
+        "date_source": "url"
+      },
+      "file": {
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260720T061331Z-5a596f07-ae3a-4854-a70c-1e02297b2520.pdf"
+      },
+      "http": {
+        "etag": null,
+        "last_modified": "Mon, 20 Jul 2026 06:13:31 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    },
+    {
+      "id": "NOCTILIEN",
+      "kind": "network",
+      "lines": [
+        "BUS_N131",
+        "BUS_N139",
+        "BUS_N140",
+        "BUS_N143",
+        "BUS_N22",
+        "BUS_N31",
+        "BUS_N42"
+      ],
+      "status": "ok",
+      "title": "Plan du réseau de Nuit (schématique)",
+      "source": {
+        "url": "https://eu.ftp.opendatasoft.com/stif/PlansRegion/Plans/NOCTILIEN_MF.pdf",
+        "via": "idfm",
+        "provider": "eu.ftp.opendatasoft.com",
+        "dataset": "plans-region",
+        "dataset_licence": "CC BY-NC-ND 4.0"
+      },
+      "document": {
+        "media_type": "application/pdf",
+        "bytes": 1357295,
+        "sha256": "53c13068e439f4fc422b7603b0e0945ed28c0e9a12a9a0e8bca37298cc313aa5",
+        "pages": 1,
+        "width": 624,
+        "height": 609,
+        "unit": "pt",
+        "date": "2026-09",
+        "date_source": "dataset"
+      },
+      "file": {
+        "url": "https://eu.ftp.opendatasoft.com/stif/PlansRegion/Plans/NOCTILIEN_MF.pdf"
+      },
+      "http": {
+        "etag": "\"6a9ae0c5-14b5ef\"",
+        "last_modified": "Fri, 04 Sep 2026 15:16:21 GMT"
+      },
+      "first_seen": "2026-10-08",
+      "checked_on": "2026-10-08"
+    }
+  ]
+}
