@@ -1,0 +1,60 @@
+{
+  "schema": "airport-connect/adjustments@2",
+  "description": "Aménagements durables de desserte (spec R-90 à R-93). Seules les entrées « published » entrent dans la base publiée ; une entrée « draft » n'est jamais diffusée. Arrêts non desservis désignés par quai (stop_id GTFS), reports par zone d'arrêt (parent_station GTFS), jamais par nom. Les distances ne sont pas saisies : le générateur les calcule à vol d'oiseau depuis les coordonnées du GTFS.",
+  "adjustments": [
+    {
+      "id": "bus-351-porte-de-montreuil",
+      "status": "published",
+      "kind": "permanent",
+      "line": "BUS_351",
+      "title_fr": "Nouvel itinéraire entre Nation et Gallieni",
+      "summary_fr": "Depuis le réaménagement de la Porte de Montreuil, la ligne 351 passe par Davout - Lagny, Porte de Montreuil, Porte de Bagnolet et Échangeur de Bagnolet. Cet itinéraire est définitif : les arrêts ci-dessous ne sont plus desservis.",
+      "valid_from": null,
+      "valid_from_note": "En vigueur avant la v2 (déjà signalé dans la v1) ; date de début non documentée, donc non inventée.",
+      "valid_until": null,
+      "valid_until_note": "Itinéraire définitif, en place au moins jusqu'en 2030.",
+      "source_url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260824T070717Z-9460187f-f06d-4953-bfba-406db64d6ea5.pdf",
+      "sources": [
+        {
+          "kind": "plan",
+          "title": "Plan de la ligne 351 « Paris - Nation - Trône ⇄ Gare de Roissypôle » (Ligne_EXPRESS_ROISSY_351_v03, édition 07.26)",
+          "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260824T070717Z-9460187f-f06d-4953-bfba-406db64d6ea5.pdf",
+          "published_on": "2026-08-24",
+          "found_via": "data.iledefrance.fr, jeu « liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france », id_line C01299, type PLAN"
+        },
+        {
+          "kind": "confirmation",
+          "title": "Confirmation du porteur du projet : déviation devenue l'itinéraire définitif de la ligne, au moins jusqu'en 2030 ; plans de ligne actualisés par Transdev Express Roissy",
+          "date": "2026-10-08"
+        }
+      ],
+      "checked_on": "2026-10-08",
+      "route_in_force": [
+        {"stop_area": "IDFM:71673",  "label": "Nation - Trône"},
+        {"stop_area": "IDFM:71661",  "label": "Pyrénées - Docteur Netter"},
+        {"stop_area": "IDFM:71663",  "label": "Porte de Vincennes"},
+        {"stop_area": "IDFM:71670",  "label": "Davout - Lagny"},
+        {"stop_area": "IDFM:71710",  "label": "Porte de Montreuil"},
+        {"stop_area": "IDFM:71799",  "label": "Porte de Bagnolet"},
+        {"stop_area": "IDFM:482759", "label": "Echangeur de Bagnolet"},
+        {"stop_area": "IDFM:71817",  "label": "Gallieni"}
+      ],
+      "replacement_rule": "Zone d'arrêt de l'itinéraire en vigueur, desservie dans le même sens, la plus proche à vol d'oiseau.",
+      "not_served": [
+        {"stop_point": "IDFM:28370", "label": "Erignac",                        "gtfs_direction_id": 0, "direction_label": "Gare de Roissypôle", "replacement_stop_area": "IDFM:71670", "replacement_label": "Davout - Lagny"},
+        {"stop_point": "IDFM:28373", "label": "Rue de Paris",                   "gtfs_direction_id": 0, "direction_label": "Gare de Roissypôle", "replacement_stop_area": "IDFM:71710", "replacement_label": "Porte de Montreuil"},
+        {"stop_point": "IDFM:28374", "label": "Edouard Vaillant",               "gtfs_direction_id": 0, "direction_label": "Gare de Roissypôle", "replacement_stop_area": "IDFM:71710", "replacement_label": "Porte de Montreuil"},
+        {"stop_point": "IDFM:39739", "label": "Général de Gaulle",              "gtfs_direction_id": 0, "direction_label": "Gare de Roissypôle", "replacement_stop_area": "IDFM:71817", "replacement_label": "Gallieni"},
+        {"stop_point": "IDFM:7766",  "label": "La Poste",                       "gtfs_direction_id": 0, "direction_label": "Gare de Roissypôle", "replacement_stop_area": "IDFM:71817", "replacement_label": "Gallieni"},
+        {"stop_point": "IDFM:27048", "label": "Général de Gaulle",              "gtfs_direction_id": 1, "direction_label": "Nation - Trône",     "replacement_stop_area": "IDFM:71817", "replacement_label": "Gallieni"},
+        {"stop_point": "IDFM:27062", "label": "Edouard Vaillant",               "gtfs_direction_id": 1, "direction_label": "Nation - Trône",     "replacement_stop_area": "IDFM:71710", "replacement_label": "Porte de Montreuil"},
+        {"stop_point": "IDFM:24730", "label": "Place de la Porte de Montreuil", "gtfs_direction_id": 1, "direction_label": "Nation - Trône",     "replacement_stop_area": "IDFM:71710", "replacement_label": "Porte de Montreuil"}
+      ],
+      "changes_from_v1": [
+        "La Poste (Bagnolet, vers Roissypôle) ajouté : absent du plan v03 alors que le GTFS de juin 2026 le dessert encore.",
+        "Edouard Vaillant vers Roissypôle : report à Porte de Montreuil (≈ 540 m) au lieu de Gallieni (≈ 800 m), selon la règle du report le plus proche.",
+        "Distances recalculées depuis les coordonnées GTFS au lieu des valeurs saisies à la main dans la v1."
+      ]
+    }
+  ]
+}
