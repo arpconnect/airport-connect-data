@@ -1,0 +1,42 @@
+# Diagnostic manuel du GTFS IDFM du jour (tools/pipeline/inspect_gtfs.py), quand le générateur signale
+# une référence disparue. Lancement : Actions → diagnostic → Run workflow, avec les arguments de l'outil,
+# par exemple « --near 49.00396,2.57918 --radius 300 » ou « --name "CDG T2" ».
+name: diagnostic
+
+on:
+  workflow_dispatch:
+    inputs:
+      args:
+        description: "Arguments de inspect_gtfs.py (--near LAT,LON, --radius, --name, --area, --stop)"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Télécharger le GTFS IDFM
+        run: |
+          curl --fail --location --retry 3 --retry-delay 20 -o IDFM-gtfs.zip \
+            https://eu.ftp.opendatasoft.com/stif/GTFS/IDFM-gtfs.zip
+          sha256sum IDFM-gtfs.zip
+
+      - name: Inspecter
+        env:
+          INSPECT_ARGS: ${{ inputs.args }}
+        run: |
+          set -o pipefail
+          # Arguments découpés comme dans un shell (shlex), sans jamais être exécutés.
+          python3 -I -c 'import os, runpy, shlex, sys
+          sys.argv = ["inspect_gtfs.py", "IDFM-gtfs.zip", *shlex.split(os.environ["INSPECT_ARGS"])]
+          runpy.run_path("tools/pipeline/inspect_gtfs.py", run_name="__main__")' | tee inspect.txt
+          { echo '```'; cat inspect.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

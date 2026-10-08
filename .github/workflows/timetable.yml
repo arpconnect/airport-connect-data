@@ -66,6 +66,18 @@ jobs:
         if: steps.changed.outputs.changed == 'true'
         run: python3 -I tests/test_timetable_db.py dist/timetable-*.sqlite.gz
 
+      - name: Signaler les erreurs bloquantes
+        # Chaque erreur du rapport devient une annotation, visible sur la page du traitement et par l'API.
+        if: failure()
+        run: |
+          python3 -I - <<'PY'
+          import json, pathlib
+          p = pathlib.Path("dist/report.json")
+          if p.exists():
+              for e in json.loads(p.read_text(encoding="utf-8")).get("errors", [])[:10]:
+                  print(f"::error title={e.get('code')}::{json.dumps(e.get('detail'), ensure_ascii=False)}")
+          PY
+
       - name: Conserver le rapport
         if: always()
         uses: actions/upload-artifact@v7
