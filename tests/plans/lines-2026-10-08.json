@@ -1,0 +1,1659 @@
+{
+  "schema": "airport-connect/lines@1",
+  "description": "Référentiel des lignes suivies par Airport Connect. Clé d'identité : idfm_route_id (code C IDFM), identique dans le GTFS IDFM et dans PRIM/Navitia (line:IDFM:Cxxxxx). Les champs v1 sont conservés pour mémoire et ne font pas foi.",
+  "verified": {
+    "gtfs_snapshot": "IDFM-gtfs, validité 2026-06-15 → 2026-07-17",
+    "future_dates_checked_on": "2026-10-07"
+  },
+  "groups": {
+    "NOCTILIEN": {
+      "display_name": "Noctilien",
+      "hubs": {
+        "ORLY": [
+          "BUS_N22",
+          "BUS_N31",
+          "BUS_N131",
+          "BUS_N139"
+        ],
+        "ROISSY": [
+          "BUS_N140",
+          "BUS_N143"
+        ],
+        "BOURGET": [
+          "BUS_N42"
+        ]
+      }
+    }
+  },
+  "lines": [
+    {
+      "id": "CDGVAL",
+      "display_name": "CDGVal",
+      "app_type": "SHUTTLE",
+      "category": "RAIL",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {
+        "ROISSY": 6
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C00563",
+      "navitia_line_id": "line:IDFM:C00563",
+      "gtfs": {
+        "short_name": "CDG VAL",
+        "long_name": "CDG VAL",
+        "route_type": 0,
+        "network": "ADP",
+        "color": "#5CC5ED",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Paris Aéroport",
+        "itinerary": "Terminal 1 ↔ Terminal 2 - TGV (via PR/PX)",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "RER_B",
+      "display_name": "RER B",
+      "app_type": "TRAIN",
+      "category": "RAIL",
+      "sectors": [
+        "ROISSY",
+        "BOURGET"
+      ],
+      "sort_order": {
+        "ROISSY": 2,
+        "BOURGET": 0
+      },
+      "shortcut_sectors": [
+        "ROISSY",
+        "BOURGET"
+      ],
+      "idfm_route_id": "IDFM:C01743",
+      "navitia_line_id": "line:IDFM:C01743",
+      "gtfs": {
+        "short_name": "B",
+        "long_name": "B",
+        "route_type": 2,
+        "network": "RER",
+        "color": "#5091CB",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "RATP & SNCF | Île-de-France Mobilités",
+        "itinerary": "Saint-Rémy ∙ Massy-Palaiseau ∙ Paris ↔ Aéroport CDG",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "CDG_EXPRESS",
+      "display_name": "CDG Express",
+      "app_type": "TRAIN",
+      "category": "RAIL",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {
+        "ROISSY": 7
+      },
+      "shortcut_sectors": [
+        "ROISSY"
+      ],
+      "idfm_route_id": null,
+      "navitia_line_id": null,
+      "gtfs": null,
+      "state": "future",
+      "future": {
+        "opening": "2027-03-28",
+        "scope": "Gare de l'Est ↔ gare Aéroport CDG 2 TGV, toutes les 15 min de 5 h à minuit",
+        "source": "https://fr.euronews.com/2026/04/28/paris-le-nouveau-train-express-pour-laeroport-a-une-date-de-lancement"
+      },
+      "v1": {
+        "operator": "Hello Paris",
+        "itinerary": "Gare de l'Est ↔ Aéroport CDG - Terminal 2 - TGV",
+        "static_status": "Mise en service le 28 mars 2027"
+      }
+    },
+    {
+      "id": "METRO_17",
+      "display_name": "Ligne 17",
+      "app_type": "METRO",
+      "category": "RAIL",
+      "sectors": [
+        "ROISSY",
+        "BOURGET"
+      ],
+      "sort_order": {
+        "ROISSY": 3,
+        "BOURGET": 3
+      },
+      "shortcut_sectors": [
+        "ROISSY",
+        "BOURGET"
+      ],
+      "idfm_route_id": null,
+      "navitia_line_id": null,
+      "gtfs": null,
+      "state": "future",
+      "future": {
+        "opening": "automne 2028 (Saint-Denis Pleyel ↔ Le Bourget Aéroport) ; automne 2029 (↔ Parc des Expositions) ; fin 2030 (↔ Le Mesnil-Amelot via Aéroport CDG)",
+        "scope": "dates prévisionnelles SGP",
+        "source": "https://www.sortiraparis.com/en/news/in-paris/articles/343880-lines-15-16-17-and-18-of-the-grand-paris-express-a-shift-in-the-projected-timetable-for-putting-the-lines-into-service"
+      },
+      "v1": {
+        "operator": "Keolis | Île-de-France Mobilités",
+        "itinerary": "Saint-Denis Pleyel ↔ Aéroport du Bourget",
+        "static_status": "Mise en service partielle en 2027"
+      }
+    },
+    {
+      "id": "T11",
+      "display_name": "Ligne T11",
+      "app_type": "TRAM_TRAIN",
+      "category": "RAIL",
+      "sectors": [
+        "BOURGET"
+      ],
+      "sort_order": {
+        "BOURGET": 5
+      },
+      "shortcut_sectors": [
+        "BOURGET"
+      ],
+      "idfm_route_id": "IDFM:C01999",
+      "navitia_line_id": "line:IDFM:C01999",
+      "gtfs": {
+        "short_name": "T11",
+        "long_name": "T11",
+        "route_type": 0,
+        "network": "STRETTO",
+        "color": "#FF5A00",
+        "text_color": "#000000"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "SNCF Voyageurs | Île-de-France Mobilités",
+        "itinerary": "Épinay-sur-Seine ↔ Le Bourget",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "METRO_16",
+      "display_name": "Ligne 16",
+      "app_type": "METRO",
+      "category": "RAIL",
+      "sectors": [
+        "BOURGET"
+      ],
+      "sort_order": {
+        "BOURGET": 1
+      },
+      "shortcut_sectors": [
+        "BOURGET"
+      ],
+      "idfm_route_id": null,
+      "navitia_line_id": null,
+      "gtfs": null,
+      "state": "future",
+      "future": {
+        "opening": "automne 2028 (Saint-Denis Pleyel ↔ Parc du Blanc-Mesnil) ; automne 2029 (↔ Noisy-Champs)",
+        "scope": "dates prévisionnelles SGP",
+        "source": "https://www.sortiraparis.com/en/news/in-paris/articles/343880-lines-15-16-17-and-18-of-the-grand-paris-express-a-shift-in-the-projected-timetable-for-putting-the-lines-into-service"
+      },
+      "v1": {
+        "operator": "Keolis | Île-de-France Mobilités",
+        "itinerary": "Saint-Denis Pleyel ↔ Clichy-Montfermeil",
+        "static_status": "Mise en service partielle en 2027"
+      }
+    },
+    {
+      "id": "ORLYVAL",
+      "display_name": "Orlyval",
+      "app_type": "SHUTTLE",
+      "category": "RAIL",
+      "sectors": [
+        "ORLY"
+      ],
+      "sort_order": {
+        "ORLY": 0
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01388",
+      "navitia_line_id": "line:IDFM:C01388",
+      "gtfs": {
+        "short_name": "ORLYVAL",
+        "long_name": "ORLYVAL",
+        "route_type": 0,
+        "network": "RATP",
+        "color": "#5EC5ED",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "RATP | Île-de-France Mobilités",
+        "itinerary": "Antony ↔ Aéroport d’Orly 4 (via 1-2-3)",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "RER_C",
+      "display_name": "RER C",
+      "app_type": "TRAIN",
+      "category": "RAIL",
+      "sectors": [
+        "ORLY"
+      ],
+      "sort_order": {
+        "ORLY": 1
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01727",
+      "navitia_line_id": "line:IDFM:C01727",
+      "gtfs": {
+        "short_name": "C",
+        "long_name": "C",
+        "route_type": 2,
+        "network": "RER",
+        "color": "#FFCC30",
+        "text_color": "#000000"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "SNCF Voyageurs | Île-de-France Mobilités",
+        "itinerary": "Paris - Austerlitz ↔ Pont de Rungis ∙ Massy–Palaiseau",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "METRO_14",
+      "display_name": "Ligne 14",
+      "app_type": "METRO",
+      "category": "RAIL",
+      "sectors": [
+        "ORLY"
+      ],
+      "sort_order": {
+        "ORLY": 2
+      },
+      "shortcut_sectors": [
+        "ORLY"
+      ],
+      "idfm_route_id": "IDFM:C01384",
+      "navitia_line_id": "line:IDFM:C01384",
+      "gtfs": {
+        "short_name": "14",
+        "long_name": "14",
+        "route_type": 1,
+        "network": "RATP",
+        "color": "#640082",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "RATP | Île-de-France Mobilités",
+        "itinerary": "Saint-Denis Pleyel ↔ Aéroport d'Orly 4",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "METRO_18",
+      "display_name": "Ligne 18",
+      "app_type": "METRO",
+      "category": "RAIL",
+      "sectors": [
+        "ORLY"
+      ],
+      "sort_order": {
+        "ORLY": 3
+      },
+      "shortcut_sectors": [
+        "ORLY"
+      ],
+      "idfm_route_id": null,
+      "navitia_line_id": null,
+      "gtfs": null,
+      "state": "future",
+      "future": {
+        "opening": "décembre 2026 (Massy-Palaiseau ↔ Christ de Saclay, sans desserte d'Orly) ; automne / fin 2027 (Massy-Palaiseau ↔ Aéroport d'Orly)",
+        "scope": "dates prévisionnelles SGP",
+        "source": "https://medias24.com/agence-presse/metro-grand-paris-express-la-ligne-18-sur-les-rails-debut-decembre-report-de-six-mois-pour-la-15-sud/"
+      },
+      "v1": {
+        "operator": "Keolis | Île-de-France Mobilités",
+        "itinerary": "Massy-Palaiseau ↔ Christ de Saclay",
+        "static_status": "Mise en service en 2026-2027"
+      }
+    },
+    {
+      "id": "BUS_9517",
+      "display_name": "Express 9517",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {
+        "ROISSY": 7
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C02835",
+      "navitia_line_id": "line:IDFM:C02835",
+      "gtfs": {
+        "short_name": "9517",
+        "long_name": "9517",
+        "route_type": 3,
+        "network": "Express Roissy",
+        "color": "#3C91DC",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Transdev | Île-de-France Mobilités",
+        "itinerary": "Gare d'Argenteuil ↔ Aéroport CDG - Roissypôle - T3",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_9509",
+      "display_name": "Express 9509",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {
+        "ROISSY": 6
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C02832",
+      "navitia_line_id": "line:IDFM:C02832",
+      "gtfs": {
+        "short_name": "9509",
+        "long_name": "9509",
+        "route_type": 3,
+        "network": "Express Roissy",
+        "color": "#3C91DC",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Transdev | Île-de-France Mobilités",
+        "itinerary": "Gare d'Ermont Eaubonne ↔ Aéroport CDG - Roissypôle - T3",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_351",
+      "display_name": "Ligne 351",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {
+        "ROISSY": 1
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01299",
+      "navitia_line_id": "line:IDFM:C01299",
+      "gtfs": {
+        "short_name": "351",
+        "long_name": "351",
+        "route_type": 3,
+        "network": "Express Roissy",
+        "color": "#F1C232",
+        "text_color": "#000000"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Transdev | Île-de-France Mobilités",
+        "itinerary": "Nation-Trône ↔ R-P. P. Sémard ∙ Aéroport CDG - Roissypôle - T3",
+        "static_status": "Travaux"
+      }
+    },
+    {
+      "id": "BUS_350",
+      "display_name": "Ligne 350",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY",
+        "BOURGET"
+      ],
+      "sort_order": {
+        "ROISSY": 0,
+        "BOURGET": 7
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01298",
+      "navitia_line_id": "line:IDFM:C01298",
+      "gtfs": {
+        "short_name": "350",
+        "long_name": "350",
+        "route_type": 3,
+        "network": "Express Roissy",
+        "color": "#662D91",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Transdev | Île-de-France Mobilités",
+        "itinerary": "Porte de la Chapelle ↔ Aéroport CDG - Roissypôle - T3",
+        "static_status": "Travaux"
+      }
+    },
+    {
+      "id": "BUS_N1",
+      "display_name": "Navette N1",
+      "app_type": "SHUTTLE",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {
+        "ROISSY": 90
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C00562",
+      "navitia_line_id": "line:IDFM:C00562",
+      "gtfs": {
+        "short_name": "N1",
+        "long_name": "N1",
+        "route_type": 3,
+        "network": "ADP",
+        "color": "#DF3A82",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Paris Aéroport",
+        "itinerary": "Circulaire Aéroport CDG (T2)",
+        "static_status": "Travaux"
+      }
+    },
+    {
+      "id": "BUS_N2",
+      "display_name": "Navette N2",
+      "app_type": "SHUTTLE",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {
+        "ROISSY": 91
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01792",
+      "navitia_line_id": "line:IDFM:C01792",
+      "gtfs": {
+        "short_name": "N2",
+        "long_name": "N2",
+        "route_type": 3,
+        "network": "ADP",
+        "color": "#6CA513",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Paris Aéroport",
+        "itinerary": "Terminal 2F ↔ Terminal 2G (via 2E)",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_148",
+      "display_name": "Ligne 148",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "BOURGET"
+      ],
+      "sort_order": {
+        "BOURGET": 2
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01173",
+      "navitia_line_id": "line:IDFM:C01173",
+      "gtfs": {
+        "short_name": "148",
+        "long_name": "148",
+        "route_type": 3,
+        "network": "Ourcq",
+        "color": "#6E491E",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Transdev | Île-de-France Mobilités",
+        "itinerary": "Bobigny – P. P. ↔ Escadrille N.-N. ∙ Collège-Liberté ∙ Musée de l'Air",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_152",
+      "display_name": "Ligne 152",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "BOURGET"
+      ],
+      "sort_order": {
+        "BOURGET": 3
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01176",
+      "navitia_line_id": "line:IDFM:C01176",
+      "gtfs": {
+        "short_name": "152",
+        "long_name": "152",
+        "route_type": 3,
+        "network": "Ourcq",
+        "color": "#FF1400",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Transdev | Île-de-France Mobilités",
+        "itinerary": "Porte de la Villette ↔ Gonesse - ZAC des Tulipes Nord",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_247",
+      "display_name": "Ligne 247",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "BOURGET"
+      ],
+      "sort_order": {
+        "BOURGET": 4
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01695",
+      "navitia_line_id": "line:IDFM:C01695",
+      "gtfs": {
+        "short_name": "247",
+        "long_name": "247",
+        "route_type": 3,
+        "network": "Ourcq",
+        "color": "#FF5A00",
+        "text_color": "#000000"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Transdev | Île-de-France Mobilités",
+        "itinerary": "Drancy - Charles Sage ↔ Aulnay-sous-Bois - Garonor",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_249",
+      "display_name": "Ligne 249",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "BOURGET"
+      ],
+      "sort_order": {
+        "BOURGET": 5
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01241",
+      "navitia_line_id": "line:IDFM:C01241",
+      "gtfs": {
+        "short_name": "249",
+        "long_name": "249",
+        "route_type": 3,
+        "network": "Ourcq",
+        "color": "#D2D200",
+        "text_color": "#000000"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Transdev | Île-de-France Mobilités",
+        "itinerary": "Porte des Lilas ↔ Dugny - Place Casanova ∙ Valérie André",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_250",
+      "display_name": "Ligne 250",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "BOURGET"
+      ],
+      "sort_order": {
+        "BOURGET": 6
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01242",
+      "navitia_line_id": "line:IDFM:C01242",
+      "gtfs": {
+        "short_name": "250",
+        "long_name": "250",
+        "route_type": 3,
+        "network": "Plaine Saint-Denis",
+        "color": "#A0006E",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "RATP CAP Île-de-France | Île-de-France Mobilités",
+        "itinerary": "Fort d’Aubervilliers ↔ ZI - Fontaine Cypierre",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_133",
+      "display_name": "Ligne 133",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "BOURGET"
+      ],
+      "sort_order": {
+        "BOURGET": 0
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01161",
+      "navitia_line_id": "line:IDFM:C01161",
+      "gtfs": {
+        "short_name": "133",
+        "long_name": "133",
+        "route_type": 3,
+        "network": "Ourcq",
+        "color": "#82DC73",
+        "text_color": "#000000"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Transdev | Île-de-France Mobilités",
+        "itinerary": "Sarcelles – Bois d'Écouen ↔ Saint-Brice ∙ Le Bourget RER",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_183",
+      "display_name": "Ligne 183",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ORLY"
+      ],
+      "sort_order": {
+        "ORLY": 2
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01204",
+      "navitia_line_id": "line:IDFM:C01204",
+      "gtfs": {
+        "short_name": "183",
+        "long_name": "183",
+        "route_type": 3,
+        "network": "RATP",
+        "color": "#FF1400",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "RATP | Île-de-France Mobilités",
+        "itinerary": "Marché International de Rungis ↔ Aéroport d’Orly 1-2-3",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "T7",
+      "display_name": "Ligne T7",
+      "app_type": "TRAM",
+      "category": "SURFACE",
+      "sectors": [
+        "ORLY"
+      ],
+      "sort_order": {
+        "ORLY": 1
+      },
+      "shortcut_sectors": [
+        "ORLY"
+      ],
+      "idfm_route_id": "IDFM:C01774",
+      "navitia_line_id": "line:IDFM:C01774",
+      "gtfs": {
+        "short_name": "T7",
+        "long_name": "T7",
+        "route_type": 0,
+        "network": "RATP",
+        "color": "#6E491E",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "RATP | Île-de-France Mobilités",
+        "itinerary": "Villejuif – Louis Aragon ↔ Athis-Mons - Porte de l'Essonne",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "T9",
+      "display_name": "Ligne T9",
+      "app_type": "TRAM",
+      "category": "SURFACE",
+      "sectors": [
+        "ORLY"
+      ],
+      "sort_order": {
+        "ORLY": 0
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C02317",
+      "navitia_line_id": "line:IDFM:C02317",
+      "gtfs": {
+        "short_name": "T9",
+        "long_name": "T9",
+        "route_type": 0,
+        "network": "Keolis Ouest Val-de-Marne",
+        "color": "#3C91DC",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Keolis | Île-de-France Mobilités",
+        "itinerary": "Porte de Choisy ↔ Christophe Colomb ∙ Orly Gaston Viens",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_4121",
+      "display_name": "Ligne 4121",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ORLY"
+      ],
+      "sort_order": {
+        "ORLY": 4
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C00379",
+      "navitia_line_id": "line:IDFM:C00379",
+      "gtfs": {
+        "short_name": "4121",
+        "long_name": "4121",
+        "route_type": 3,
+        "network": "Val d'Yerres Val de Seine",
+        "color": "#0055C8",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Keolis | Île-de-France Mobilités",
+        "itinerary": "Gare de Yerres ↔ Marché International de Rungis ",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_480",
+      "display_name": "Ligne 480",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ORLY"
+      ],
+      "sort_order": {
+        "ORLY": 3
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C00006",
+      "navitia_line_id": "line:IDFM:C00006",
+      "gtfs": {
+        "short_name": "480",
+        "long_name": "480",
+        "route_type": 3,
+        "network": "Seine Grand Orly",
+        "color": "#3C91DC",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Keolis | Île-de-France Mobilités",
+        "itinerary": "Gare de Villeneuve-Saint-Georges ↔ Aéroport d'Orly 1-2-3",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_5154",
+      "display_name": "Ligne 5154",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ORLY"
+      ],
+      "sort_order": {
+        "ORLY": 5
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01571",
+      "navitia_line_id": "line:IDFM:C01571",
+      "gtfs": {
+        "short_name": "5154",
+        "long_name": "5154",
+        "route_type": 3,
+        "network": "Lignes Île-de-France Ouest",
+        "color": "#FFBE00",
+        "text_color": "#000000"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Francilité | Île-de-France Mobilités",
+        "itinerary": "Gare de Saint-Quentin-en-Yvelines ↔ Aéroport d'Orly 1-2-3",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_9112",
+      "display_name": "Ligne 9112",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ORLY"
+      ],
+      "sort_order": {
+        "ORLY": 6
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C02725",
+      "navitia_line_id": "line:IDFM:C02725",
+      "gtfs": {
+        "short_name": "9112",
+        "long_name": "9112",
+        "route_type": 3,
+        "network": "Evry Centre Essonne",
+        "color": "#3C91DC",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "TISSE | Île-de-France Mobilités",
+        "itinerary": "Gare de Corbeil-Essonnes ↔ Marché International de Rungis ",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_143",
+      "display_name": "Ligne 143",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "BOURGET"
+      ],
+      "sort_order": {
+        "BOURGET": 1
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01168",
+      "navitia_line_id": "line:IDFM:C01168",
+      "gtfs": {
+        "short_name": "143",
+        "long_name": "143",
+        "route_type": 3,
+        "network": "Ourcq",
+        "color": "#0055C8",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Transdev | Île-de-France Mobilités",
+        "itinerary": "La Courneuve - Aubervilliers ↔ Gare de Roissy-sous-Bois",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_607",
+      "display_name": "Ligne 607",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "BOURGET"
+      ],
+      "sort_order": {
+        "BOURGET": 8
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01578",
+      "navitia_line_id": "line:IDFM:C01578",
+      "gtfs": {
+        "short_name": "607",
+        "long_name": "607",
+        "route_type": 3,
+        "network": "Terres d'Envol",
+        "color": "#F28E43",
+        "text_color": "#000000"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Transdev | Île-de-France Mobilités",
+        "itinerary": "Villepinte - Hôpital Ballanger ↔ La Courneuve 8 Mai 1945",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_609",
+      "display_name": "Ligne 609",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "BOURGET"
+      ],
+      "sort_order": {
+        "BOURGET": 9
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01579",
+      "navitia_line_id": "line:IDFM:C01579",
+      "gtfs": {
+        "short_name": "609",
+        "long_name": "609",
+        "route_type": 3,
+        "network": "Terres d'Envol",
+        "color": "#C04191",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Transdev | Île-de-France Mobilités",
+        "itinerary": "Gare de Villepinte ↔ 8 Mai 1945 ∙ Fort d'Aubervilliers",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_610",
+      "display_name": "Ligne 610",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "BOURGET"
+      ],
+      "sort_order": {
+        "BOURGET": 10
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01580",
+      "navitia_line_id": "line:IDFM:C01580",
+      "gtfs": {
+        "short_name": "610",
+        "long_name": "610",
+        "route_type": 3,
+        "network": "Terres d'Envol",
+        "color": "#CEADD2",
+        "text_color": "#000000"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Transdev | Île-de-France Mobilités",
+        "itinerary": "Gare de Sevran Beaudottes ↔ Gare de Dugny - La Courneuve",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_703",
+      "display_name": "Ligne 703",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "BOURGET"
+      ],
+      "sort_order": {
+        "BOURGET": 11
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01550",
+      "navitia_line_id": "line:IDFM:C01550",
+      "gtfs": {
+        "short_name": "703",
+        "long_name": "703",
+        "route_type": 3,
+        "network": "Terres d'Envol",
+        "color": "#3BB2FF",
+        "text_color": "#000000"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Transdev | Île-de-France Mobilités",
+        "itinerary": "Gare de Drancy ↔ Gare du Bourget",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_7708",
+      "display_name": "Ligne 7708",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {
+        "ROISSY": 2
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C00960",
+      "navitia_line_id": "line:IDFM:C00960",
+      "gtfs": {
+        "short_name": "7708",
+        "long_name": "7708",
+        "route_type": 3,
+        "network": "Brie et 2 Morin",
+        "color": "#3C91DC",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Transdev | Île-de-France Mobilités",
+        "itinerary": "Gare de La Ferté-sous-Jouarre ↔ Terminal 3 - Roissypôle",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_7720",
+      "display_name": "Ligne 7720",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {
+        "ROISSY": 3
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C00661",
+      "navitia_line_id": "line:IDFM:C00661",
+      "gtfs": {
+        "short_name": "7720",
+        "long_name": "7720",
+        "route_type": 3,
+        "network": "Meaux et Ourcq",
+        "color": "#3C91DC",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Transdev | Île-de-France Mobilités",
+        "itinerary": "Gare de Meaux ↔ Aéroport CDG - Terminal 3 - Roissypôle",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_9501",
+      "display_name": "Ligne 9501",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {
+        "ROISSY": 4
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C00264",
+      "navitia_line_id": "line:IDFM:C00264",
+      "gtfs": {
+        "short_name": "9501",
+        "long_name": "9501",
+        "route_type": 3,
+        "network": "Roissy Ouest",
+        "color": "#5191CD",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Keolis | Île-de-France Mobilités",
+        "itinerary": "Gare de Survilliers-Fosses ↔ Terminal 3 - Roissypôle",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_9502",
+      "display_name": "Ligne 9502",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {
+        "ROISSY": 5
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C00265",
+      "navitia_line_id": "line:IDFM:C00265",
+      "gtfs": {
+        "short_name": "9502",
+        "long_name": "9502",
+        "route_type": 3,
+        "network": "Roissy Ouest",
+        "color": "#006DB8",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Keolis | Île-de-France Mobilités",
+        "itinerary": "Gare de Sarcelles Saint-Brice ↔ Terminal 3 - Roissypôle",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_9504",
+      "display_name": "Ligne 9504",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {
+        "ROISSY": 8
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01552",
+      "navitia_line_id": "line:IDFM:C01552",
+      "gtfs": {
+        "short_name": "9504",
+        "long_name": "9504",
+        "route_type": 3,
+        "network": "Vexin",
+        "color": "#3C91DC",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Keolis | Île-de-France Mobilités",
+        "itinerary": "Porte de Rouen ↔ Gare de Cergy Saint-Christophe",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_9518",
+      "display_name": "Ligne 9518",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {
+        "ROISSY": 9
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01472",
+      "navitia_line_id": "line:IDFM:C01472",
+      "gtfs": {
+        "short_name": "9518",
+        "long_name": "9518",
+        "route_type": 3,
+        "network": "Haut Val d'Oise",
+        "color": "#3C91DC",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Keolis | Île-de-France Mobilités",
+        "itinerary": "Gare de Cergy Préfecture ↔ Terminal 3 - Roissypôle",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_EX100",
+      "display_name": "Ligne EX 100",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {
+        "ROISSY": 12
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C02062",
+      "navitia_line_id": "line:IDFM:C02062",
+      "gtfs": {
+        "short_name": "EX 100",
+        "long_name": "EX 100 (future 700)",
+        "route_type": 3,
+        "network": "Marne et Brie",
+        "color": "#3C91DC",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Transdev | Île-de-France Mobilités",
+        "itinerary": "Chelles - Rond-Point des Sciences ↔ Terminal 3 - Roissypôle",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_EX19",
+      "display_name": "Ligne EX 19",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {
+        "ROISSY": 10
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C00639",
+      "navitia_line_id": "line:IDFM:C00639",
+      "gtfs": {
+        "short_name": "EX 19",
+        "long_name": "Express 19 (future 7719)",
+        "route_type": 3,
+        "network": "Marne et Brie",
+        "color": "#3C91DC",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Keolis | Île-de-France Mobilités",
+        "itinerary": "Gare de Torcy ↔ Aéroport CDG - Terminal 3 - Roissypôle",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_EX93",
+      "display_name": "Ligne EX 93",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {
+        "ROISSY": 11
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C00223",
+      "navitia_line_id": "line:IDFM:C00223",
+      "gtfs": {
+        "short_name": "EX 93",
+        "long_name": "EX 93",
+        "route_type": 3,
+        "network": "Roissy Ouest",
+        "color": "#5191CD",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Keolis | Île-de-France Mobilités",
+        "itinerary": "Bobigny - Pablo Picasso ↔ Terminal 3 - Roissypôle",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_R4",
+      "display_name": "Ligne R4",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {
+        "ROISSY": 13
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C00231",
+      "navitia_line_id": "line:IDFM:C00231",
+      "gtfs": {
+        "short_name": "R4",
+        "long_name": "R4",
+        "route_type": 3,
+        "network": "Roissy Ouest",
+        "color": "#98D0C1",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Keolis | Île-de-France Mobilités",
+        "itinerary": "Gare de Louvres ↔ Aéroport CDG - Terminal 3 - Roissypôle",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_TBUS1",
+      "display_name": "Ligne T'Bus 1",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {
+        "ROISSY": 14
+      },
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C02265",
+      "navitia_line_id": "line:IDFM:C02265",
+      "gtfs": {
+        "short_name": "T'bus 1",
+        "long_name": "T'bus 1",
+        "route_type": 3,
+        "network": "Terres d'Envol",
+        "color": "#E3051B",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Transdev | Île-de-France Mobilités",
+        "itinerary": "Gare du Vert Galant ↔ Roissypôle ∙ Route de l'Arpenteur",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_A01",
+      "display_name": "Ligne A01",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "BEAUVAIS"
+      ],
+      "sort_order": {
+        "BEAUVAIS": 0
+      },
+      "shortcut_sectors": [
+        "BEAUVAIS"
+      ],
+      "idfm_route_id": "IDFM:C02179",
+      "navitia_line_id": "line:IDFM:C02179",
+      "gtfs": {
+        "short_name": "A01 PPM",
+        "long_name": "A01 Paris Porte Maillot",
+        "route_type": 3,
+        "network": "Aérobus",
+        "color": "#0000CC",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Aérobus | Paris-Beauvais Airport",
+        "itinerary": "Porte Maillot ↔ Aéroport Paris-Beauvais",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_A04",
+      "display_name": "Ligne A04",
+      "app_type": "BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "BEAUVAIS"
+      ],
+      "sort_order": {
+        "BEAUVAIS": 1
+      },
+      "shortcut_sectors": [
+        "BEAUVAIS"
+      ],
+      "idfm_route_id": "IDFM:C02723",
+      "navitia_line_id": "line:IDFM:C02723",
+      "gtfs": {
+        "short_name": "A04 VIL",
+        "long_name": "A04 Paris La Villette",
+        "route_type": 3,
+        "network": "Aérobus",
+        "color": "#003DA5",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "v1": {
+        "operator": "Aérobus | Paris-Beauvais Airport",
+        "itinerary": "Porte de la Villette ↔ Aéroport Paris-Beauvais",
+        "static_status": "Service normal"
+      }
+    },
+    {
+      "id": "BUS_N22",
+      "display_name": "N22",
+      "app_type": "NIGHT_BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ORLY"
+      ],
+      "sort_order": {},
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01407",
+      "navitia_line_id": "line:IDFM:C01407",
+      "gtfs": {
+        "short_name": "N22",
+        "long_name": "N22",
+        "route_type": 3,
+        "network": "RATP",
+        "color": "#FFBE00",
+        "text_color": "#000000"
+      },
+      "state": "active",
+      "future": null,
+      "group": "NOCTILIEN",
+      "v1": {
+        "operator": null,
+        "itinerary": "Châtelet ↔ Juvisy (via Orly)",
+        "static_status": null
+      }
+    },
+    {
+      "id": "BUS_N31",
+      "display_name": "N31",
+      "app_type": "NIGHT_BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ORLY"
+      ],
+      "sort_order": {},
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01400",
+      "navitia_line_id": "line:IDFM:C01400",
+      "gtfs": {
+        "short_name": "N31",
+        "long_name": "N31",
+        "route_type": 3,
+        "network": "RATP",
+        "color": "#FF82B4",
+        "text_color": "#000000"
+      },
+      "state": "active",
+      "future": null,
+      "group": "NOCTILIEN",
+      "v1": {
+        "operator": null,
+        "itinerary": "Gare de Lyon ↔ Aéroport d'Orly 4",
+        "static_status": null
+      }
+    },
+    {
+      "id": "BUS_N131",
+      "display_name": "N131",
+      "app_type": "NIGHT_BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ORLY"
+      ],
+      "sort_order": {},
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01636",
+      "navitia_line_id": "line:IDFM:C01636",
+      "gtfs": {
+        "short_name": "N131",
+        "long_name": "N131",
+        "route_type": 3,
+        "network": "Cœur d’Essonne",
+        "color": "#FFBE00",
+        "text_color": "#000000"
+      },
+      "state": "active",
+      "future": null,
+      "group": "NOCTILIEN",
+      "v1": {
+        "operator": null,
+        "itinerary": "Gare de Lyon ↔ Brétigny (via Orly)",
+        "static_status": null
+      }
+    },
+    {
+      "id": "BUS_N139",
+      "display_name": "N139",
+      "app_type": "NIGHT_BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ORLY"
+      ],
+      "sort_order": {},
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01645",
+      "navitia_line_id": "line:IDFM:C01645",
+      "gtfs": {
+        "short_name": "N139",
+        "long_name": "N139",
+        "route_type": 3,
+        "network": "Evry Centre Essonne",
+        "color": "#00643C",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "group": "NOCTILIEN",
+      "v1": {
+        "operator": null,
+        "itinerary": "Gare de Lyon ↔ Corbeil-Essonnes (via Orly)",
+        "static_status": null
+      }
+    },
+    {
+      "id": "BUS_N140",
+      "display_name": "N140",
+      "app_type": "NIGHT_BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {},
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01638",
+      "navitia_line_id": "line:IDFM:C01638",
+      "gtfs": {
+        "short_name": "N140",
+        "long_name": "N140",
+        "route_type": 3,
+        "network": "Roissy Ouest",
+        "color": "#5191CD",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "group": "NOCTILIEN",
+      "v1": {
+        "operator": null,
+        "itinerary": "Gare de l'Est ↔ Roissypôle",
+        "static_status": null
+      }
+    },
+    {
+      "id": "BUS_N143",
+      "display_name": "N143",
+      "app_type": "NIGHT_BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "ROISSY"
+      ],
+      "sort_order": {},
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01644",
+      "navitia_line_id": "line:IDFM:C01644",
+      "gtfs": {
+        "short_name": "N143",
+        "long_name": "N143",
+        "route_type": 3,
+        "network": "Roissy Ouest",
+        "color": "#5191CD",
+        "text_color": "#FFFFFF"
+      },
+      "state": "active",
+      "future": null,
+      "group": "NOCTILIEN",
+      "v1": {
+        "operator": null,
+        "itinerary": "Gare de l'Est ↔ Roissypôle",
+        "static_status": null
+      }
+    },
+    {
+      "id": "BUS_N42",
+      "display_name": "N42",
+      "app_type": "NIGHT_BUS",
+      "category": "SURFACE",
+      "sectors": [
+        "BOURGET"
+      ],
+      "sort_order": {},
+      "shortcut_sectors": [],
+      "idfm_route_id": "IDFM:C01396",
+      "navitia_line_id": "line:IDFM:C01396",
+      "gtfs": {
+        "short_name": "N42",
+        "long_name": "N42",
+        "route_type": 3,
+        "network": "RATP",
+        "color": "#DC9600",
+        "text_color": "#000000"
+      },
+      "state": "active",
+      "future": null,
+      "group": "NOCTILIEN",
+      "v1": {
+        "operator": null,
+        "itinerary": "Gare de l'Est ↔ Le Bourget RER / Garonor",
+        "static_status": null
+      }
+    }
+  ]
+}

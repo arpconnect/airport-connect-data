@@ -24,7 +24,10 @@ sys.path.insert(0, str(ROOT / "tools" / "pipeline"))
 import fetch_plans as fp  # noqa: E402
 
 FIX = json.loads((ROOT / "tests" / "plans" / "opendata-2026-10-08.json").read_text(encoding="utf-8"))
-LINES = json.loads((ROOT / "data" / "lines.json").read_text(encoding="utf-8"))
+# Référentiel des lignes tel qu'il était le 8 octobre 2026, date des réponses de l'API enregistrées
+# (avant l'alignement sur le GTFS du jour) : les renumérotations y sont encore à détecter.
+LINES = json.loads((ROOT / "tests" / "plans" / "lines-2026-10-08.json").read_text(encoding="utf-8"))
+LINES_NOW = json.loads((ROOT / "data" / "lines.json").read_text(encoding="utf-8"))
 SOURCES = json.loads((ROOT / "data" / "plans-sources.json").read_text(encoding="utf-8"))
 TODAY = date(2026, 10, 8)
 failures, passed = [], 0
@@ -144,6 +147,9 @@ check("1 : renumérotations repérées dans le référentiel IDFM",
       sorted((w["detail"]["line"], w["detail"]["idfm_referential"]) for w in rep["warnings"] if w["code"] == "line_name_differs"),
       [("BUS_9501", "1601"), ("BUS_9502", "1602"), ("BUS_EX100", "700"), ("BUS_EX19", "7719"),
        ("BUS_EX93", "9301"), ("BUS_R4", "1614")])
+_, rep_now = fp.build(LINES_NOW, SOURCES, None, FakeHttp(), TODAY, None, "")
+check("1 : référentiel actuel aligné sur les noms du référentiel IDFM (aucune renumérotation restante)",
+      [w["detail"]["line"] for w in rep_now["warnings"] if w["code"] == "line_name_differs"], [])
 check("1 : distribution par lien par défaut", (cat["distribution"], "mirror_name" in p["BUS_351"]["file"]), ("link", False))
 
 # 2. Deuxième passage identique : requêtes conditionnelles, même version
