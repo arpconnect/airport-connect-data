@@ -1,0 +1,391 @@
+{
+ "captured_on": "2026-10-08",
+ "how": "Réponses réelles de l'API Opendatasoft v2.1 de data.iledefrance.fr, relevées le 8 octobre 2026 pour les 50 codes C actifs de data/lines.json (type PLAN : 48 lignes ; C02179 et C02723, navettes Aérobus Beauvais, n'ont qu'une fiche horaire).",
+ "line_documents": {
+  "total_count": 48,
+  "results": [
+   {
+    "id_line": "C00006",
+    "name_line": "480",
+    "document_name": "Plan de ligne 480",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260430T104146Z-de751168-2644-4447-a72e-e3da9dc90efa.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C00223",
+    "name_line": "9301",
+    "document_name": "Plan de la ligne 9301",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260821T122313Z-5d93d289-3092-4fbe-8756-48e45166be4a.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C00231",
+    "name_line": "1614",
+    "document_name": "Plan de la ligne 1614",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260821T123728Z-761ef2d1-a52a-427c-ae29-1071ef7b039b.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C00264",
+    "name_line": "1601",
+    "document_name": "Plan de la ligne 1601",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260821T124612Z-0cfe6880-f737-4c12-952a-bf766f989dc6.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C00265",
+    "name_line": "1602",
+    "document_name": "Plan de la ligne 1602",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260821T124718Z-bdd75f94-9199-460a-8976-8bc84f876e36.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C00379",
+    "name_line": "4121",
+    "document_name": "Plan de la ligne 4121",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260724T101308Z-0c3e113a-ec30-4a13-bc09-d9592bd370d5.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C00562",
+    "name_line": "N1",
+    "document_name": "Plan (mise à jour 29/12/2021)",
+    "url": "https://www.parisaeroport.fr/docs/default-source/passager-fichiers/acces/acces-routiers/plan-ligne_navette_n1_v2.pdf?sfvrsn=6cfe35bd_10",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C00563",
+    "name_line": "CDG VAL",
+    "document_name": "Plan CDG VAL",
+    "url": "https://www.parisaeroport.fr/docs/default-source/passager-fichiers/acces/acces-routiers/edito_navettes-inter-terminaux-paris-cdg_plan-cdgval.jpg?sfvrsn=b6fc35bd_8",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C00639",
+    "name_line": "7719",
+    "document_name": "Ligne 7719 - Plan de ligne",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260710T084933Z-c15216e5-838a-4822-a394-a76200a8fd20.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C00661",
+    "name_line": "7720",
+    "document_name": "Plan Ligne 7720",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260826T081524Z-7d03e961-a2a0-4caf-a8c4-0c326d9d7560.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C00960",
+    "name_line": "7708",
+    "document_name": "Plan Ligne 7708",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20251001T090717Z-7eb9d93e-fc27-4b19-bc27-38ec86274dd7.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01161",
+    "name_line": "133",
+    "document_name": "Plan ligne 133",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260422T112805Z-1c4c5069-ebf7-45b1-ba73-f8b2e87be2f9.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01168",
+    "name_line": "143",
+    "document_name": "Plan ligne 143",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260422T113001Z-ce905428-3c57-49c8-b523-94344a5eff64.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01173",
+    "name_line": "148",
+    "document_name": "Plan ligne 148",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260422T113656Z-19adf904-ece8-4f54-a730-1bcf134e29cf.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01176",
+    "name_line": "152",
+    "document_name": "Plan ligne 152",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260422T114123Z-2e253735-8b22-471f-a1df-a670b77ef00b.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01204",
+    "name_line": "183",
+    "document_name": "Plan de ligne 183",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260818T141257Z-ba5a998c-8382-4bed-a98f-7130b2d1e506.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01241",
+    "name_line": "249",
+    "document_name": "Plan ligne 249",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260422T114828Z-de31ae20-be49-4598-9e55-035c1d3a0778.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01242",
+    "name_line": "250",
+    "document_name": "Plan ligne 250",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260831T080306Z-9956a736-abcc-4e5c-9667-135f98782067.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01298",
+    "name_line": "350",
+    "document_name": "Plan ligne 350",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260819T071345Z-aed79ef1-ef58-4873-8610-4f4deb0b067d.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01299",
+    "name_line": "351",
+    "document_name": "Plan ligne 351",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260824T070717Z-9460187f-f06d-4953-bfba-406db64d6ea5.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01384",
+    "name_line": "14",
+    "document_name": "Plan Métro 14",
+    "url": "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/metro/plan-de-ligne_metro_ligne-14.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01388",
+    "name_line": "ORLYVAL",
+    "document_name": "Plan Orlyval",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260202T144524Z-6231dec6-b80e-4da1-9a43-036606d0a93e.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01396",
+    "name_line": "N42",
+    "document_name": "Plan Ligne N42",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20261001T085347Z-61626aa1-18f3-49cd-9c42-d3905ad9c8a3.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01400",
+    "name_line": "N31",
+    "document_name": "Plan de ligne N31",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260801T172952Z-398259fa-d99d-4086-a204-21f9b8897ba3.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01407",
+    "name_line": "N22",
+    "document_name": "Plan de ligne N22",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260801T173244Z-3acbb080-b616-4d58-8631-dd3acce414e5.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01472",
+    "name_line": "9518",
+    "document_name": "Plan de ligne 9518",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20240902T155852Z-d4362d6a-c493-4d5b-a706-18a9729bf1c4.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01550",
+    "name_line": "703",
+    "document_name": "Plan de la ligne 703",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/64fed8e443923_Ligne_NORD-SEINE-SAINT-DENIS_703.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01552",
+    "name_line": "9504",
+    "document_name": "Plan de ligne 9504",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20251215T153752Z-52381d26-4f37-4253-a7e2-f0edfd8e66c7.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01571",
+    "name_line": "5154",
+    "document_name": "Plan de la ligne 5154",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260820T091358Z-86a321a4-60c5-4d89-8c4a-07f3daf9f8f5.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01578",
+    "name_line": "607",
+    "document_name": "Plan de la ligne 607",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20240229T114001Z-7e20b425-316d-4f71-83c6-618992d04b87.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01579",
+    "name_line": "609",
+    "document_name": "Plan de la ligne 609",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20240229T114041Z-cfd4de35-e3fe-4544-9c76-139c12ffee78.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01580",
+    "name_line": "610",
+    "document_name": "Plan de la ligne 610",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20240602T141936Z-d3e7984f-071c-4e80-ab93-facf70b087fd.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01636",
+    "name_line": "N131",
+    "document_name": "Plan de ligne N131 à compter du 5 janvier 2026",
+    "url": "https://portail-idfm-operateurs.cdn.prismic.io/portail-idfm-operateurs/aTrYk3NYClf9oENd_Ligne_COEUR_D%27ESSONNE_N13150126v2.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01638",
+    "name_line": "N140",
+    "document_name": "Plan",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260821T131207Z-07f23a2b-6a6e-4b0d-9ba2-9e49509ac490.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01644",
+    "name_line": "N143",
+    "document_name": "Plan Ligne N143",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260821T131631Z-484e1e02-1574-49eb-a4f7-a2067c3eb53f.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01645",
+    "name_line": "N139",
+    "document_name": "Plan ligne N139",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260706T082656Z-3f99f447-e549-4cb2-8f45-b18f6f269f4e.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01695",
+    "name_line": "247",
+    "document_name": "Plan ligne 247",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260422T114409Z-963d40c9-7444-4749-a416-e8817ef99db4.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01727",
+    "name_line": "C",
+    "document_name": "Plan RER C",
+    "url": "https://www.transilien.com/fr/page-lignes/ligne-c",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01743",
+    "name_line": "B",
+    "document_name": "Plan RER B",
+    "url": "https://www.ratp.fr/plans-lignes/rer/b",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01774",
+    "name_line": "T7",
+    "document_name": "Plan Tramway T7",
+    "url": "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/tram/plan-de-ligne_tram_ligne-t7.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01792",
+    "name_line": "N2",
+    "document_name": "Plan (mise à jour 29/12/2021)",
+    "url": "https://www.parisaeroport.fr/docs/default-source/passager-fichiers/acces/acces-routiers/edito_navettes-inter-terminaux-paris-cdg_plan-circuit-n2.jpg?sfvrsn=28fe35bd_6",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C01999",
+    "name_line": "T11",
+    "document_name": "Plan de la ligne T11",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20250314T075859Z-7e7e895f-57cb-4cc8-8a9b-43e759a6eb7c.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C02062",
+    "name_line": "700",
+    "document_name": "Ligne 700 - Plan de ligne",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260710T091134Z-8af76d36-3e16-4a59-ad96-0c276a04e742.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C02265",
+    "name_line": "T'bus 1",
+    "document_name": "Plan de la ligne T'bus 1",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/64fed5fc38d66_Ligne_NORD-SEINE-SAINT-DENIS_Tbus1.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C02317",
+    "name_line": "T9",
+    "document_name": "Plan du T9",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260720T061331Z-5a596f07-ae3a-4854-a70c-1e02297b2520.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C02725",
+    "name_line": "9112",
+    "document_name": "Plan ligne 9112",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260706T084735Z-8c0bb3d9-11cc-4cd7-a47e-895fdf3eba89.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C02832",
+    "name_line": "9509",
+    "document_name": "Plan de ligne 9509",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20251103T162333Z-53d00b47-7df8-4d5b-82c9-32bd5198ae35.pdf",
+    "type": "PLAN"
+   },
+   {
+    "id_line": "C02835",
+    "name_line": "9517",
+    "document_name": "Plan de ligne Express 9517",
+    "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260130T170327Z-658af949-c2b0-44f4-a8c7-e49492782ee0.pdf",
+    "type": "PLAN"
+   }
+  ]
+ },
+ "network_plans": {
+  "total_count": 1,
+  "results": [
+   {
+    "id": "6",
+    "ordre_affichage": 13,
+    "nom_plan": "Plan du réseau de Nuit (schématique)",
+    "url": "https://eu.ftp.opendatasoft.com/stif/PlansRegion/Plans/NOCTILIEN_MF.pdf",
+    "poids": 0.8,
+    "date_publication": "2026-09",
+    "format": "pdf"
+   }
+  ]
+ },
+ "document_heads": {
+  "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/rer/plan-de-ligne_rer_ligne-b.pdf": {
+   "status": 200,
+   "content-type": "application/pdf",
+   "content-length": 771120,
+   "last-modified": "Sat, 28 Feb 2026 00:05:17 GMT"
+  },
+  "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/rer/plan-de-ligne_rer_ligne-c.pdf": {
+   "status": 200,
+   "content-type": "application/pdf",
+   "content-length": 238203,
+   "last-modified": "Mon, 23 Sep 2024 12:33:04 GMT"
+  },
+  "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/metro/plan-de-ligne_metro_ligne-14.pdf": {
+   "status": 200,
+   "content-type": "application/pdf",
+   "content-length": 587165,
+   "last-modified": "Mon, 03 Mar 2025 00:05:32 GMT"
+  },
+  "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/tram/plan-de-ligne_tram_ligne-t7.pdf": {
+   "status": 200,
+   "content-type": "application/pdf",
+   "content-length": 461639,
+   "last-modified": "Mon, 03 Mar 2025 00:05:33 GMT"
+  },
+  "https://ilico.iledefrance-mobilites.fr/uploads/plans/20260824T070717Z-9460187f-f06d-4953-bfba-406db64d6ea5.pdf": {
+   "status": 200,
+   "content-type": "application/pdf",
+   "content-length": 2046850,
+   "last-modified": "Mon, 24 Aug 2026 07:07:17 GMT"
+  }
+ }
+}

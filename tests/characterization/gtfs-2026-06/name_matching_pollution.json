@@ -1,0 +1,34 @@
+{
+  "schema": "airport-connect/characterization@1",
+  "rule": "Le matching par libellé de la v1 agrège des lignes homonymes ; la v2 identifie par code C",
+  "cases": [
+    {
+      "line": "BUS_703",
+      "own_route_id": "IDFM:C01550",
+      "own_trips": 104,
+      "homonym_routes": [
+        {
+          "route_id": "IDFM:C02129",
+          "short_name": "3",
+          "long_name": "3 (future 703)",
+          "trips": 204
+        }
+      ],
+      "share_of_wrong_trips": 0.662
+    },
+    {
+      "line": "BUS_R4",
+      "own_route_id": "IDFM:C00231",
+      "own_trips": 138,
+      "homonym_routes": [
+        {
+          "route_id": "IDFM:C00156",
+          "short_name": "R4",
+          "long_name": "R4 (future 6305)",
+          "trips": 299
+        }
+      ],
+      "share_of_wrong_trips": 0.684
+    }
+  ]
+}

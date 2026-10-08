@@ -1,0 +1,282 @@
+{
+  "schema": "airport-connect/characterization@1",
+  "rule": "Profil réel d'une journée de semaine pour les navettes aéroportuaires",
+  "reference_date": "2026-07-01",
+  "lines": {
+    "CDGVAL": {
+      "trips_on_reference_day": 572,
+      "trip_duration_minutes": {
+        "min": 9,
+        "max": 9
+      },
+      "directions": {
+        "0": {
+          "stops_longest_trip": [
+            "Terminal 2 Gare",
+            "Parking Px",
+            "Terminal 3",
+            "Parking Pr",
+            "Terminal 1"
+          ],
+          "headsigns": [
+            "Terminal 1"
+          ],
+          "departures_from_origin": 286,
+          "first": "00:00",
+          "last": "23:55",
+          "headway_minutes": {
+            "min": 4,
+            "median": 5,
+            "max": 20
+          },
+          "duplicate_departures": 0
+        },
+        "1": {
+          "stops_longest_trip": [
+            "Terminal 1",
+            "Parking Pr",
+            "Terminal 3",
+            "Parking Px",
+            "Terminal 2 Gare"
+          ],
+          "headsigns": [
+            "Terminal 2 Gare"
+          ],
+          "departures_from_origin": 286,
+          "first": "00:00",
+          "last": "23:55",
+          "headway_minutes": {
+            "min": 4,
+            "median": 5,
+            "max": 20
+          },
+          "duplicate_departures": 0
+        }
+      }
+    },
+    "ORLYVAL": {
+      "trips_on_reference_day": 301,
+      "trip_duration_minutes": {
+        "min": 6,
+        "max": 9
+      },
+      "directions": {
+        "0": {
+          "stops_longest_trip": [
+            "Orly 4",
+            "Orly 1-2-3",
+            "Antony"
+          ],
+          "headsigns": [
+            "Antony"
+          ],
+          "departures_from_origin": 147,
+          "first": "06:00",
+          "last": "23:35",
+          "headway_minutes": {
+            "min": 5,
+            "median": 7,
+            "max": 8
+          },
+          "duplicate_departures": 0
+        },
+        "1": {
+          "stops_longest_trip": [
+            "Antony",
+            "Orly 1-2-3",
+            "Orly 4"
+          ],
+          "headsigns": [
+            "Orly 4"
+          ],
+          "departures_from_origin": 154,
+          "first": "06:00",
+          "last": "23:35",
+          "headway_minutes": {
+            "min": 0,
+            "median": 7,
+            "max": 8
+          },
+          "duplicate_departures": 1
+        }
+      }
+    },
+    "BUS_N1": {
+      "trips_on_reference_day": 175,
+      "trip_duration_minutes": {
+        "min": 15,
+        "max": 15
+      },
+      "directions": {
+        "1": {
+          "stops_longest_trip": [
+            "Terminal 2 F",
+            "Gare TGV Nord",
+            "Aéroport CDG - Terminal 2D",
+            "Aéroport CDG - Terminal 2B",
+            "Aéroport CDG - Terminal 2A",
+            "Aéroport CDG - Terminal 2C",
+            "Gare TGV Sud",
+            "Terminal 2E",
+            "Terminal Pw (Résa Parking Eco)",
+            "Terminal 2 F"
+          ],
+          "headsigns": [
+            "Terminal 2 F"
+          ],
+          "departures_from_origin": 175,
+          "first": "00:02",
+          "last": "23:54",
+          "headway_minutes": {
+            "min": 7,
+            "median": 8,
+            "max": 15
+          },
+          "duplicate_departures": 0
+        }
+      }
+    },
+    "BUS_N2": {
+      "trips_on_reference_day": 281,
+      "trip_duration_minutes": {
+        "min": 4,
+        "max": 6
+      },
+      "directions": {
+        "0": {
+          "stops_longest_trip": [
+            "Terminal 2 G",
+            "Terminal 2E",
+            "Terminal 2 F"
+          ],
+          "headsigns": [
+            "Terminal 2 F"
+          ],
+          "departures_from_origin": 141,
+          "first": "05:30",
+          "last": "23:30",
+          "headway_minutes": {
+            "min": 6,
+            "median": 8,
+            "max": 10
+          },
+          "duplicate_departures": 0
+        },
+        "1": {
+          "stops_longest_trip": [
+            "Terminal 2 F",
+            "Terminal 2E",
+            "Terminal 2 G"
+          ],
+          "headsigns": [
+            "Terminal 2 G"
+          ],
+          "departures_from_origin": 140,
+          "first": "05:30",
+          "last": "23:30",
+          "headway_minutes": {
+            "min": 6,
+            "median": 8,
+            "max": 10
+          },
+          "duplicate_departures": 0
+        }
+      },
+      "terminal_2E_calls_by_hour": {
+        "21h": 10,
+        "22h": 20,
+        "23h": 11
+      }
+    },
+    "BUS_A01": {
+      "trips_on_reference_day": 80,
+      "trip_duration_minutes": {
+        "min": 89,
+        "max": 90
+      },
+      "directions": {
+        "0": {
+          "stops_longest_trip": [
+            "Aéroport Paris Beauvais",
+            "Paris Porte Maillot"
+          ],
+          "headsigns": [
+            "Paris Porte Maillot"
+          ],
+          "departures_from_origin": 46,
+          "first": "08:00",
+          "last": "23:15",
+          "headway_minutes": {
+            "min": 15,
+            "median": 15,
+            "max": 75
+          },
+          "duplicate_departures": 0
+        },
+        "1": {
+          "stops_longest_trip": [
+            "Paris Porte Maillot",
+            "Aéroport Paris Beauvais"
+          ],
+          "headsigns": [
+            "Aéroport Paris Beauvais"
+          ],
+          "departures_from_origin": 34,
+          "first": "02:45",
+          "last": "20:00",
+          "headway_minutes": {
+            "min": 15,
+            "median": 30,
+            "max": 90
+          },
+          "duplicate_departures": 0
+        }
+      }
+    },
+    "BUS_A04": {
+      "trips_on_reference_day": 13,
+      "trip_duration_minutes": {
+        "min": 90,
+        "max": 90
+      },
+      "directions": {
+        "0": {
+          "stops_longest_trip": [
+            "Aéroport Paris Beauvais",
+            "Paris La Villette"
+          ],
+          "headsigns": [
+            "Paris La Villette"
+          ],
+          "departures_from_origin": 10,
+          "first": "09:15",
+          "last": "22:15",
+          "headway_minutes": {
+            "min": 45,
+            "median": 60,
+            "max": 195
+          },
+          "duplicate_departures": 0
+        },
+        "1": {
+          "stops_longest_trip": [
+            "Paris La Villette",
+            "Aéroport Paris Beauvais"
+          ],
+          "headsigns": [
+            "Aéroport Paris Beauvais"
+          ],
+          "departures_from_origin": 3,
+          "first": "06:00",
+          "last": "11:00",
+          "headway_minutes": {
+            "min": 120,
+            "median": 180,
+            "max": 180
+          },
+          "duplicate_departures": 0
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "airport-connect/characterization@1",
+  "rule": "« Paris → Le Bourget » ne doit retenir que les trains qui desservent réellement la gare du Bourget",
+  "reference_date": "2026-07-01",
+  "origin": "Châtelet - Les Halles",
+  "trains_northbound": [
+    {
+      "terminus": "Aéroport Charles de Gaulle 2 (Terminal 2)",
+      "calls_at_le_bourget": false,
+      "count": 33
+    },
+    {
+      "terminus": "Aéroport Charles de Gaulle 2 (Terminal 2)",
+      "calls_at_le_bourget": true,
+      "count": 113
+    },
+    {
+      "terminus": "Mitry - Claye",
+      "calls_at_le_bourget": true,
+      "count": 96
+    }
+  ]
+}

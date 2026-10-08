@@ -1,0 +1,63 @@
+{
+  "schema": "airport-connect/rules-v2@1",
+  "rule": "Fusion des horaires théoriques (base) et d'une réponse temps réel PRIM, et disjoncteur par ligne",
+  "spec": ["R-150", "R-152", "R-154", "R-155", "R-55"],
+  "notes": [
+    "Contrairement à tests/characterization/ (comportement v1), ces cas décrivent le comportement CIBLE de la v2.",
+    "Temps en secondes Unix ; now = 1000000. Ligne demandée : IDFM:C01299 (351), quai demandé : IDFM:10219.",
+    "Seuils proposés : réponse périmée au-delà de 120 s, disjoncteur ouvert 300 s après 3 échecs consécutifs.",
+    "Règle temps réel stricte (D-4) appliquée : data_freshness doit valoir « realtime »."
+  ],
+  "context": {
+    "route_id": "IDFM:C01299",
+    "stop_id": "IDFM:10219",
+    "now": 1000000,
+    "theoretical": [
+      {"epoch": 1000300, "headsign": "Roissypôle"},
+      {"epoch": 1000900, "headsign": "Roissypôle"},
+      {"epoch": 1001500, "headsign": "Roissypôle"}
+    ]
+  },
+  "merge_cases": [
+    {"id": "aucune-reponse", "response": null,
+     "expected": {"states": ["theoretical", "theoretical", "theoretical"], "epochs": [1000300, 1000900, 1001500], "reason": "no_response", "rejected": 0, "realtime_used": false}},
+    {"id": "reponse-perimee-121s", "response": {"received_at": 999879, "departures": [
+       {"line_id": "line:IDFM:C01299", "stop_point_id": "stop_point:IDFM:10219", "base_epoch": 1000300, "epoch": 1000420, "data_freshness": "realtime", "headsign": "Roissypôle"}]},
+     "expected": {"states": ["theoretical", "theoretical", "theoretical"], "epochs": [1000300, 1000900, 1001500], "reason": "stale", "rejected": 0, "realtime_used": false}},
+    {"id": "reponse-a-120s-encore-valide", "response": {"received_at": 999880, "departures": [
+       {"line_id": "line:IDFM:C01299", "stop_point_id": "stop_point:IDFM:10219", "base_epoch": 1000300, "epoch": 1000420, "data_freshness": "realtime", "headsign": "Roissypôle"}]},
+     "expected": {"states": ["realtime", "theoretical", "theoretical"], "epochs": [1000420, 1000900, 1001500], "reason": null, "rejected": 0, "realtime_used": true}},
+    {"id": "retard-2-min", "response": {"received_at": 999990, "departures": [
+       {"line_id": "line:IDFM:C01299", "stop_point_id": "stop_point:IDFM:10219", "base_epoch": 1000300, "epoch": 1000420, "data_freshness": "realtime", "headsign": "Roissypôle"}]},
+     "expected": {"states": ["realtime", "theoretical", "theoretical"], "epochs": [1000420, 1000900, 1001500], "reason": null, "rejected": 0, "realtime_used": true}},
+    {"id": "avance-reordonne", "response": {"received_at": 999990, "departures": [
+       {"line_id": "line:IDFM:C01299", "stop_point_id": "stop_point:IDFM:10219", "base_epoch": 1001500, "epoch": 1000600, "data_freshness": "realtime", "headsign": "Roissypôle"}]},
+     "expected": {"states": ["theoretical", "realtime", "theoretical"], "epochs": [1000300, 1000600, 1000900], "reason": null, "rejected": 0, "realtime_used": true}},
+    {"id": "autre-ligne-au-meme-arret-rejetee", "response": {"received_at": 999990, "departures": [
+       {"line_id": "line:IDFM:C01407", "stop_point_id": "stop_point:IDFM:10219", "base_epoch": 1000300, "epoch": 1000310, "data_freshness": "realtime", "headsign": "Juvisy RER"}]},
+     "expected": {"states": ["theoretical", "theoretical", "theoretical"], "epochs": [1000300, 1000900, 1001500], "reason": null, "rejected": 1, "realtime_used": false}},
+    {"id": "autre-quai-rejete", "response": {"received_at": 999990, "departures": [
+       {"line_id": "line:IDFM:C01299", "stop_point_id": "stop_point:IDFM:10218", "base_epoch": 1000300, "epoch": 1000310, "data_freshness": "realtime", "headsign": "Nation - Trône"}]},
+     "expected": {"states": ["theoretical", "theoretical", "theoretical"], "epochs": [1000300, 1000900, 1001500], "reason": null, "rejected": 1, "realtime_used": false}},
+    {"id": "fraicheur-vide-non-temps-reel", "response": {"received_at": 999990, "departures": [
+       {"line_id": "line:IDFM:C01299", "stop_point_id": "stop_point:IDFM:10219", "base_epoch": 1000300, "epoch": 1000420, "data_freshness": "", "headsign": "Roissypôle"}]},
+     "expected": {"states": ["theoretical", "theoretical", "theoretical"], "epochs": [1000300, 1000900, 1001500], "reason": null, "rejected": 0, "realtime_used": false}},
+    {"id": "passage-supplementaire-sans-equivalent", "response": {"received_at": 999990, "departures": [
+       {"line_id": "line:IDFM:C01299", "stop_point_id": "stop_point:IDFM:10219", "base_epoch": null, "epoch": 1000100, "data_freshness": "realtime", "headsign": "Roissypôle"}]},
+     "expected": {"states": ["realtime", "theoretical", "theoretical", "theoretical"], "epochs": [1000100, 1000300, 1000900, 1001500], "reason": null, "rejected": 0, "realtime_used": true}},
+    {"id": "passages-depasses-retires", "now": 1000324, "response": {"received_at": 1000320, "departures": [
+       {"line_id": "line:IDFM:C01299", "stop_point_id": "stop_point:IDFM:10219", "base_epoch": 1000300, "epoch": 1000300, "data_freshness": "realtime", "headsign": "Roissypôle"}]},
+     "expected": {"states": ["realtime", "theoretical", "theoretical"], "epochs": [1000300, 1000900, 1001500], "reason": null, "rejected": 0, "realtime_used": true}},
+    {"id": "temps-reel-retire-a-moins-25s", "now": 1000325, "response": {"received_at": 1000320, "departures": [
+       {"line_id": "line:IDFM:C01299", "stop_point_id": "stop_point:IDFM:10219", "base_epoch": 1000300, "epoch": 1000300, "data_freshness": "realtime", "headsign": "Roissypôle"}]},
+     "expected": {"states": ["theoretical", "theoretical"], "epochs": [1000900, 1001500], "reason": null, "rejected": 0, "realtime_used": false}}
+  ],
+  "breaker_cases": [
+    {"id": "trois-echecs-ouvrent-300s", "events": [[0, false, null], [10, false, null], [20, false, null]],
+     "probes": [[319, false], [320, true]]},
+    {"id": "un-succes-remet-a-zero", "events": [[0, false, null], [10, false, null], [20, true, null], [30, false, null]],
+     "probes": [[31, true]]},
+    {"id": "retry-after-respecte", "events": [[0, false, 60]],
+     "probes": [[59, false], [60, true]]}
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "schema": "airport-connect/characterization@1",
+  "rule": "Conserver ou écarter un incident trafic RER B / RER C selon les axes couverts",
+  "source_v1": "ui/traffic/TrafficBranchFiltering.kt (règle de conservation, hors dé-doublonnage)",
+  "v2_status": "à conserver ; en v2, préférer les arrêts impactés fournis par PRIM (impacted_objects) au texte libre quand ils existent",
+  "notes": [
+    "Conserver si un indice d'axe couvert est présent OU si aucun indice de branche non couverte n'est présent.",
+    "Un incident générique de tronc commun (Châtelet, Gare du Nord…) est donc toujours conservé.",
+    "Les autres lignes ne sont jamais filtrées par cette règle."
+  ],
+  "cases": [
+    {"id": "b-mitry-seul", "line_names": ["RER B"], "stops": [], "summary": "Trafic perturbé entre Aulnay-sous-Bois et Mitry - Claye", "expected": false},
+    {"id": "b-tronc-commun", "line_names": ["RER B"], "stops": [], "summary": "Trafic interrompu entre Gare du Nord et Châtelet - Les Halles", "expected": true},
+    {"id": "b-vers-cdg", "line_names": ["RER B"], "stops": [], "summary": "Trafic perturbé entre Aulnay-sous-Bois et Aéroport CDG", "expected": true},
+    {"id": "b-mitry-et-cdg", "line_names": ["RER B"], "stops": [], "summary": "Incident entre Mitry - Claye et Aéroport Charles de Gaulle 2", "expected": true},
+    {"id": "b-robinson", "line_names": ["RER B"], "stops": [], "summary": "Travaux entre Bourg-la-Reine et Robinson", "expected": false},
+    {"id": "b-villeparisis", "line_names": ["RER B"], "stops": ["Villeparisis - Mitry-le-Neuf"], "summary": "Incident voyageur", "expected": false},
+    {"id": "b-roissypole", "line_names": ["RER B"], "stops": [], "summary": "Accès perturbé à Roissypôle", "expected": true},
+    {"id": "b-saint-remy", "line_names": ["RER B"], "stops": [], "summary": "Trafic ralenti vers Saint-Rémy-lès-Chevreuse", "expected": true},
+    {"id": "c-invalides-versailles", "line_names": ["RER C"], "stops": [], "summary": "Trafic interrompu entre Invalides et Versailles Château", "expected": false},
+    {"id": "c-juvisy", "line_names": ["RER C"], "stops": [], "summary": "Ralentissements à Juvisy", "expected": true},
+    {"id": "c-pontoise", "line_names": ["RER C"], "stops": [], "summary": "Travaux à Pontoise", "expected": false},
+    {"id": "c-montigny", "line_names": ["RER C"], "stops": [], "summary": "Retards entre Montigny - Beauchamp et Ermont - Eaubonne", "expected": false},
+    {"id": "c-rungis", "line_names": ["RER C"], "stops": [], "summary": "Gare de Pont de Rungis fermée", "expected": true},
+    {"id": "b-et-c-tronc", "line_names": ["RER B", "RER C"], "stops": [], "summary": "Incident à Saint-Michel Notre-Dame", "expected": true},
+    {"id": "b-et-c-une-branche-couverte", "line_names": ["RER B", "RER C"], "stops": [], "summary": "Trafic perturbé vers Mitry - Claye et Massy - Palaiseau", "expected": true},
+    {"id": "bus-jamais-filtre", "line_names": ["Ligne 351"], "stops": [], "summary": "Déviation à Mitry", "expected": true},
+    {"id": "texte-vide", "line_names": ["RER B"], "stops": [], "summary": "", "expected": true}
+  ]
+}

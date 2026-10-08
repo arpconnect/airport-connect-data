@@ -1,0 +1,68 @@
+# Catalogue quotidien des plans de lignes (spec R-180 à R-186, ADR-8).
+# Aucun secret : GitHub fournit le jeton du traitement (permission contents: write).
+# Publication : published/plans/catalogue.json, commité (tools/pipeline/publish_plans.sh).
+# Mode lien uniquement tant que D-9 n'est pas tranchée.
+name: plans
+
+on:
+  schedule:
+    - cron: "47 4 * * *"      # chaque jour à 04:47 UTC, après la mise à jour quotidienne du jeu IDFM
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publication          # partagé avec timetable.yml : les deux traitements commitent sur main
+  cancel-in-progress: false
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Vérifier les fichiers de données et l'outil
+        run: |
+          python3 -I tools/check_fixtures.py
+          python3 -I tests/test_fetch_plans.py
+
+      - name: Construire le catalogue
+        run: |
+          prev=""
+          if [ -f published/plans/catalogue.json ]; then prev="--previous-catalogue published/plans/catalogue.json"; fi
+          python3 -I tools/pipeline/fetch_plans.py --out dist-plans $prev
+
+      - name: Comparer avec la version publiée
+        id: changed
+        run: |
+          now="$(python3 -I -c 'import json;print(json.load(open("dist-plans/catalogue.json"))["version"])')"
+          before=""
+          if [ -f published/plans/catalogue.json ]; then
+            before="$(python3 -I -c 'import json;print(json.load(open("published/plans/catalogue.json")).get("version",""))')"
+          fi
+          if [ "$now" = "$before" ]; then
+            echo "Catalogue inchangé ($now) : rien à publier."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Conserver le rapport
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: plans-report
+          path: |
+            dist-plans/report.json
+            dist-plans/catalogue.json
+          if-no-files-found: ignore
+
+      - name: Publier
+        if: steps.changed.outputs.changed == 'true'
+        run: bash tools/pipeline/publish_plans.sh dist-plans

@@ -1,0 +1,19 @@
+{
+  "schema": "airport-connect/characterization@1",
+  "rule": "Un passage PRIM/Navitia est-il du temps réel ?",
+  "source_v1": "data/remote/NavitiaDepartureFilteringSupport.kt → inferRealtime (état final, appliqué à toutes les lignes)",
+  "v2_status": "décision à prendre (voir spec § 7.2) : la règle v1 affiche « temps réel » quand data_freshness est vide sur un appel temps réel ; la règle stricte proposée exige data_freshness = realtime",
+  "notes": [
+    "Conflit documenté : AUDIT V36L imposait la règle stricte au Noctilien ; AUDIT V37K a rétabli la règle permissive ; le code final applique la règle permissive partout.",
+    "Valeurs Navitia attendues pour data_freshness : realtime, base_schedule, adapted_schedule."
+  ],
+  "cases": [
+    {"id": "rt-explicite", "requested": "realtime", "freshness": "realtime", "expected_v1": true, "expected_strict": true},
+    {"id": "rt-majuscules", "requested": "realtime", "freshness": "REALTIME", "expected_v1": true, "expected_strict": true},
+    {"id": "rt-champ-vide", "requested": "realtime", "freshness": "", "expected_v1": true, "expected_strict": false},
+    {"id": "base-schedule", "requested": "realtime", "freshness": "base_schedule", "expected_v1": false, "expected_strict": false},
+    {"id": "adapted-schedule", "requested": "realtime", "freshness": "adapted_schedule", "expected_v1": false, "expected_strict": false},
+    {"id": "appel-theorique-champ-vide", "requested": "base_schedule", "freshness": "", "expected_v1": false, "expected_strict": false},
+    {"id": "appel-theorique-reponse-rt", "requested": "base_schedule", "freshness": "realtime", "expected_v1": false, "expected_strict": true}
+  ]
+}

@@ -1,0 +1,95 @@
+# Construction et publication quotidiennes de la base d'horaires (spec § 17, ADR-8).
+# Aucun secret : GitHub fournit le jeton du traitement (permission contents: write).
+# Publication : la base en pièce jointe d'une release « timetable-<version> », puis le manifeste
+# commité dans published/timetable/manifest.json (tools/pipeline/publish_timetable.sh).
+name: timetable
+
+on:
+  schedule:
+    - cron: "17 4 * * *"      # chaque jour à 04:17 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publication          # partagé avec plans.yml : les deux traitements commitent sur main
+  cancel-in-progress: false
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Vérifier les fixtures, les fichiers de données et les aménagements
+        run: |
+          python3 -I tools/check_fixtures.py
+          python3 -I tests/test_adjustments_pipeline.py
+
+      - name: Télécharger le GTFS IDFM
+        run: |
+          curl --fail --location --retry 3 --retry-delay 20 -o IDFM-gtfs.zip \
+            https://eu.ftp.opendatasoft.com/stif/GTFS/IDFM-gtfs.zip
+          sha256sum IDFM-gtfs.zip
+
+      - name: Comparer avec la source déjà publiée
+        id: changed
+        # Le manifeste publié est dans le dépôt : pas de téléchargement, pas d'ambiguïté.
+        run: |
+          current="$(sha256sum IDFM-gtfs.zip | cut -d' ' -f1)"
+          published=""
+          if [ -f published/timetable/manifest.json ]; then
+            published="$(python3 -I -c 'import json;print(json.load(open("published/timetable/manifest.json"))["source"]["sha256"])')"
+          fi
+          if [ "$current" = "$published" ]; then
+            echo "GTFS inchangé : rien à publier."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Construire la base
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          prev=""
+          if [ -f published/timetable/manifest.json ]; then prev="--previous-manifest published/timetable/manifest.json"; fi
+          python3 -I tools/pipeline/build_timetable.py IDFM-gtfs.zip --out dist \
+            --base-url "https://github.com/${{ github.repository }}/releases/download/timetable-{version}" $prev
+
+      - name: Valider la base produite
+        if: steps.changed.outputs.changed == 'true'
+        run: python3 -I tests/test_timetable_db.py dist/timetable-*.sqlite.gz
+
+      - name: Conserver le rapport
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: timetable-report
+          path: dist/report.json
+          if-no-files-found: ignore
+
+      - name: Publier
+        if: steps.changed.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash tools/pipeline/publish_timetable.sh dist
+
+      - name: Battement mensuel
+        # GitHub suspend les traitements planifiés d'un dépôt public sans activité depuis 60 jours.
+        # Un commit au moins par mois, même si rien n'a changé, les garde actifs.
+        if: success()
+        run: |
+          . tools/pipeline/git_publish.sh
+          month="$(date -u +%Y-%m)"
+          mkdir -p published
+          if [ "$(cat published/heartbeat 2>/dev/null || true)" != "$month" ]; then
+            echo "$month" > published/heartbeat
+            git pull --quiet --rebase origin "${{ github.ref_name }}"
+            commit_and_push "Battement mensuel $month" published/heartbeat
+          fi

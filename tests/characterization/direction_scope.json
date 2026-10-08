@@ -1,0 +1,41 @@
+{
+  "schema": "airport-connect/characterization@1",
+  "rule": "Directions retenues pour les RER B et C (axes réellement couverts par l'application)",
+  "source_v1": "data/gtfs/AirportConnectDirectionScope.kt",
+  "v2_status": "à conserver comme règle métier ; en v2, raisonner sur les arrêts desservis (GTFS) plutôt que sur le texte de la girouette quand c'est possible",
+  "notes": [
+    "supported : la direction (girouette / headsign) fait-elle partie d'un axe couvert ? Une ligne sans règle dédiée accepte tout.",
+    "compatible : variante utilisée pour une sélection d'arrêt avec mots-clés de direction et score de correspondance.",
+    "Limite assumée de la v1 : un RER C terminus Juvisy n'est pas retenu (aucun groupe inclus ne correspond)."
+  ],
+  "supported_cases": [
+    {"id": "b-cdg2", "line": "RER_B", "direction": "Aéroport Charles de Gaulle 2 (Terminal 2)", "expected": true},
+    {"id": "b-cdg-abrege", "line": "RER_B", "direction": "CDG", "expected": true},
+    {"id": "b-saint-remy", "line": "RER_B", "direction": "Saint-Rémy-lès-Chevreuse", "expected": true},
+    {"id": "b-massy", "line": "RER_B", "direction": "Massy - Palaiseau", "expected": true},
+    {"id": "b-mitry", "line": "RER_B", "direction": "Mitry - Claye", "expected": false},
+    {"id": "b-robinson", "line": "RER_B", "direction": "Robinson", "expected": false},
+    {"id": "b-gare-du-nord", "line": "RER_B", "direction": "Gare du Nord", "expected": false},
+    {"id": "b-vide", "line": "RER_B", "direction": "", "expected": false},
+    {"id": "c-massy", "line": "RER_C", "direction": "Massy - Palaiseau", "expected": true},
+    {"id": "c-pont-de-rungis", "line": "RER_C", "direction": "Pont de Rungis - Aéroport d'Orly", "expected": true},
+    {"id": "c-austerlitz", "line": "RER_C", "direction": "Paris Austerlitz", "expected": true},
+    {"id": "c-bibliotheque", "line": "RER_C", "direction": "Bibliothèque François Mitterrand", "expected": true},
+    {"id": "c-versailles", "line": "RER_C", "direction": "Versailles Château Rive Gauche", "expected": false},
+    {"id": "c-saint-quentin", "line": "RER_C", "direction": "Saint-Quentin-en-Yvelines", "expected": false},
+    {"id": "c-montigny", "line": "RER_C", "direction": "Montigny - Beauchamp", "expected": false},
+    {"id": "c-dourdan", "line": "RER_C", "direction": "Dourdan", "expected": false},
+    {"id": "c-etampes-accent", "line": "RER_C", "direction": "Étampes", "expected": false},
+    {"id": "c-pontoise", "line": "RER_C", "direction": "Pontoise", "expected": false},
+    {"id": "c-juvisy-non-couvert", "line": "RER_C", "direction": "Juvisy", "expected": false},
+    {"id": "bus-sans-regle", "line": "BUS_351", "direction": "Nation", "expected": true}
+  ],
+  "compatible_cases": [
+    {"id": "b-massy-terminus-partiel", "line": "RER_B", "direction": "Massy - Palaiseau", "keywords": ["Saint-Rémy-lès-Chevreuse"], "match_score": 0, "expected": true},
+    {"id": "b-cdg-pour-selection-sud", "line": "RER_B", "direction": "Aéroport Charles de Gaulle 2 (Terminal 2)", "keywords": ["Saint-Rémy-lès-Chevreuse"], "match_score": 0, "expected": false},
+    {"id": "b-score-suffisant", "line": "RER_B", "direction": "Aéroport Charles de Gaulle 2 (Terminal 2)", "keywords": ["Saint-Rémy-lès-Chevreuse"], "match_score": 25, "expected": true},
+    {"id": "b-sans-mots-cles", "line": "RER_B", "direction": "Aéroport Charles de Gaulle 2 (Terminal 2)", "keywords": [], "match_score": 0, "expected": true},
+    {"id": "b-mitry-toujours-exclu", "line": "RER_B", "direction": "Mitry - Claye", "keywords": [], "match_score": 100, "expected": false},
+    {"id": "c-pas-de-terminus-partiel", "line": "RER_C", "direction": "Massy - Palaiseau", "keywords": ["Pont de Rungis"], "match_score": 0, "expected": false}
+  ]
+}

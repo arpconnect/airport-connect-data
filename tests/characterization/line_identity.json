@@ -1,0 +1,28 @@
+{
+  "schema": "airport-connect/characterization@1",
+  "rule": "Identité d'une ligne : code C IDFM, jamais le libellé",
+  "source_v1": "data/gtfs/IdfmGtfsLineRegistry.kt (matching par libellé) — comportement à NE PAS reproduire",
+  "v2_status": "remplacé : la v2 identifie une ligne par idfm_route_id (data/lines.json) côté GTFS, et par line:IDFM:Cxxxxx côté PRIM",
+  "notes": [
+    "v1_name_match_cases documente le matching par libellé de la v1 : expected_v1 = résultat réel de la v1, correct = ce qui aurait dû se passer.",
+    "Les deux cas « homonyme » ont réellement pollué l'index embarqué de la v1 (mesure sur le GTFS de juin 2026 dans gtfs-2026-06/name_matching_pollution.json).",
+    "Depuis le 13 juillet 2026, la ligne 3 de Marne et Brie est renumérotée 703 : deux lignes 703 coexistent en Île-de-France."
+  ],
+  "v1_name_match_cases": [
+    {"id": "351-vs-N351", "candidates": ["351"], "route_short_name": "N351", "route_long_name": "N351", "expected_v1": false, "correct": false},
+    {"id": "14-vs-114", "candidates": ["14", "M14", "METRO 14", "METRO14"], "route_short_name": "114", "route_long_name": "114", "expected_v1": false, "correct": false},
+    {"id": "B-exact", "candidates": ["B", "RER B"], "route_short_name": "B", "route_long_name": "B", "expected_v1": true, "correct": true},
+    {"id": "B-vs-Bobigny", "candidates": ["B", "RER B"], "route_short_name": "BOB", "route_long_name": "Bobigny - Pablo Picasso", "expected_v1": false, "correct": false},
+    {"id": "navette-N1-vs-noctilien-N01", "candidates": ["N1"], "route_short_name": "N01", "route_long_name": "N01", "expected_v1": false, "correct": false},
+    {"id": "A01-libelle-gtfs-reel", "candidates": ["A01", "A 01"], "route_short_name": "A01 PPM", "route_long_name": "A01 Paris Porte Maillot", "expected_v1": true, "correct": true},
+    {"id": "homonyme-703-marne-et-brie", "candidates": ["703"], "route_short_name": "3", "route_long_name": "3 (future 703)", "expected_v1": true, "correct": false},
+    {"id": "homonyme-R4-saint-germain", "candidates": ["R4"], "route_short_name": "R4", "route_long_name": "R4 (future 6305)", "expected_v1": true, "correct": false}
+  ],
+  "realtime_line_match_cases": [
+    {"id": "meme-code-c", "line": "BUS_351", "payload_line_id": "line:IDFM:C01299", "expected": true},
+    {"id": "noctilien-au-meme-arret", "line": "BUS_351", "payload_line_id": "line:IDFM:C01407", "expected": false},
+    {"id": "orlyval-ancien-code-faux-v1", "line": "ORLYVAL", "payload_line_id": "line:IDFM:C01414", "expected": false},
+    {"id": "orlyval-code-correct", "line": "ORLYVAL", "payload_line_id": "line:IDFM:C01388", "expected": true},
+    {"id": "ligne-future-sans-code", "line": "CDG_EXPRESS", "payload_line_id": "line:IDFM:C01743", "expected": false}
+  ]
+}

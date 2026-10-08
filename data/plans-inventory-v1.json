@@ -1,0 +1,1254 @@
+{
+ "schema": "airport-connect/plans-inventory@1",
+ "description": "Inventaire des plans embarqués par la v1 (res/drawable-nodpi). Origine et licence inconnues : aucun plan n'est réutilisable en v2 tant que ces deux champs ne sont pas renseignés (docs/modele-donnees.md § 9).",
+ "totals": {
+  "plans": 54,
+  "bytes_including_previews": 68437965,
+  "identical_previews": 19
+ },
+ "plans": [
+  {
+   "plan_v1": "plan_bus_133",
+   "lines_v1": [
+    "BUS_133"
+   ],
+   "full": {
+    "file": "plan_bus_133.png",
+    "bytes": 965224,
+    "width": 2848,
+    "height": 827,
+    "sha256": "fe26c1e17f53dffc3f06bd54724d9b8b964f605d85397e15c3a34aa165b07e74"
+   },
+   "preview": {
+    "file": "plan_bus_133_preview.png",
+    "bytes": 232846,
+    "width": 1248,
+    "height": 382,
+    "sha256": "29897f7f0326e9f46b794e9d1eaf7a4d5a98b35db1212d15d7471cd8ff994456"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_143",
+   "lines_v1": [
+    "BUS_143"
+   ],
+   "full": {
+    "file": "plan_bus_143.png",
+    "bytes": 308648,
+    "width": 1870,
+    "height": 520,
+    "sha256": "6c45c239a4e7532d79515d86735fa6cc0d0294eb6244f0fbb9195e4e0483586e"
+   },
+   "preview": {
+    "file": "plan_bus_143_preview.png",
+    "bytes": 320080,
+    "width": 1248,
+    "height": 347,
+    "sha256": "2b42ac63bb7e2cdcd1fb695d1fc901d972a3cf572ba9238a258b9d002a63d6c4"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_148",
+   "lines_v1": [
+    "BUS_148"
+   ],
+   "full": {
+    "file": "plan_bus_148.png",
+    "bytes": 866154,
+    "width": 2848,
+    "height": 827,
+    "sha256": "ec99b5a4fe7157a815e92d4f0682946401f1e0437885a53468a6bc749188b4d3"
+   },
+   "preview": {
+    "file": "plan_bus_148_preview.png",
+    "bytes": 204276,
+    "width": 1248,
+    "height": 382,
+    "sha256": "90c7df35ce24b7bc93c6f5a5131b8d6c2742630c8153ceaae97ee4064858422f"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_152",
+   "lines_v1": [
+    "BUS_152"
+   ],
+   "full": {
+    "file": "plan_bus_152.png",
+    "bytes": 689340,
+    "width": 2848,
+    "height": 827,
+    "sha256": "529c5f8308ff9f3bc3615ba909bd251b7e326dfbf0849415b61d1bc1e52b95a1"
+   },
+   "preview": {
+    "file": "plan_bus_152_preview.png",
+    "bytes": 170970,
+    "width": 1248,
+    "height": 382,
+    "sha256": "dd4f2c783dac6059cf2ae7d653bf4bdb6b67231c6cb3cf49b88449419d811b54"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_183",
+   "lines_v1": [
+    "BUS_183"
+   ],
+   "full": {
+    "file": "plan_bus_183.png",
+    "bytes": 924086,
+    "width": 2848,
+    "height": 827,
+    "sha256": "df6c4a3e2d807d9165a873da905ccba3dc0d3fbefbcf485bdb0de4ef12a0c5d5"
+   },
+   "preview": {
+    "file": "plan_bus_183_preview.png",
+    "bytes": 227193,
+    "width": 1248,
+    "height": 382,
+    "sha256": "adaae42e67ed9584141a2f182867ca209cc4ba8c66216d7aa79c9f769cc8478b"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_247",
+   "lines_v1": [
+    "BUS_247"
+   ],
+   "full": {
+    "file": "plan_bus_247.png",
+    "bytes": 566424,
+    "width": 2848,
+    "height": 827,
+    "sha256": "80f3c25403a731f76fdc7df114ce9a16c73af25ea52162bb4c8a289b7a73d081"
+   },
+   "preview": {
+    "file": "plan_bus_247_preview.png",
+    "bytes": 141689,
+    "width": 1248,
+    "height": 382,
+    "sha256": "262162ca0e42d42f37cd923ff70e460120211cba98abb4d203e936c35db8766b"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_249",
+   "lines_v1": [
+    "BUS_249"
+   ],
+   "full": {
+    "file": "plan_bus_249.png",
+    "bytes": 1008355,
+    "width": 2848,
+    "height": 827,
+    "sha256": "c91e189c1df0e569aead72ef4c9eea5fde0c4908d913e13672c445a28ec8b2b4"
+   },
+   "preview": {
+    "file": "plan_bus_249_preview.png",
+    "bytes": 247513,
+    "width": 1248,
+    "height": 382,
+    "sha256": "460a78eaf1bbf857b995ece96f7862a8dc3b807250317459d00ff9570c260e1d"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_250",
+   "lines_v1": [
+    "BUS_250"
+   ],
+   "full": {
+    "file": "plan_bus_250.png",
+    "bytes": 731446,
+    "width": 2848,
+    "height": 827,
+    "sha256": "ef188a1e0da86bc7dfc4acfae479a237a5571fa924e72602a66aeb8de418a640"
+   },
+   "preview": {
+    "file": "plan_bus_250_preview.png",
+    "bytes": 181236,
+    "width": 1248,
+    "height": 382,
+    "sha256": "9b1762a9af0f02f0014a37b81e6a340195014770f6f8940207ac7e3c9f67a141"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_350",
+   "lines_v1": [
+    "BUS_350"
+   ],
+   "full": {
+    "file": "plan_bus_350.png",
+    "bytes": 2787604,
+    "width": 7000,
+    "height": 2976,
+    "sha256": "3232e662dc642be04845e8ba8a1895d4794b9d9a5ae8d5abe5428a4efdd22f23"
+   },
+   "preview": {
+    "file": "plan_bus_350_preview.png",
+    "bytes": 415017,
+    "width": 1248,
+    "height": 531,
+    "sha256": "1de5110f1fef672ce144ca2357013c5bbaaaa397fe71b58738c3e9bd467433e6"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_351",
+   "lines_v1": [
+    "BUS_351"
+   ],
+   "full": {
+    "file": "plan_bus_351.png",
+    "bytes": 1861561,
+    "width": 7000,
+    "height": 1950,
+    "sha256": "2266ac2e72b1b2f5ffde0adb9d609ecbd85b79f1e7953bd3480fcba3cec055f4"
+   },
+   "preview": {
+    "file": "plan_bus_351_preview.png",
+    "bytes": 235537,
+    "width": 1248,
+    "height": 348,
+    "sha256": "6f158cf404ac4ff8bef81d9c68f745b72738baece8dc3a0e70fc9234df9323a7"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_4121",
+   "lines_v1": [
+    "BUS_4121"
+   ],
+   "full": {
+    "file": "plan_bus_4121.png",
+    "bytes": 347575,
+    "width": 1180,
+    "height": 500,
+    "sha256": "458675365c0a0577cbd33e05b98761e7af6e6056540b0cc9ebf19cd77ed33cee"
+   },
+   "preview": {
+    "file": "plan_bus_4121_preview.png",
+    "bytes": 347575,
+    "width": 1180,
+    "height": 500,
+    "sha256": "458675365c0a0577cbd33e05b98761e7af6e6056540b0cc9ebf19cd77ed33cee"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_480",
+   "lines_v1": [
+    "BUS_480"
+   ],
+   "full": {
+    "file": "plan_bus_480.png",
+    "bytes": 390035,
+    "width": 1180,
+    "height": 500,
+    "sha256": "3d6d5bd87df58bce8f67cd7c8a215584ab5b7e90fe735521c8816146b32a837a"
+   },
+   "preview": {
+    "file": "plan_bus_480_preview.png",
+    "bytes": 390035,
+    "width": 1180,
+    "height": 500,
+    "sha256": "3d6d5bd87df58bce8f67cd7c8a215584ab5b7e90fe735521c8816146b32a837a"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_5154",
+   "lines_v1": [
+    "BUS_5154"
+   ],
+   "full": {
+    "file": "plan_bus_5154.png",
+    "bytes": 568804,
+    "width": 1180,
+    "height": 500,
+    "sha256": "6ca12196551e7c3541fa6d99f8898e6281a63caadc5f0e7b38b0e92e1ecda715"
+   },
+   "preview": {
+    "file": "plan_bus_5154_preview.png",
+    "bytes": 568804,
+    "width": 1180,
+    "height": 500,
+    "sha256": "6ca12196551e7c3541fa6d99f8898e6281a63caadc5f0e7b38b0e92e1ecda715"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_607",
+   "lines_v1": [
+    "BUS_607"
+   ],
+   "full": {
+    "file": "plan_bus_607.png",
+    "bytes": 525846,
+    "width": 1180,
+    "height": 500,
+    "sha256": "e1c72c87dc9abc12f1a14ebc94af2dbd08ee1269cc12463564e1aade95dfb919"
+   },
+   "preview": {
+    "file": "plan_bus_607_preview.png",
+    "bytes": 525846,
+    "width": 1180,
+    "height": 500,
+    "sha256": "e1c72c87dc9abc12f1a14ebc94af2dbd08ee1269cc12463564e1aade95dfb919"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_609",
+   "lines_v1": [
+    "BUS_609"
+   ],
+   "full": {
+    "file": "plan_bus_609.png",
+    "bytes": 487953,
+    "width": 1180,
+    "height": 500,
+    "sha256": "b5d5adddbc7584f266ea7e6464045900e786b318395a848a42b147f3397c377a"
+   },
+   "preview": {
+    "file": "plan_bus_609_preview.png",
+    "bytes": 487953,
+    "width": 1180,
+    "height": 500,
+    "sha256": "b5d5adddbc7584f266ea7e6464045900e786b318395a848a42b147f3397c377a"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_610",
+   "lines_v1": [
+    "BUS_610"
+   ],
+   "full": {
+    "file": "plan_bus_610.png",
+    "bytes": 484947,
+    "width": 1180,
+    "height": 500,
+    "sha256": "70fb3314fd7b54e3aa6e1d497a21cea5639a5ea052770893785aa3513f7d3829"
+   },
+   "preview": {
+    "file": "plan_bus_610_preview.png",
+    "bytes": 484947,
+    "width": 1180,
+    "height": 500,
+    "sha256": "70fb3314fd7b54e3aa6e1d497a21cea5639a5ea052770893785aa3513f7d3829"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_703",
+   "lines_v1": [
+    "BUS_703"
+   ],
+   "full": {
+    "file": "plan_bus_703.png",
+    "bytes": 306032,
+    "width": 1180,
+    "height": 500,
+    "sha256": "78b462aa8ca8c89a1f0d4f24d787cb755f10587816d3191e2a791b21abef17ad"
+   },
+   "preview": {
+    "file": "plan_bus_703_preview.png",
+    "bytes": 306032,
+    "width": 1180,
+    "height": 500,
+    "sha256": "78b462aa8ca8c89a1f0d4f24d787cb755f10587816d3191e2a791b21abef17ad"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_7708",
+   "lines_v1": [
+    "BUS_7708"
+   ],
+   "full": {
+    "file": "plan_bus_7708.png",
+    "bytes": 443418,
+    "width": 1180,
+    "height": 500,
+    "sha256": "d9fcacbf86f1b274909c6aa07ef9963936a4c83317f99bb6d8784299e106766f"
+   },
+   "preview": {
+    "file": "plan_bus_7708_preview.png",
+    "bytes": 443418,
+    "width": 1180,
+    "height": 500,
+    "sha256": "d9fcacbf86f1b274909c6aa07ef9963936a4c83317f99bb6d8784299e106766f"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_7720",
+   "lines_v1": [
+    "BUS_7720"
+   ],
+   "full": {
+    "file": "plan_bus_7720.png",
+    "bytes": 379216,
+    "width": 1180,
+    "height": 500,
+    "sha256": "3ba8a457145fabbf21d57dd8939d82488315050be570c5a742ace86966fd2de3"
+   },
+   "preview": {
+    "file": "plan_bus_7720_preview.png",
+    "bytes": 379216,
+    "width": 1180,
+    "height": 500,
+    "sha256": "3ba8a457145fabbf21d57dd8939d82488315050be570c5a742ace86966fd2de3"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_9112",
+   "lines_v1": [
+    "BUS_9112"
+   ],
+   "full": {
+    "file": "plan_bus_9112.png",
+    "bytes": 445774,
+    "width": 1180,
+    "height": 500,
+    "sha256": "c9ad9d92939fd13b60c00bf8535be214d5e81318e27f3928be51c7cb6eba1696"
+   },
+   "preview": {
+    "file": "plan_bus_9112_preview.png",
+    "bytes": 445774,
+    "width": 1180,
+    "height": 500,
+    "sha256": "c9ad9d92939fd13b60c00bf8535be214d5e81318e27f3928be51c7cb6eba1696"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_9501",
+   "lines_v1": [
+    "BUS_9501"
+   ],
+   "full": {
+    "file": "plan_bus_9501.png",
+    "bytes": 332528,
+    "width": 1180,
+    "height": 500,
+    "sha256": "541fd1a3fbe839dd4e177a0e573b6877aa053977e7fc813967cf9b600fef50c1"
+   },
+   "preview": {
+    "file": "plan_bus_9501_preview.png",
+    "bytes": 332528,
+    "width": 1180,
+    "height": 500,
+    "sha256": "541fd1a3fbe839dd4e177a0e573b6877aa053977e7fc813967cf9b600fef50c1"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_9502",
+   "lines_v1": [
+    "BUS_9502"
+   ],
+   "full": {
+    "file": "plan_bus_9502.png",
+    "bytes": 465879,
+    "width": 1180,
+    "height": 500,
+    "sha256": "b89741fe21384c9f6b7dd60ef7a0fa840930cb4197970080a01efa4e72538a4e"
+   },
+   "preview": {
+    "file": "plan_bus_9502_preview.png",
+    "bytes": 465879,
+    "width": 1180,
+    "height": 500,
+    "sha256": "b89741fe21384c9f6b7dd60ef7a0fa840930cb4197970080a01efa4e72538a4e"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_9504",
+   "lines_v1": [
+    "BUS_9504"
+   ],
+   "full": {
+    "file": "plan_bus_9504.png",
+    "bytes": 366350,
+    "width": 1180,
+    "height": 500,
+    "sha256": "3d72ee9e4808b47ad1d4c0144edf5a85e3a99e01a18f3e7b60f22bd3917bfbd4"
+   },
+   "preview": {
+    "file": "plan_bus_9504_preview.png",
+    "bytes": 366350,
+    "width": 1180,
+    "height": 500,
+    "sha256": "3d72ee9e4808b47ad1d4c0144edf5a85e3a99e01a18f3e7b60f22bd3917bfbd4"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_9509",
+   "lines_v1": [
+    "BUS_9509"
+   ],
+   "full": {
+    "file": "plan_bus_9509.png",
+    "bytes": 2788382,
+    "width": 2848,
+    "height": 1234,
+    "sha256": "af6f26a36b7b2ce9f1310b204727c6a1360bf28c9fe648659f56e0382abba74b"
+   },
+   "preview": {
+    "file": "plan_bus_9509_preview.png",
+    "bytes": 751257,
+    "width": 1248,
+    "height": 556,
+    "sha256": "4758c193d7a1e4d5f8522f40535e709994401cca95de2ccfc1051275b6cebf48"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_9517",
+   "lines_v1": [
+    "BUS_9517"
+   ],
+   "full": {
+    "file": "plan_bus_9517.png",
+    "bytes": 2489159,
+    "width": 2848,
+    "height": 1234,
+    "sha256": "2c258358230b244692094f48f7699811bc0917b6f20fea2e53b032734fa02889"
+   },
+   "preview": {
+    "file": "plan_bus_9517_preview.png",
+    "bytes": 668345,
+    "width": 1248,
+    "height": 556,
+    "sha256": "9a7016f82d48ddab3363d8e62f9a4ecd6197177881197dacb2f9939c3a7f08d4"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_9518",
+   "lines_v1": [
+    "BUS_9518"
+   ],
+   "full": {
+    "file": "plan_bus_9518.png",
+    "bytes": 813221,
+    "width": 1180,
+    "height": 500,
+    "sha256": "921283985f2c96e023834e8e3cbc91dea05449d29140b26afc183a240cef5dcb"
+   },
+   "preview": {
+    "file": "plan_bus_9518_preview.png",
+    "bytes": 813221,
+    "width": 1180,
+    "height": 500,
+    "sha256": "921283985f2c96e023834e8e3cbc91dea05449d29140b26afc183a240cef5dcb"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_a01_a04",
+   "lines_v1": [
+    "BUS_A01",
+    "BUS_A04"
+   ],
+   "full": {
+    "file": "plan_bus_a01_a04.png",
+    "bytes": 958443,
+    "width": 1170,
+    "height": 1170,
+    "sha256": "5ee31a1d839f3b39818a3575a864fd4124e239f2ad7d68ad983c9fdc284ef699"
+   },
+   "preview": {
+    "file": "plan_bus_a01_a04_preview.png",
+    "bytes": 503905,
+    "width": 780,
+    "height": 780,
+    "sha256": "bd15f0d440c91d04778018528aceeccd4f136364f6e8a484bfce3130fb16125f"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_ex100",
+   "lines_v1": [
+    "BUS_EX100"
+   ],
+   "full": {
+    "file": "plan_bus_ex100.png",
+    "bytes": 513715,
+    "width": 1180,
+    "height": 500,
+    "sha256": "b7515676c916833ec2fe321dcea90c0aa8fdb3d859dc365c02bd6671a520e683"
+   },
+   "preview": {
+    "file": "plan_bus_ex100_preview.png",
+    "bytes": 513715,
+    "width": 1180,
+    "height": 500,
+    "sha256": "b7515676c916833ec2fe321dcea90c0aa8fdb3d859dc365c02bd6671a520e683"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_ex19",
+   "lines_v1": [
+    "BUS_EX19"
+   ],
+   "full": {
+    "file": "plan_bus_ex19.png",
+    "bytes": 519953,
+    "width": 1180,
+    "height": 500,
+    "sha256": "fbdca15a2df4dffabd97c1029f63eab8b9c9d3223748d1371219e78fae85425f"
+   },
+   "preview": {
+    "file": "plan_bus_ex19_preview.png",
+    "bytes": 519953,
+    "width": 1180,
+    "height": 500,
+    "sha256": "fbdca15a2df4dffabd97c1029f63eab8b9c9d3223748d1371219e78fae85425f"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_ex93",
+   "lines_v1": [
+    "BUS_EX93"
+   ],
+   "full": {
+    "file": "plan_bus_ex93.png",
+    "bytes": 514580,
+    "width": 1180,
+    "height": 500,
+    "sha256": "35de8d74e62d99e780b8c95ca13d92925e17398793aae38c8f874ae455e0aa5e"
+   },
+   "preview": {
+    "file": "plan_bus_ex93_preview.png",
+    "bytes": 514580,
+    "width": 1180,
+    "height": 500,
+    "sha256": "35de8d74e62d99e780b8c95ca13d92925e17398793aae38c8f874ae455e0aa5e"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_n1",
+   "lines_v1": [
+    "BUS_N1"
+   ],
+   "full": {
+    "file": "plan_bus_n1.png",
+    "bytes": 340327,
+    "width": 4212,
+    "height": 1993,
+    "sha256": "427d651b6e7b7f454ad526b3fb4664dedbdab2a137208f79159acb3ec2392b96"
+   },
+   "preview": {
+    "file": "plan_bus_n1_preview.png",
+    "bytes": 216023,
+    "width": 1248,
+    "height": 609,
+    "sha256": "724583f20e8d236e6564034defdcd970c470d25856233e872a19440b2640f1f1"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_n2",
+   "lines_v1": [
+    "BUS_N2"
+   ],
+   "full": {
+    "file": "plan_bus_n2.png",
+    "bytes": 698476,
+    "width": 2848,
+    "height": 1356,
+    "sha256": "74ecaa04a028675e9c942871e5b2c53f8e254243cffa646474d4f957fb92f537"
+   },
+   "preview": {
+    "file": "plan_bus_n2_preview.png",
+    "bytes": 152112,
+    "width": 1248,
+    "height": 608,
+    "sha256": "d9956dbc0c0cbade7fb624238a2b0738888fa566c4714ef6b375ad3d98757d43"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_r4",
+   "lines_v1": [
+    "BUS_R4"
+   ],
+   "full": {
+    "file": "plan_bus_r4.png",
+    "bytes": 312852,
+    "width": 1180,
+    "height": 500,
+    "sha256": "d4596de1e93925a6879b3b1c9c7f7b82e94a9c3237e9590df858a0f8cadf828a"
+   },
+   "preview": {
+    "file": "plan_bus_r4_preview.png",
+    "bytes": 312852,
+    "width": 1180,
+    "height": 500,
+    "sha256": "d4596de1e93925a6879b3b1c9c7f7b82e94a9c3237e9590df858a0f8cadf828a"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_bus_tbus1",
+   "lines_v1": [
+    "BUS_TBUS1"
+   ],
+   "full": {
+    "file": "plan_bus_tbus1.png",
+    "bytes": 432750,
+    "width": 1180,
+    "height": 500,
+    "sha256": "06338959688f39c2b5f5f84a3579a068b7cb282540fad4609f7a3b69a7ac7a72"
+   },
+   "preview": {
+    "file": "plan_bus_tbus1_preview.png",
+    "bytes": 432750,
+    "width": 1180,
+    "height": 500,
+    "sha256": "06338959688f39c2b5f5f84a3579a068b7cb282540fad4609f7a3b69a7ac7a72"
+   },
+   "preview_identical_to_full": true,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_cdg_express",
+   "lines_v1": [
+    "CDG_EXPRESS"
+   ],
+   "full": {
+    "file": "plan_cdg_express.png",
+    "bytes": 452713,
+    "width": 3114,
+    "height": 1180,
+    "sha256": "7fe81dab40cb04a5a03bedf1dde6fbb181ec573e1b8fa327c7afbbd45c440408"
+   },
+   "preview": {
+    "file": "plan_cdg_express_preview.png",
+    "bytes": 254996,
+    "width": 2179,
+    "height": 826,
+    "sha256": "79da6caa5d959ddfa9af12eb7f25a3cd48fd2ce8d82cba45c502dfeda24fc152"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_cdgval",
+   "lines_v1": [
+    "CDGVAL"
+   ],
+   "full": {
+    "file": "plan_cdgval.png",
+    "bytes": 756222,
+    "width": 2848,
+    "height": 1352,
+    "sha256": "f1d0fe4f68e91e55d826f2336fefa2e75aee0a57cae7839b137e790230ebb775"
+   },
+   "preview": {
+    "file": "plan_cdgval_preview.png",
+    "bytes": 192902,
+    "width": 1248,
+    "height": 607,
+    "sha256": "4d5a016f7bdcc8d85032108cb4f757a4218a5d90d4f91d94fd4c24d6c225b6bb"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_metro_14",
+   "lines_v1": [
+    "METRO_14"
+   ],
+   "full": {
+    "file": "plan_metro_14.png",
+    "bytes": 321030,
+    "width": 2848,
+    "height": 415,
+    "sha256": "eb242a407e810be1a0433caae9b2abc8adea8ba2f9e2df03e9315ba6d4eca104"
+   },
+   "preview": {
+    "file": "plan_metro_14_preview.png",
+    "bytes": 68590,
+    "width": 1248,
+    "height": 205,
+    "sha256": "7b06b3b9e3afad01a4f81bbee19b9a90ab4fae0987c632b8e7a502c7a8aef077"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_metro_16",
+   "lines_v1": [
+    "METRO_16"
+   ],
+   "full": {
+    "file": "plan_metro_16.png",
+    "bytes": 1114983,
+    "width": 2848,
+    "height": 2058,
+    "sha256": "1ee5c024c3bc38cba11d87bfaa438586348f2bac04e8942bdc0200d882c00b7f"
+   },
+   "preview": {
+    "file": "plan_metro_16_preview.png",
+    "bytes": 264483,
+    "width": 1248,
+    "height": 909,
+    "sha256": "9041b6a2999bcb282a56f06fb64ac9491e5c0f74723b583b6b55c8de7dbcca97"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_metro_17",
+   "lines_v1": [
+    "METRO_17"
+   ],
+   "full": {
+    "file": "plan_metro_17.png",
+    "bytes": 1461529,
+    "width": 2848,
+    "height": 2754,
+    "sha256": "0715a725c54cf0d6b964295eb06088cab8f0ad2d3d2384a549df54e641da2ca3"
+   },
+   "preview": {
+    "file": "plan_metro_17_preview.png",
+    "bytes": 387798,
+    "width": 1248,
+    "height": 1208,
+    "sha256": "3b51e8dfb3570b77ee3671b8c5e1f4f662575460845c4231d9a06802e6023c32"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_metro_18",
+   "lines_v1": [
+    "METRO_18"
+   ],
+   "full": {
+    "file": "plan_metro_18.png",
+    "bytes": 934223,
+    "width": 2848,
+    "height": 2191,
+    "sha256": "d4e798d442d41eab8f998328f8a29d43d44075e474da3c271025c9ea05a4b74d"
+   },
+   "preview": {
+    "file": "plan_metro_18_preview.png",
+    "bytes": 236467,
+    "width": 1248,
+    "height": 967,
+    "sha256": "d199f847e3c38f236d677988d2bf4c9ac560b047a708f666d79c10ba60c116bc"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_n131",
+   "lines_v1": [
+    "N131"
+   ],
+   "full": {
+    "file": "plan_n131.png",
+    "bytes": 5949076,
+    "width": 2529,
+    "height": 5070,
+    "sha256": "724b3b1044b3aae769ec5aeaecd1499eb46e7b4baf66abbdca21d5baa21e8633"
+   },
+   "preview": {
+    "file": "plan_n131_preview.png",
+    "bytes": 928085,
+    "width": 748,
+    "height": 1500,
+    "sha256": "229a5c9ddffd76144a972ef27a8447bf6d12122af890f91f5aaea2a905951561"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_n139",
+   "lines_v1": [
+    "N139"
+   ],
+   "full": {
+    "file": "plan_n139.png",
+    "bytes": 2217199,
+    "width": 745,
+    "height": 6378,
+    "sha256": "0b8be2c7a28d7ae3cc8c1e473d70ae82e7ae35c3d1a704dcec01335bad2c7226"
+   },
+   "preview": {
+    "file": "plan_n139_preview.png",
+    "bytes": 277005,
+    "width": 175,
+    "height": 1500,
+    "sha256": "cca4f8e0c7b4c0f5a0bce928b9ee01d8b5b0686a20633da41338c965f12ea836"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_n140",
+   "lines_v1": [
+    "N140"
+   ],
+   "full": {
+    "file": "plan_n140.png",
+    "bytes": 724237,
+    "width": 744,
+    "height": 2116,
+    "sha256": "1755c73861c6951fc9a4bbc932098dfa5a6cb4c9c1686c6c0ddcca54e156e291"
+   },
+   "preview": {
+    "file": "plan_n140_preview.png",
+    "bytes": 649066,
+    "width": 527,
+    "height": 1500,
+    "sha256": "2b764f7e056be97ab2cc02d3a7b4c87f4f90c3be498837631c0c089f02dedbd6"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_n143",
+   "lines_v1": [
+    "N143"
+   ],
+   "full": {
+    "file": "plan_n143.png",
+    "bytes": 650197,
+    "width": 744,
+    "height": 2116,
+    "sha256": "406c7762e703bbf86a53d7840dd4906179f653a83e96d09d1fd4444d7f3e0037"
+   },
+   "preview": {
+    "file": "plan_n143_preview.png",
+    "bytes": 592456,
+    "width": 527,
+    "height": 1500,
+    "sha256": "ab11f2270441a4fbcf9c071f934393d689b63a10cd154e24da11d3b6ea6cd9f3"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_n22",
+   "lines_v1": [
+    "N22"
+   ],
+   "full": {
+    "file": "plan_n22.png",
+    "bytes": 656527,
+    "width": 1418,
+    "height": 2996,
+    "sha256": "84a559a5131c8bb3801aaf4f842af1a20752e0d1516654aaa46c164684b24d44"
+   },
+   "preview": {
+    "file": "plan_n22_preview.png",
+    "bytes": 493615,
+    "width": 757,
+    "height": 1600,
+    "sha256": "1f33d839fc49bd2d7d798ab191c5a858f6704ab5b5e47c4f8a8fc5a1f8b1417b"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_n31",
+   "lines_v1": [
+    "N31"
+   ],
+   "full": {
+    "file": "plan_n31.png",
+    "bytes": 711936,
+    "width": 1418,
+    "height": 2996,
+    "sha256": "12c849dcc60828f1cbcaec005d1addfdea2b69fd8273875b77666638f7cc20e0"
+   },
+   "preview": {
+    "file": "plan_n31_preview.png",
+    "bytes": 569114,
+    "width": 757,
+    "height": 1600,
+    "sha256": "fe5678933033b8f56ced0a70e7563491e956e9edb562a172e0eb13f4c7602e7d"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_n42",
+   "lines_v1": [
+    "N42"
+   ],
+   "full": {
+    "file": "plan_n42.png",
+    "bytes": 581925,
+    "width": 1418,
+    "height": 2996,
+    "sha256": "be002e75fbc3058d27ed2a6b508fa7f42bc00f995edb93b1aafe0b9b78507393"
+   },
+   "preview": {
+    "file": "plan_n42_preview.png",
+    "bytes": 434051,
+    "width": 757,
+    "height": 1600,
+    "sha256": "bd7c6a998d98f9d4ad89788d962924770bb9ae6a1241f49fbcfc56a4d7ac5267"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_noctilien",
+   "lines_v1": [
+    "NOCTILIEN"
+   ],
+   "full": {
+    "file": "plan_noctilien.png",
+    "bytes": 2246225,
+    "width": 3444,
+    "height": 3365,
+    "sha256": "44d7eacba27324c6318e17a9c27fd8737cc729252b360c95510bfba3c9809995"
+   },
+   "preview": {
+    "file": "plan_noctilien_preview.png",
+    "bytes": 895549,
+    "width": 1550,
+    "height": 1514,
+    "sha256": "928dcef637c1d0e2d25c3c19e52d79143a5d2dc07e36dd1c33dde2fe458d219b"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_orlyval",
+   "lines_v1": [
+    "ORLYVAL"
+   ],
+   "full": {
+    "file": "plan_orlyval.png",
+    "bytes": 294459,
+    "width": 9504,
+    "height": 679,
+    "sha256": "b7270cce92d01aa14542ac38b3713c59bf602bef88b32201a7cedc06cf698abf"
+   },
+   "preview": {
+    "file": "plan_orlyval_preview.png",
+    "bytes": 36661,
+    "width": 1248,
+    "height": 128,
+    "sha256": "3746e4d225a30d70d8438c35d4afa4796fe828d0e0a038f1486c29e08999f76a"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_rer_b",
+   "lines_v1": [
+    "RER_B"
+   ],
+   "full": {
+    "file": "plan_rer_b.png",
+    "bytes": 463837,
+    "width": 2848,
+    "height": 416,
+    "sha256": "1fdfc0080b4626aa6872ee7c4ac0c39e728b1639fbd54595a13bf6e641801655"
+   },
+   "preview": {
+    "file": "plan_rer_b_preview.png",
+    "bytes": 110240,
+    "width": 1248,
+    "height": 206,
+    "sha256": "d6ce5cb536b8aedbd36c790bed3b5935cab3495f0982cf4449d04ead58afe379"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_rer_c",
+   "lines_v1": [
+    "RER_C"
+   ],
+   "full": {
+    "file": "plan_rer_c.png",
+    "bytes": 918107,
+    "width": 2848,
+    "height": 901,
+    "sha256": "74bd4c423361f844f9f596cbd09961fe160f5a0081e6c6fbcf951a5479292f37"
+   },
+   "preview": {
+    "file": "plan_rer_c_preview.png",
+    "bytes": 215015,
+    "width": 1248,
+    "height": 414,
+    "sha256": "d009c432403258623158e557e1faa77f2de35f43cd3fb8efa5ec751e7be0d4dd"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_t11",
+   "lines_v1": [
+    "T11"
+   ],
+   "full": {
+    "file": "plan_t11.png",
+    "bytes": 187191,
+    "width": 2848,
+    "height": 385,
+    "sha256": "a7ac8e8ed9029decd1d9f229aaea7b3c6669343be6fba43d2098606dc0d8afba"
+   },
+   "preview": {
+    "file": "plan_t11_preview.png",
+    "bytes": 49488,
+    "width": 1248,
+    "height": 192,
+    "sha256": "e6b65a7eb4f38d96a344369e7efc58dfd8847368adf058d28219038ebb223303"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_t7",
+   "lines_v1": [
+    "T7"
+   ],
+   "full": {
+    "file": "plan_t7.png",
+    "bytes": 273762,
+    "width": 2848,
+    "height": 347,
+    "sha256": "864f42ea2293128b97f848e28bb8b2ba16191f60a7819753d6ca812f77237ff8"
+   },
+   "preview": {
+    "file": "plan_t7_preview.png",
+    "bytes": 58896,
+    "width": 1248,
+    "height": 176,
+    "sha256": "5485d584c2cb850f0594169cd5e23d2bb7f252c95218b97002946c1a841b4b1f"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  },
+  {
+   "plan_v1": "plan_t9",
+   "lines_v1": [
+    "T9"
+   ],
+   "full": {
+    "file": "plan_t9.png",
+    "bytes": 707242,
+    "width": 2848,
+    "height": 1238,
+    "sha256": "6e208a6f07ddfba84c1e0aed412593f71b5f0635bdd1738a8f8aa6de6e00f7a8"
+   },
+   "preview": {
+    "file": "plan_t9_preview.png",
+    "bytes": 146384,
+    "width": 1248,
+    "height": 558,
+    "sha256": "5143ae0ea4834bcf8a4b77bbe37252b940f5043c42e94be512fc555051635e4d"
+   },
+   "preview_identical_to_full": false,
+   "origin": null,
+   "licence": null
+  }
+ ]
+}

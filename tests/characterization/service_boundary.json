@@ -1,0 +1,55 @@
+{
+  "schema": "airport-connect/characterization@1",
+  "rule": "Passages visibles à un arrêt et message de frontière de service (horaires théoriques)",
+  "source_v1": "data/gtfs/IdfmGtfsTheoreticalRepository.kt → getStationSnapshot (fenêtres 15 min / 60 min, 4 passages max)",
+  "v2_status": "à conserver ; amélioration proposée : remplacer « Service terminé » par « Reprise à HH:MM » quand la reprise est connue (voir spec § 6.3)",
+  "notes": [
+    "Un « bloc de service » = l'ensemble des passages d'une même date de service GTFS (une nuit Noctilien de 23:55 à 29:55 forme un seul bloc).",
+    "Les passages d'un bloc deviennent visibles 15 min avant son premier passage.",
+    "Sans passage visible : « Service non commencé » si le prochain bloc démarre dans 60 min ou moins, sinon « Service terminé ».",
+    "patterns : first/last/headway_min génèrent first, first+h, … jusqu'à last inclus, au format horaire GTFS (heures ≥ 24 autorisées).",
+    "Dates hors changement d'heure : la v1 calcule minuit local + secondes GTFS, la norme dit midi − 12 h (identique hors jours de bascule).",
+    "expected.visible : heures locales Europe/Paris au format AAAA-MM-JJTHH:MM."
+  ],
+  "fixtures": {
+    "jour": [
+      {"service_date": "2026-06-30", "first": "05:30", "last": "23:30", "headway_min": 8},
+      {"service_date": "2026-07-01", "first": "05:30", "last": "23:30", "headway_min": 8},
+      {"service_date": "2026-07-02", "first": "05:30", "last": "23:30", "headway_min": 8}
+    ],
+    "nuit": [
+      {"service_date": "2026-07-01", "first": "23:55", "last": "29:55", "headway_min": 20},
+      {"service_date": "2026-07-02", "first": "23:55", "last": "29:55", "headway_min": 20}
+    ],
+    "vide": []
+  },
+  "cases": [
+    {"id": "jour-90min-avant-premier-depart", "fixture": "jour", "now": "2026-07-01T04:00",
+     "expected": {"visible": [], "boundary": "service_ended"},
+     "comment": "Comportement v1 discutable : « Service terminé » affiché 90 min avant la reprise."},
+    {"id": "jour-60min-avant", "fixture": "jour", "now": "2026-07-01T04:30",
+     "expected": {"visible": [], "boundary": "service_not_started"}},
+    {"id": "jour-45min-avant", "fixture": "jour", "now": "2026-07-01T04:45",
+     "expected": {"visible": [], "boundary": "service_not_started"}},
+    {"id": "jour-16min-avant", "fixture": "jour", "now": "2026-07-01T05:14",
+     "expected": {"visible": [], "boundary": "service_not_started"}},
+    {"id": "jour-15min-avant-revelation", "fixture": "jour", "now": "2026-07-01T05:15",
+     "expected": {"visible": ["2026-07-01T05:30", "2026-07-01T05:38", "2026-07-01T05:46", "2026-07-01T05:54"], "boundary": null}},
+    {"id": "jour-midi", "fixture": "jour", "now": "2026-07-01T12:00",
+     "expected": {"visible": ["2026-07-01T12:02", "2026-07-01T12:10", "2026-07-01T12:18", "2026-07-01T12:26"], "boundary": null}},
+    {"id": "jour-dernier-passage-pile", "fixture": "jour", "now": "2026-07-01T23:30",
+     "expected": {"visible": ["2026-07-01T23:30"], "boundary": null}},
+    {"id": "jour-apres-dernier", "fixture": "jour", "now": "2026-07-01T23:31",
+     "expected": {"visible": [], "boundary": "service_ended"}},
+    {"id": "nuit-apres-minuit-meme-bloc", "fixture": "nuit", "now": "2026-07-02T00:20",
+     "expected": {"visible": ["2026-07-02T00:35", "2026-07-02T00:55", "2026-07-02T01:15", "2026-07-02T01:35"], "boundary": null}},
+    {"id": "nuit-matinee", "fixture": "nuit", "now": "2026-07-02T06:30",
+     "expected": {"visible": [], "boundary": "service_ended"}},
+    {"id": "nuit-55min-avant", "fixture": "nuit", "now": "2026-07-02T23:00",
+     "expected": {"visible": [], "boundary": "service_not_started"}},
+    {"id": "nuit-15min-avant-traverse-minuit", "fixture": "nuit", "now": "2026-07-02T23:40",
+     "expected": {"visible": ["2026-07-02T23:55", "2026-07-03T00:15", "2026-07-03T00:35", "2026-07-03T00:55"], "boundary": null}},
+    {"id": "aucun-passage", "fixture": "vide", "now": "2026-07-01T12:00",
+     "expected": {"visible": [], "boundary": null}}
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "description": "Couples de couleurs que l'interface utilise réellement, avec le contraste minimal exigé (WCAG 2.1 AA : 4,5 pour le texte, 3 pour le texte de 19 px gras et plus, les contours, les indicateurs d'état et les pictogrammes ; sans arrondi). Chaque couple est vérifié dans chaque thème par tools/check_fixtures.py.",
+  "pairs": [
+    {
+      "fg": "ink",
+      "bg": "paper",
+      "min": 4.5,
+      "use": "texte principal"
+    },
+    {
+      "fg": "ink",
+      "bg": "surface",
+      "min": 4.5,
+      "use": "texte principal sur carte"
+    },
+    {
+      "fg": "ink",
+      "bg": "surface-sunken",
+      "min": 4.5,
+      "use": "texte sur zone en retrait"
+    },
+    {
+      "fg": "ink-muted",
+      "bg": "paper",
+      "min": 4.5,
+      "use": "texte secondaire"
+    },
+    {
+      "fg": "ink-muted",
+      "bg": "surface",
+      "min": 4.5,
+      "use": "horaire prévu sur carte"
+    },
+    {
+      "fg": "ink-muted",
+      "bg": "surface-sunken",
+      "min": 4.5,
+      "use": "texte secondaire en retrait"
+    },
+    {
+      "fg": "on-signal",
+      "bg": "signal",
+      "min": 4.5,
+      "use": "bandeau de lieu et de direction"
+    },
+    {
+      "fg": "emphasis",
+      "bg": "paper",
+      "min": 4.5,
+      "use": "temps d'attente"
+    },
+    {
+      "fg": "emphasis",
+      "bg": "surface",
+      "min": 4.5,
+      "use": "temps d'attente sur carte"
+    },
+    {
+      "fg": "on-primary",
+      "bg": "primary",
+      "min": 4.5,
+      "use": "bouton principal"
+    },
+    {
+      "fg": "on-banner",
+      "bg": "banner",
+      "min": 4.5,
+      "use": "bandeau d'information"
+    },
+    {
+      "fg": "live",
+      "bg": "paper",
+      "min": 4.5,
+      "use": "marque temps réel"
+    },
+    {
+      "fg": "live",
+      "bg": "surface",
+      "min": 4.5,
+      "use": "marque temps réel sur carte"
+    },
+    {
+      "fg": "alert",
+      "bg": "paper",
+      "min": 4.5,
+      "use": "alerte"
+    },
+    {
+      "fg": "alert",
+      "bg": "surface",
+      "min": 4.5,
+      "use": "alerte sur carte"
+    },
+    {
+      "fg": "outline",
+      "bg": "paper",
+      "min": 3,
+      "use": "contour de bouton secondaire"
+    },
+    {
+      "fg": "outline",
+      "bg": "surface",
+      "min": 3,
+      "use": "contour de champ sur carte"
+    },
+    {
+      "fg": "focus",
+      "bg": "paper",
+      "min": 3,
+      "use": "anneau de focus"
+    },
+    {
+      "fg": "focus",
+      "bg": "surface",
+      "min": 3,
+      "use": "anneau de focus sur carte"
+    },
+    {
+      "fg": "focus",
+      "bg": "surface-sunken",
+      "min": 3,
+      "use": "anneau de focus en retrait"
+    },
+    {
+      "fg": "focus-on-signal",
+      "bg": "signal",
+      "min": 3,
+      "use": "anneau de focus sur le bandeau jaune"
+    },
+    {
+      "fg": "ink",
+      "bg": "surface",
+      "min": 3,
+      "use": "barre de l'onglet actif (tab-indicator)"
+    },
+    {
+      "fg": "on-signal",
+      "bg": "signal",
+      "min": 3,
+      "use": "liseré d'une pastille posée sur signal (badge-outline)"
+    },
+    {
+      "fg": "on-banner",
+      "bg": "banner",
+      "min": 3,
+      "use": "liseré d'une pastille posée sur banner (badge-outline)"
+    }
+  ],
+  "line_badges": {
+    "rule": "Fond = route_color du GTFS. Texte = route_text_color s'il atteint 3:1 (numéro en gras de 19 px minimum, style badge), sinon la plus contrastée de #000000 et #FFFFFF.",
+    "min": 3
+  }
+}

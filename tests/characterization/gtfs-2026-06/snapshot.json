@@ -1,0 +1,290 @@
+{
+  "schema": "airport-connect/gtfs-snapshot@1",
+  "source_zip_sha256": "6f5cd2fcc00470940da50b8caaf378bf84a73821226a3c157284a83be122b63f",
+  "calendar_window": {
+    "min_start": "20260615",
+    "max_end": "20260717"
+  },
+  "reference_dates": {
+    "weekday": "2026-07-01",
+    "friday_night": "2026-07-03"
+  },
+  "coverage": {
+    "BUS_133": {
+      "route_id": "IDFM:C01161",
+      "trips": 918,
+      "stop_times": 26890
+    },
+    "BUS_143": {
+      "route_id": "IDFM:C01168",
+      "trips": 782,
+      "stop_times": 27468
+    },
+    "BUS_148": {
+      "route_id": "IDFM:C01173",
+      "trips": 1489,
+      "stop_times": 38895
+    },
+    "BUS_152": {
+      "route_id": "IDFM:C01176",
+      "trips": 974,
+      "stop_times": 25381
+    },
+    "BUS_183": {
+      "route_id": "IDFM:C01204",
+      "trips": 832,
+      "stop_times": 24465
+    },
+    "BUS_247": {
+      "route_id": "IDFM:C01695",
+      "trips": 20,
+      "stop_times": 410
+    },
+    "BUS_249": {
+      "route_id": "IDFM:C01241",
+      "trips": 757,
+      "stop_times": 28652
+    },
+    "BUS_250": {
+      "route_id": "IDFM:C01242",
+      "trips": 207,
+      "stop_times": 6150
+    },
+    "BUS_350": {
+      "route_id": "IDFM:C01298",
+      "trips": 487,
+      "stop_times": 11074
+    },
+    "BUS_351": {
+      "route_id": "IDFM:C01299",
+      "trips": 630,
+      "stop_times": 15728
+    },
+    "BUS_4121": {
+      "route_id": "IDFM:C00379",
+      "trips": 261,
+      "stop_times": 5793
+    },
+    "BUS_480": {
+      "route_id": "IDFM:C00006",
+      "trips": 219,
+      "stop_times": 5364
+    },
+    "BUS_5154": {
+      "route_id": "IDFM:C01571",
+      "trips": 147,
+      "stop_times": 6088
+    },
+    "BUS_607": {
+      "route_id": "IDFM:C01578",
+      "trips": 400,
+      "stop_times": 11513
+    },
+    "BUS_609": {
+      "route_id": "IDFM:C01579",
+      "trips": 782,
+      "stop_times": 20438
+    },
+    "BUS_610": {
+      "route_id": "IDFM:C01580",
+      "trips": 230,
+      "stop_times": 6900
+    },
+    "BUS_703": {
+      "route_id": "IDFM:C01550",
+      "trips": 104,
+      "stop_times": 832
+    },
+    "BUS_7708": {
+      "route_id": "IDFM:C00960",
+      "trips": 18,
+      "stop_times": 180
+    },
+    "BUS_7720": {
+      "route_id": "IDFM:C00661",
+      "trips": 326,
+      "stop_times": 2277
+    },
+    "BUS_9112": {
+      "route_id": "IDFM:C02725",
+      "trips": 121,
+      "stop_times": 1644
+    },
+    "BUS_9501": {
+      "route_id": "IDFM:C00264",
+      "trips": 131,
+      "stop_times": 2751
+    },
+    "BUS_9502": {
+      "route_id": "IDFM:C00265",
+      "trips": 309,
+      "stop_times": 9248
+    },
+    "BUS_9504": {
+      "route_id": "IDFM:C01552",
+      "trips": 227,
+      "stop_times": 2270
+    },
+    "BUS_9509": {
+      "route_id": "IDFM:C02832",
+      "trips": 124,
+      "stop_times": 992
+    },
+    "BUS_9517": {
+      "route_id": "IDFM:C02835",
+      "trips": 333,
+      "stop_times": 3204
+    },
+    "BUS_9518": {
+      "route_id": "IDFM:C01472",
+      "trips": 327,
+      "stop_times": 4125
+    },
+    "BUS_A01": {
+      "route_id": "IDFM:C02179",
+      "trips": 112,
+      "stop_times": 224
+    },
+    "BUS_A04": {
+      "route_id": "IDFM:C02723",
+      "trips": 30,
+      "stop_times": 60
+    },
+    "BUS_EX100": {
+      "route_id": "IDFM:C02062",
+      "trips": 218,
+      "stop_times": 6104
+    },
+    "BUS_EX19": {
+      "route_id": "IDFM:C00639",
+      "trips": 156,
+      "stop_times": 1404
+    },
+    "BUS_EX93": {
+      "route_id": "IDFM:C00223",
+      "trips": 110,
+      "stop_times": 1007
+    },
+    "BUS_N1": {
+      "route_id": "IDFM:C00562",
+      "trips": 175,
+      "stop_times": 1750
+    },
+    "BUS_N131": {
+      "route_id": "IDFM:C01636",
+      "trips": 23,
+      "stop_times": 368
+    },
+    "BUS_N139": {
+      "route_id": "IDFM:C01645",
+      "trips": 16,
+      "stop_times": 304
+    },
+    "BUS_N140": {
+      "route_id": "IDFM:C01638",
+      "trips": 10,
+      "stop_times": 174
+    },
+    "BUS_N143": {
+      "route_id": "IDFM:C01644",
+      "trips": 24,
+      "stop_times": 216
+    },
+    "BUS_N2": {
+      "route_id": "IDFM:C01792",
+      "trips": 281,
+      "stop_times": 603
+    },
+    "BUS_N22": {
+      "route_id": "IDFM:C01407",
+      "trips": 131,
+      "stop_times": 6450
+    },
+    "BUS_N31": {
+      "route_id": "IDFM:C01400",
+      "trips": 101,
+      "stop_times": 4007
+    },
+    "BUS_N42": {
+      "route_id": "IDFM:C01396",
+      "trips": 181,
+      "stop_times": 6065
+    },
+    "BUS_R4": {
+      "route_id": "IDFM:C00231",
+      "trips": 138,
+      "stop_times": 790
+    },
+    "BUS_TBUS1": {
+      "route_id": "IDFM:C02265",
+      "trips": 243,
+      "stop_times": 8733
+    },
+    "CDGVAL": {
+      "route_id": "IDFM:C00563",
+      "trips": 572,
+      "stop_times": 2860
+    },
+    "CDG_EXPRESS": {
+      "route_id": null,
+      "trips": 0,
+      "stop_times": 0
+    },
+    "METRO_14": {
+      "route_id": "IDFM:C01384",
+      "trips": 5435,
+      "stop_times": 113807
+    },
+    "METRO_16": {
+      "route_id": null,
+      "trips": 0,
+      "stop_times": 0
+    },
+    "METRO_17": {
+      "route_id": null,
+      "trips": 0,
+      "stop_times": 0
+    },
+    "METRO_18": {
+      "route_id": null,
+      "trips": 0,
+      "stop_times": 0
+    },
+    "ORLYVAL": {
+      "route_id": "IDFM:C01388",
+      "trips": 433,
+      "stop_times": 1299
+    },
+    "RER_B": {
+      "route_id": "IDFM:C01743",
+      "trips": 6816,
+      "stop_times": 150622
+    },
+    "RER_C": {
+      "route_id": "IDFM:C01727",
+      "trips": 4887,
+      "stop_times": 107567
+    },
+    "T11": {
+      "route_id": "IDFM:C01999",
+      "trips": 775,
+      "stop_times": 5425
+    },
+    "T7": {
+      "route_id": "IDFM:C01774",
+      "trips": 758,
+      "stop_times": 13353
+    },
+    "T9": {
+      "route_id": "IDFM:C02317",
+      "trips": 1382,
+      "stop_times": 26116
+    }
+  },
+  "lines_without_route": [
+    "CDG_EXPRESS",
+    "METRO_16",
+    "METRO_17",
+    "METRO_18"
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "schema": "airport-connect/plans-sources@1",
+  "description": "Sources des plans de lignes (spec R-180 à R-186). Le catalogue est reconstruit chaque jour par tools/pipeline/fetch_plans.py ; aucun plan n'est saisi à la main. Pour chaque ligne, la source IDFM est essayée en premier ; une source de repli n'est utilisée que si l'URL IDFM ne mène pas à un document (PDF ou image).",
+  "checked_on": "2026-10-08",
+  "datasets": {
+    "line_documents": {
+      "portal": "https://data.iledefrance.fr",
+      "dataset_id": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
+      "title": "Liens fiches horaires et plans des lignes de transport en commun d'Île-de-France",
+      "publisher": "Île-de-France Mobilités",
+      "licence": "Licence Ouverte v2.0 (Etalab)",
+      "licence_scope": "La liste des liens. Les documents liés restent ceux de leurs éditeurs (IDFM, opérateurs, Paris Aéroport) ; le jeu de données n'en précise pas les droits.",
+      "update_frequency": "quotidienne",
+      "document_type": "PLAN"
+    },
+    "network_plans": {
+      "portal": "https://data.iledefrance.fr",
+      "dataset_id": "plans-region",
+      "title": "Plans du réseau régional de transports",
+      "publisher": "Île-de-France Mobilités",
+      "licence": "CC BY-NC-ND 4.0",
+      "licence_scope": "Les plans eux-mêmes : attribution obligatoire, usage non commercial, pas de modification."
+    }
+  },
+  "fallbacks": {
+    "RER_B": {
+      "url": "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/rer/plan-de-ligne_rer_ligne-b.pdf",
+      "title": "Plan de ligne RER B",
+      "provider": "RATP",
+      "reason": "Le jeu IDFM pointe vers la page web https://www.ratp.fr/plans-lignes/rer/b ; le PDF est celui que cette page propose."
+    },
+    "RER_C": {
+      "url": "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/rer/plan-de-ligne_rer_ligne-c.pdf",
+      "title": "Plan de ligne RER C",
+      "provider": "RATP",
+      "reason": "Le jeu IDFM pointe vers la page web https://www.transilien.com/fr/page-lignes/ligne-c, qui ne propose aucun fichier ; RATP publie le plan de la ligne C."
+    }
+  },
+  "no_plan": {
+    "BUS_A01": {
+      "reason": "Navette Aérobus Beauvais ⇄ Paris Porte Maillot : aucun plan publié. Le jeu IDFM ne référence qu'une fiche horaire, sous forme de page web de l'aéroport.",
+      "info_url": "https://www.aeroportparisbeauvais.com/acces-et-parking/navette-aerobus-paris-aeroport/"
+    },
+    "BUS_A04": {
+      "reason": "Navette Aérobus Beauvais ⇄ Paris La Villette : aucun plan publié. Le jeu IDFM ne référence qu'une fiche horaire, sous forme de page web de l'aéroport.",
+      "info_url": "https://www.aeroportparisbeauvais.com/acces-et-parking/navette-aerobus-paris-aeroport"
+    }
+  },
+  "network_plans": {
+    "NOCTILIEN": {
+      "record_id": "6",
+      "expected_title": "Plan du réseau de Nuit (schématique)",
+      "lines_group": "NOCTILIEN"
+    }
+  },
+  "untrusted_last_modified_hosts": {
+    "www.parisaeroport.fr": "Le serveur renvoie le même Last-Modified (22 novembre 2018) pour tous ses fichiers, y compris le plan N2 mis à jour en 2021 : cet en-tête ne date pas le document."
+  },
+  "limits": {
+    "max_bytes": 41943040,
+    "old_document_days": 730,
+    "max_failure_ratio": 0.5
+  }
+}

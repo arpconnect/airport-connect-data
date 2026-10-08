@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+dist/
+dist-plans/
+IDFM-gtfs.zip
+previous-*.json

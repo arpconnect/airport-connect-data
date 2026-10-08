@@ -1,0 +1,36 @@
+{
+  "schema": "airport-connect/characterization@1",
+  "rule": "Affichage du temps d'attente d'un passage",
+  "source_v1": "ui/components/StationsTimelineRows.kt → etaUiForStationDeparture",
+  "v2_status": "à conserver tel quel",
+  "notes": [
+    "input.ms_until = heure de départ − maintenant, en millisecondes. La v1 tronque vers zéro (division entière Kotlin), d'où les cas à ±999 ms.",
+    "expected.kind : minutes | approaching (« À l'approche ») | at_stop (« À l'arrêt ») | hidden (passage retiré de la liste).",
+    "Théorique : jamais d'état « À l'approche » ni « À l'arrêt » (le véhicule n'est pas suivi)."
+  ],
+  "cases": [
+    {"id": "rt-26s", "input": {"realtime": true, "ms_until": 26000}, "expected": {"kind": "minutes", "minutes": 1, "blink": false}},
+    {"id": "rt-25s-limite-approche", "input": {"realtime": true, "ms_until": 25000}, "expected": {"kind": "approaching", "blink": false}},
+    {"id": "rt-25999ms-tronque-a-25s", "input": {"realtime": true, "ms_until": 25999}, "expected": {"kind": "approaching", "blink": false}},
+    {"id": "rt-14s", "input": {"realtime": true, "ms_until": 14000}, "expected": {"kind": "approaching", "blink": false}},
+    {"id": "rt-13s-clignote", "input": {"realtime": true, "ms_until": 13000}, "expected": {"kind": "approaching", "blink": true}},
+    {"id": "rt-1s", "input": {"realtime": true, "ms_until": 1000}, "expected": {"kind": "approaching", "blink": true}},
+    {"id": "rt-0s-a-l-arret", "input": {"realtime": true, "ms_until": 0}, "expected": {"kind": "at_stop", "blink": false}},
+    {"id": "rt-moins-24s", "input": {"realtime": true, "ms_until": -24000}, "expected": {"kind": "at_stop", "blink": false}},
+    {"id": "rt-moins-24999ms-tronque", "input": {"realtime": true, "ms_until": -24999}, "expected": {"kind": "at_stop", "blink": false}},
+    {"id": "rt-moins-25s-masque", "input": {"realtime": true, "ms_until": -25000}, "expected": {"kind": "hidden", "blink": false}},
+    {"id": "rt-60s", "input": {"realtime": true, "ms_until": 60000}, "expected": {"kind": "minutes", "minutes": 1, "blink": false}},
+    {"id": "rt-61s", "input": {"realtime": true, "ms_until": 61000}, "expected": {"kind": "minutes", "minutes": 2, "blink": false}},
+    {"id": "rt-1h", "input": {"realtime": true, "ms_until": 3600000}, "expected": {"kind": "minutes", "minutes": 60, "blink": false}},
+    {"id": "th-0s", "input": {"realtime": false, "ms_until": 0}, "expected": {"kind": "minutes", "minutes": 1, "blink": false}},
+    {"id": "th-1s", "input": {"realtime": false, "ms_until": 1000}, "expected": {"kind": "minutes", "minutes": 1, "blink": false}},
+    {"id": "th-25s-pas-d-approche", "input": {"realtime": false, "ms_until": 25000}, "expected": {"kind": "minutes", "minutes": 1, "blink": false}},
+    {"id": "th-60s", "input": {"realtime": false, "ms_until": 60000}, "expected": {"kind": "minutes", "minutes": 1, "blink": false}},
+    {"id": "th-61s", "input": {"realtime": false, "ms_until": 61000}, "expected": {"kind": "minutes", "minutes": 2, "blink": false}},
+    {"id": "th-moins-1s", "input": {"realtime": false, "ms_until": -1000}, "expected": {"kind": "minutes", "minutes": 0, "blink": false}},
+    {"id": "th-moins-59s", "input": {"realtime": false, "ms_until": -59000}, "expected": {"kind": "minutes", "minutes": 0, "blink": false}},
+    {"id": "th-moins-59999ms-tronque", "input": {"realtime": false, "ms_until": -59999}, "expected": {"kind": "minutes", "minutes": 0, "blink": false}},
+    {"id": "th-moins-60s-masque", "input": {"realtime": false, "ms_until": -60000}, "expected": {"kind": "hidden", "blink": false}},
+    {"id": "sans-horodatage", "input": {"realtime": false, "ms_until": null, "eta_min_fallback": 7}, "expected": {"kind": "minutes", "minutes": 7, "blink": false}}
+  ]
+}
