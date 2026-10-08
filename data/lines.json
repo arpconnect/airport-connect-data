@@ -2,7 +2,7 @@
   "schema": "airport-connect/lines@1",
   "description": "Référentiel des lignes suivies par Airport Connect. Clé d'identité : idfm_route_id (code C IDFM), identique dans le GTFS IDFM et dans PRIM/Navitia (line:IDFM:Cxxxxx). Les champs v1 sont conservés pour mémoire et ne font pas foi.",
   "verified": {
-    "gtfs_snapshot": "IDFM-gtfs, validité 2026-06-15 → 2026-07-17",
+    "gtfs_snapshot": "IDFM-gtfs du 8 octobre 2026, validité 2026-10-05 → 2026-11-06 (noms, couleurs et réseaux relevés par tools/pipeline/inspect_gtfs.py)",
     "future_dates_checked_on": "2026-10-07"
   },
   "groups": {
@@ -714,7 +714,7 @@
         "short_name": "183",
         "long_name": "183",
         "route_type": 3,
-        "network": "RATP",
+        "network": "Pompadour",
         "color": "#FF1400",
         "text_color": "#FFFFFF"
       },
@@ -776,7 +776,7 @@
         "short_name": "T9",
         "long_name": "T9",
         "route_type": 0,
-        "network": "Keolis Ouest Val-de-Marne",
+        "network": "Seine Orly",
         "color": "#3C91DC",
         "text_color": "#FFFFFF"
       },
@@ -836,7 +836,7 @@
         "short_name": "480",
         "long_name": "480",
         "route_type": 3,
-        "network": "Seine Grand Orly",
+        "network": "Seine Orly",
         "color": "#3C91DC",
         "text_color": "#FFFFFF"
       },
@@ -1120,7 +1120,7 @@
     },
     {
       "id": "BUS_9501",
-      "display_name": "Ligne 9501",
+      "display_name": "Ligne 1601",
       "app_type": "BUS",
       "category": "SURFACE",
       "sectors": [
@@ -1133,11 +1133,11 @@
       "idfm_route_id": "IDFM:C00264",
       "navitia_line_id": "line:IDFM:C00264",
       "gtfs": {
-        "short_name": "9501",
-        "long_name": "9501",
+        "short_name": "1601",
+        "long_name": "1601",
         "route_type": 3,
         "network": "Roissy Ouest",
-        "color": "#5191CD",
+        "color": "#3C91DC",
         "text_color": "#FFFFFF"
       },
       "state": "active",
@@ -1150,7 +1150,7 @@
     },
     {
       "id": "BUS_9502",
-      "display_name": "Ligne 9502",
+      "display_name": "Ligne 1602",
       "app_type": "BUS",
       "category": "SURFACE",
       "sectors": [
@@ -1163,11 +1163,11 @@
       "idfm_route_id": "IDFM:C00265",
       "navitia_line_id": "line:IDFM:C00265",
       "gtfs": {
-        "short_name": "9502",
-        "long_name": "9502",
+        "short_name": "1602",
+        "long_name": "1602",
         "route_type": 3,
         "network": "Roissy Ouest",
-        "color": "#006DB8",
+        "color": "#0055C8",
         "text_color": "#FFFFFF"
       },
       "state": "active",
@@ -1240,7 +1240,7 @@
     },
     {
       "id": "BUS_EX100",
-      "display_name": "Ligne EX 100",
+      "display_name": "Ligne 700",
       "app_type": "BUS",
       "category": "SURFACE",
       "sectors": [
@@ -1253,12 +1253,12 @@
       "idfm_route_id": "IDFM:C02062",
       "navitia_line_id": "line:IDFM:C02062",
       "gtfs": {
-        "short_name": "EX 100",
-        "long_name": "EX 100 (future 700)",
+        "short_name": "700",
+        "long_name": "700",
         "route_type": 3,
         "network": "Marne et Brie",
-        "color": "#3C91DC",
-        "text_color": "#FFFFFF"
+        "color": "#82C8E6",
+        "text_color": "#000000"
       },
       "state": "active",
       "future": null,
@@ -1270,7 +1270,7 @@
     },
     {
       "id": "BUS_EX19",
-      "display_name": "Ligne EX 19",
+      "display_name": "Ligne 7719",
       "app_type": "BUS",
       "category": "SURFACE",
       "sectors": [
@@ -1283,8 +1283,8 @@
       "idfm_route_id": "IDFM:C00639",
       "navitia_line_id": "line:IDFM:C00639",
       "gtfs": {
-        "short_name": "EX 19",
-        "long_name": "Express 19 (future 7719)",
+        "short_name": "7719",
+        "long_name": "7719",
         "route_type": 3,
         "network": "Marne et Brie",
         "color": "#3C91DC",
@@ -1300,7 +1300,7 @@
     },
     {
       "id": "BUS_EX93",
-      "display_name": "Ligne EX 93",
+      "display_name": "Ligne 9301",
       "app_type": "BUS",
       "category": "SURFACE",
       "sectors": [
@@ -1313,11 +1313,11 @@
       "idfm_route_id": "IDFM:C00223",
       "navitia_line_id": "line:IDFM:C00223",
       "gtfs": {
-        "short_name": "EX 93",
-        "long_name": "EX 93",
+        "short_name": "9301",
+        "long_name": "9301",
         "route_type": 3,
         "network": "Roissy Ouest",
-        "color": "#5191CD",
+        "color": "#3C91DC",
         "text_color": "#FFFFFF"
       },
       "state": "active",
@@ -1330,7 +1330,7 @@
     },
     {
       "id": "BUS_R4",
-      "display_name": "Ligne R4",
+      "display_name": "Ligne 1614",
       "app_type": "BUS",
       "category": "SURFACE",
       "sectors": [
@@ -1343,11 +1343,11 @@
       "idfm_route_id": "IDFM:C00231",
       "navitia_line_id": "line:IDFM:C00231",
       "gtfs": {
-        "short_name": "R4",
-        "long_name": "R4",
+        "short_name": "1614",
+        "long_name": "1614",
         "route_type": 3,
         "network": "Roissy Ouest",
-        "color": "#98D0C1",
+        "color": "#00A092",
         "text_color": "#FFFFFF"
       },
       "state": "active",
@@ -1468,7 +1468,7 @@
         "short_name": "N22",
         "long_name": "N22",
         "route_type": 3,
-        "network": "RATP",
+        "network": "Seine Orly",
         "color": "#FFBE00",
         "text_color": "#000000"
       },
@@ -1497,7 +1497,7 @@
         "short_name": "N31",
         "long_name": "N31",
         "route_type": 3,
-        "network": "RATP",
+        "network": "Seine Orly",
         "color": "#FF82B4",
         "text_color": "#000000"
       },
@@ -1585,7 +1585,7 @@
         "long_name": "N140",
         "route_type": 3,
         "network": "Roissy Ouest",
-        "color": "#5191CD",
+        "color": "#3C91DC",
         "text_color": "#FFFFFF"
       },
       "state": "active",
@@ -1614,7 +1614,7 @@
         "long_name": "N143",
         "route_type": 3,
         "network": "Roissy Ouest",
-        "color": "#5191CD",
+        "color": "#3C91DC",
         "text_color": "#FFFFFF"
       },
       "state": "active",
