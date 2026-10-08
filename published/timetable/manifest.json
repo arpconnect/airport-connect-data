@@ -1,0 +1,206 @@
+{
+  "schema": "airport-connect/timetable-manifest@1",
+  "db_schema_version": 1,
+  "version": "20261005-dd8c7083f656",
+  "generated_at": "2026-10-08T12:45:14+00:00",
+  "source": {
+    "url": "https://eu.ftp.opendatasoft.com/stif/GTFS/IDFM-gtfs.zip",
+    "sha256": "59c79d57e244d874c7c0a8592c1076d5a0059394359688d051429b0b16e2e3b5"
+  },
+  "validity": {
+    "start": "2026-10-05",
+    "end": "2026-11-06",
+    "days": 33
+  },
+  "file": {
+    "name": "timetable-20261005-dd8c7083f656.sqlite.gz",
+    "url": "https://github.com/arpconnect/airport-connect-data/releases/download/timetable-20261005-dd8c7083f656/timetable-20261005-dd8c7083f656.sqlite.gz",
+    "encoding": "gzip",
+    "bytes_gzip": 4880322,
+    "sha256_gzip": "d1f79cacf11b8444f585be70a7bff9c28399921d7f63557724e09d63a475d068",
+    "bytes": 13361152,
+    "sha256": "dd8c7083f656302f54432eea58a1f5127343c0532090d02b1fd8b79877b7e50d"
+  },
+  "counts": {
+    "lines_active": 50,
+    "lines_future": 4,
+    "stop_areas": 801,
+    "stop_points": 1696,
+    "places": 18,
+    "services": 248,
+    "patterns": 701,
+    "trips": 35105,
+    "stop_times": 826701,
+    "duplicate_trips_removed": 1,
+    "adjustments_published": 1,
+    "trips_per_line": {
+      "BUS_133": 1398,
+      "BUS_143": 1199,
+      "BUS_148": 2785,
+      "BUS_152": 1993,
+      "BUS_183": 1314,
+      "BUS_247": 40,
+      "BUS_249": 1816,
+      "BUS_250": 207,
+      "BUS_350": 487,
+      "BUS_351": 422,
+      "BUS_4121": 153,
+      "BUS_480": 219,
+      "BUS_5154": 158,
+      "BUS_607": 400,
+      "BUS_609": 590,
+      "BUS_610": 230,
+      "BUS_703": 104,
+      "BUS_7708": 36,
+      "BUS_7720": 294,
+      "BUS_9112": 142,
+      "BUS_9501": 133,
+      "BUS_9502": 311,
+      "BUS_9504": 183,
+      "BUS_9509": 124,
+      "BUS_9517": 333,
+      "BUS_9518": 172,
+      "BUS_A01": 112,
+      "BUS_A04": 30,
+      "BUS_EX100": 160,
+      "BUS_EX19": 115,
+      "BUS_EX93": 110,
+      "BUS_N1": 193,
+      "BUS_N131": 24,
+      "BUS_N139": 51,
+      "BUS_N140": 29,
+      "BUS_N143": 72,
+      "BUS_N2": 281,
+      "BUS_N22": 88,
+      "BUS_N31": 105,
+      "BUS_N42": 225,
+      "BUS_R4": 138,
+      "BUS_TBUS1": 243,
+      "CDGVAL": 618,
+      "METRO_14": 4626,
+      "ORLYVAL": 432,
+      "RER_B": 4971,
+      "RER_C": 4271,
+      "T11": 775,
+      "T7": 767,
+      "T9": 1426
+    }
+  },
+  "warnings": [
+    {
+      "code": "route_renamed",
+      "detail": {
+        "line": "BUS_9501",
+        "before": "9501",
+        "now": "1601"
+      }
+    },
+    {
+      "code": "route_renamed",
+      "detail": {
+        "line": "BUS_9502",
+        "before": "9502",
+        "now": "1602"
+      }
+    },
+    {
+      "code": "route_renamed",
+      "detail": {
+        "line": "BUS_EX100",
+        "before": "EX 100",
+        "now": "700"
+      }
+    },
+    {
+      "code": "route_renamed",
+      "detail": {
+        "line": "BUS_EX19",
+        "before": "EX 19",
+        "now": "7719"
+      }
+    },
+    {
+      "code": "route_renamed",
+      "detail": {
+        "line": "BUS_EX93",
+        "before": "EX 93",
+        "now": "9301"
+      }
+    },
+    {
+      "code": "route_renamed",
+      "detail": {
+        "line": "BUS_R4",
+        "before": "R4",
+        "now": "1614"
+      }
+    },
+    {
+      "code": "adjustment_stop_unused",
+      "detail": {
+        "adjustment": "bus-351-porte-de-montreuil",
+        "stop_point": "IDFM:28370",
+        "note": "le GTFS ne dessert plus ce quai"
+      }
+    },
+    {
+      "code": "adjustment_stop_unused",
+      "detail": {
+        "adjustment": "bus-351-porte-de-montreuil",
+        "stop_point": "IDFM:28373",
+        "note": "le GTFS ne dessert plus ce quai"
+      }
+    },
+    {
+      "code": "adjustment_stop_missing",
+      "detail": {
+        "adjustment": "bus-351-porte-de-montreuil",
+        "stop_point": "IDFM:28374"
+      }
+    },
+    {
+      "code": "adjustment_stop_missing",
+      "detail": {
+        "adjustment": "bus-351-porte-de-montreuil",
+        "stop_point": "IDFM:39739"
+      }
+    },
+    {
+      "code": "adjustment_stop_unused",
+      "detail": {
+        "adjustment": "bus-351-porte-de-montreuil",
+        "stop_point": "IDFM:7766",
+        "note": "le GTFS ne dessert plus ce quai"
+      }
+    },
+    {
+      "code": "adjustment_stop_missing",
+      "detail": {
+        "adjustment": "bus-351-porte-de-montreuil",
+        "stop_point": "IDFM:27048"
+      }
+    },
+    {
+      "code": "adjustment_stop_missing",
+      "detail": {
+        "adjustment": "bus-351-porte-de-montreuil",
+        "stop_point": "IDFM:27062"
+      }
+    },
+    {
+      "code": "adjustment_stop_unused",
+      "detail": {
+        "adjustment": "bus-351-porte-de-montreuil",
+        "stop_point": "IDFM:24730",
+        "note": "le GTFS ne dessert plus ce quai"
+      }
+    },
+    {
+      "code": "adjustment_redundant",
+      "detail": {
+        "adjustment": "bus-351-porte-de-montreuil",
+        "note": "le GTFS reflète l'aménagement : il peut être retiré"
+      }
+    }
+  ]
+}
