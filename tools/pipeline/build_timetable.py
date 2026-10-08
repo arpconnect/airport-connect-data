@@ -12,7 +12,7 @@ Produit dans --out :
     report.json                     résultat des contrôles (toujours écrit, même en cas d'échec)
 
 Code de sortie : 0 si tous les contrôles bloquants passent, 2 sinon (rien n'est alors à publier).
-La sortie est déterministe : même GTFS et mêmes fichiers data/ → mêmes octets de base.
+La sortie est déterministe : même GTFS, mêmes fichiers data/ et même jour de construction → mêmes octets de base.
 Stdlib uniquement, Python 3.9+.
 """
 
@@ -33,6 +33,7 @@ import zipfile
 from collections import defaultdict
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_PATH = ROOT / "schema" / "timetable.sql"
@@ -150,7 +151,12 @@ def active_dates(sid: str, cal: dict, cald: dict) -> set:
     return out
 
 
-def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_doc, report: Report) -> dict:
+def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_doc, report: Report,
+             today: date | None = None) -> dict:
+    """Construit la base. [today] (jour de la construction, heure de Paris) borne le début de la validité :
+    le GTFS IDFM publie aussi quelques jours passés, de façon partielle (constaté le 8 octobre 2026 : du 5 au
+    7 octobre, seuls les trains SNCF y figurent). Ces jours restent dans les masques de service, mais la base
+    ne les déclare pas valides : l'application n'en tire ni passage ni fin de service (R-153, R-173)."""
     routes, agencies, trips, stop_times, stops_all, wanted_points, cal, cald = read_feed(zip_path, lines_doc, places_doc, report)
 
     # Services → masques de jours
@@ -164,13 +170,14 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
     if window > MAX_WINDOW_DAYS:
         report.error("window_too_long", {"days": window, "max": MAX_WINDOW_DAYS})
         return {}
+    start = min(max(base, today), last) if today else base
 
     con = sqlite3.connect(db_path)
     con.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
     cur = con.cursor()
     meta = {
         "schema_version": str(SCHEMA_VERSION), "base_date": base.isoformat(),
-        "validity_start": base.isoformat(), "validity_end": last.isoformat(),
+        "validity_start": start.isoformat(), "validity_end": last.isoformat(),
         "source_sha256": sha256_file(zip_path), "source_url": SOURCE_URL, "timezone": TIMEZONE,
     }
     cur.executemany("INSERT INTO meta VALUES (?,?)", sorted(meta.items()))
@@ -376,7 +383,7 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
             report.error("line_without_trips", l["id"])
 
     return {
-        "meta": meta, "window_days": window,
+        "meta": meta, "window_days": (last - start).days + 1, "first_service_date": base.isoformat(),
         "counts": {
             "lines_active": sum(1 for l in lines_doc["lines"] if l["state"] == "active"),
             "lines_future": sum(1 for l in lines_doc["lines"] if l["state"] == "future"),
@@ -552,10 +559,11 @@ def main() -> int:
     args.out.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp:
         db_path = Path(tmp) / "timetable.sqlite"
-        result = build_db(db_path, args.gtfs_zip, lines_doc, places_doc, adjustments_doc, report)
+        # Jour de la construction, à l'heure de Paris : début de validité au plus tôt, et contrôle d'expiration.
+        today = args.today or datetime.now(ZoneInfo(TIMEZONE)).date()
+        result = build_db(db_path, args.gtfs_zip, lines_doc, places_doc, adjustments_doc, report, today)
         manifest = None
         if result:
-            today = args.today or datetime.now(timezone.utc).date()
             end = date.fromisoformat(result["meta"]["validity_end"])
             remaining = (end - today).days
             if remaining < 0:
@@ -580,7 +588,8 @@ def main() -> int:
                 "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
                 "source": {"url": SOURCE_URL, "sha256": result["meta"]["source_sha256"]},
                 "inputs": {"sha256": inputs_sha256(args.data)},
-                "validity": {"start": result["meta"]["validity_start"], "end": result["meta"]["validity_end"], "days": result["window_days"]},
+                "validity": {"start": result["meta"]["validity_start"], "end": result["meta"]["validity_end"], "days": result["window_days"],
+                             "first_service_date": result["first_service_date"]},
                 "file": {"name": gz_name, "url": file_url(args.base_url, version, gz_name),
                          "encoding": "gzip", "bytes_gzip": gz_path.stat().st_size, "sha256_gzip": sha256_file(gz_path),
                          "bytes": len(raw), "sha256": db_sha},

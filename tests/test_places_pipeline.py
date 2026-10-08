@@ -8,7 +8,8 @@ Teste le générateur sur les lieux (schéma 2) avec un GTFS fictif minimal, san
 - points de montée de Paris (spec R-100, décision D-13) : écrits, puis contrôlés sur le GTFS ;
 - erreurs bloquantes : sorte inconnue, ville avec secteur, ligne ou zone d'arrêt inconnue, doublon ;
 - alertes : point de montée que la ligne ne dessert plus vers un aéroport, nom différent du GTFS ;
-- départs du lieu par le lecteur de référence, y compris une ligne qui ne mène plus à l'aéroport.
+- départs du lieu par le lecteur de référence, y compris une ligne qui ne mène plus à l'aéroport ;
+- début de validité borné au jour de la construction, et jour de service de la veille non couvert (R-153).
 """
 
 from __future__ import annotations
@@ -20,7 +21,7 @@ import sqlite3
 import sys
 import tempfile
 import zipfile
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -73,11 +74,16 @@ def make_gtfs(path: Path) -> None:
     trip("X2", "RX", "0", "AERO", [("C1", "08:20:00"), ("M1", "08:30:00"), ("A1", "08:50:00")])
     trip("X3", "RX", "1", "CITY", [("A1", "09:00:00"), ("M1", "09:20:00"), ("C1", "09:30:00")])
     trip("Y1", "RY", "0", "Banlieue", [("C1", "08:05:00"), ("B1", "08:25:00")])
+    # ligne de nuit Z : un départ en tout début de journée de service, deux le soir (dont un après minuit)
+    trip("Z1", "RZ", "0", "AERO", [("C1", "00:05:00"), ("A1", "00:35:00")])
+    trip("Z2", "RZ", "0", "AERO", [("C1", "23:50:00"), ("A1", "24:20:00")])
+    trip("Z3", "RZ", "0", "AERO", [("C1", "24:40:00"), ("A1", "25:10:00")])
     with zipfile.ZipFile(path, "w") as z:
         z.writestr("agency.txt", _csv([{"agency_id": "A", "agency_name": "Réseau test", "agency_url": "https://example.org", "agency_timezone": "Europe/Paris"}]))
         z.writestr("routes.txt", _csv([
             {"route_id": "RX", "agency_id": "A", "route_short_name": "X", "route_long_name": "Ligne X", "route_type": "3", "route_color": "112233", "route_text_color": "FFFFFF"},
-            {"route_id": "RY", "agency_id": "A", "route_short_name": "Y", "route_long_name": "Ligne Y", "route_type": "3", "route_color": "445566", "route_text_color": "FFFFFF"}]))
+            {"route_id": "RY", "agency_id": "A", "route_short_name": "Y", "route_long_name": "Ligne Y", "route_type": "3", "route_color": "445566", "route_text_color": "FFFFFF"},
+            {"route_id": "RZ", "agency_id": "A", "route_short_name": "Z", "route_long_name": "Ligne Z", "route_type": "3", "route_color": "778899", "route_text_color": "FFFFFF"}]))
         z.writestr("stops.txt", _csv(stops))
         z.writestr("trips.txt", _csv(trips))
         z.writestr("stop_times.txt", _csv(times))
@@ -92,7 +98,8 @@ def line(code, route, sectors):
             "gtfs": {"short_name": route[1:]}, "state": "active", "future": None}
 
 
-LINES = {"verified": {"future_dates_checked_on": "2026-07-01"}, "lines": [line("BUS_X", "RX", ["ROISSY"]), line("BUS_Y", "RY", ["ROISSY"])]}
+LINES = {"verified": {"future_dates_checked_on": "2026-07-01"},
+         "lines": [line("BUS_X", "RX", ["ROISSY"]), line("BUS_Y", "RY", ["ROISSY"]), line("BUS_Z", "RZ", ["ROISSY"])]}
 PLACES = {"places": [
     {"id": "paris", "kind": "city", "label_fr": "Paris", "label_en": "Paris", "short_label": "Paris",
      "boarding": [{"line": "BUS_X", "stop_area": "ZC", "name": "Gare Centrale"}]},
@@ -102,10 +109,10 @@ PLACES = {"places": [
 ADJ = {"adjustments": []}
 
 
-def build(tmp: Path, gtfs: Path, places: dict, name: str):
+def build(tmp: Path, gtfs: Path, places: dict, name: str, today=None):
     report = bt.Report()
     db = tmp / f"{name}.sqlite"
-    bt.build_db(db, gtfs, LINES, places, ADJ, report)
+    bt.build_db(db, gtfs, LINES, places, ADJ, report, today)
     codes = sorted({e["code"] for e in report.errors})
     warns = sorted({w["code"] for w in report.warnings})
     return db, codes, warns
@@ -154,11 +161,35 @@ def main() -> int:
               g, [("BUS_X", "sector:ROISSY", "Aéroport Terminal", "ok"), ("BUS_Y", "sector:ROISSY", "", "no_data")])
         tt.con.close()
 
+        # Début de validité borné au jour de la construction ; jour de service de la veille non couvert (R-153)
+        p = copy.deepcopy(PLACES)
+        p["places"][0]["boarding"].append({"line": "BUS_Z", "stop_area": "ZC", "name": "Gare Centrale"})
+        db, errors, warns = build(tmp, gtfs, p, "clip", today=date(2026, 7, 3))
+        con = sqlite3.connect(db)
+        meta = dict(con.execute("SELECT key, value FROM meta"))
+        con.close()
+        check("validité bornée au jour de la construction", (meta["base_date"], meta["validity_start"]), ("2026-07-01", "2026-07-03"))
+        tt = Timetable(str(db))
+
+        def card(line, hh, mm):
+            g = [x for x in tt.place_departures("paris", datetime(2026, 7, 3, hh, mm, tzinfo=PARIS)) if x.line == line][0]
+            return (g.board.status, g.board.boundary, g.board.incomplete,
+                    [datetime.fromtimestamp(q.epoch, PARIS).strftime("%H:%M") for q in g.board.passages])
+        check("veille non couverte, 00:00 : passages du jour marqués incomplets, sans frontière",
+              card("BUS_Z", 0, 0), ("ok", None, True, ["00:05", "23:50", "00:40"]))
+        check("veille non couverte, 00:30 : aucun passage visible → « Horaires indisponibles », pas « Service terminé »",
+              card("BUS_X", 0, 30), ("no_data", None, False, []))
+        check("après le dernier trajet possible de la veille (01:10), la frontière de service revient",
+              card("BUS_X", 1, 20), ("ok", "service_ended", False, []))
+        check("après le dernier trajet possible de la veille, plus d'indication d'horaires incomplets",
+              card("BUS_Z", 1, 20), ("ok", None, False, ["23:50", "00:40"]))
+        tt.con.close()
+
         cases = [
             ("nom différent du GTFS : alerte", lambda q: q["places"][0]["boarding"][0].update(name="Ancien nom"), [], "boarding_name_differs"),
             ("zone d'arrêt absente du GTFS : erreur", lambda q: q["places"][0]["boarding"][0].update(stop_area="ZZ"),
              ["place_boarding_stop_missing", "stop_area_missing"], None),
-            ("ligne inconnue : erreur", lambda q: q["places"][0]["boarding"][0].update(line="BUS_Z"), ["place_boarding_line_unknown"], None),
+            ("ligne inconnue : erreur", lambda q: q["places"][0]["boarding"][0].update(line="BUS_W"), ["place_boarding_line_unknown"], None),
             ("ligne en double : erreur", lambda q: q["places"][0]["boarding"].append(dict(q["places"][0]["boarding"][0])),
              ["place_boarding_duplicate"], None),
             ("ville sans point de montée : erreur", lambda q: q["places"][0].update(boarding=[]), ["place_without_boarding"], None),

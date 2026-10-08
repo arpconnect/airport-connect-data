@@ -100,6 +100,13 @@ class Timetable:
         self.valid_end = date.fromisoformat(meta["validity_end"])
         self.meta = meta
         self._terminus = None
+        self._max_departure = None
+
+    def max_departure(self) -> int:
+        """Heure GTFS la plus tardive de la base, en secondes (au-delà de 24 h pour les services de nuit)."""
+        if self._max_departure is None:
+            self._max_departure = self.con.execute("SELECT MAX(departure) FROM stop_time").fetchone()[0] or 0
+        return self._max_departure
 
     def terminus(self, pattern_id: int) -> str:
         """Nom GTFS du dernier quai d'une mission : destination affichée (R-30). Les girouettes GTFS des RER
@@ -261,6 +268,17 @@ class Timetable:
             if not sps:
                 return StopBoard(status="not_served", adjustment_id=first_adj, replacements=dropped)
         board = self._timetable_board(line_code, sps, days, now_s, limit, headsign_filter, allowed)
+        # R-153 : le jour de service de la veille n'est pas couvert par la base (premier jour de validité) ; tant
+        # que ses trajets peuvent encore circuler, la liste peut manquer des passages et aucune frontière de
+        # service n'est déduite.
+        yesterday = today - timedelta(days=1)
+        if yesterday < self.valid_start and now_s < self.epoch(yesterday, self.max_departure()) \
+                and board.status in ("ok", "no_service_soon"):
+            board.boundary = board.next_service_start = None
+            if board.passages:
+                board.incomplete = True
+            else:
+                board.status = "no_data"
         if board.status in ("ok", "no_service_soon"):
             # R-92 : des missions du GTFS contournent encore ces quais. Si l'une circule sur la plage
             # couverte par l'affichage, la liste peut manquer des bus : on le signale, et on ne conclut
