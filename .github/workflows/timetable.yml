@@ -38,17 +38,18 @@ jobs:
             https://eu.ftp.opendatasoft.com/stif/GTFS/IDFM-gtfs.zip
           sha256sum IDFM-gtfs.zip
 
-      - name: Comparer avec la source déjà publiée
+      - name: Comparer avec la version déjà publiée
         id: changed
-        # Le manifeste publié est dans le dépôt : pas de téléchargement, pas d'ambiguïté.
+        # Le manifeste publié est dans le dépôt. On reconstruit si le GTFS a changé, ou si le référentiel,
+        # le schéma ou le générateur ont changé (empreinte « inputs »).
         run: |
-          current="$(sha256sum IDFM-gtfs.zip | cut -d' ' -f1)"
+          current="$(sha256sum IDFM-gtfs.zip | cut -d' ' -f1)/$(python3 -I tools/pipeline/build_timetable.py --print-inputs-sha256)"
           published=""
           if [ -f published/timetable/manifest.json ]; then
-            published="$(python3 -I -c 'import json;print(json.load(open("published/timetable/manifest.json"))["source"]["sha256"])')"
+            published="$(python3 -I -c 'import json;m=json.load(open("published/timetable/manifest.json"));print(m["source"]["sha256"]+"/"+m.get("inputs",{}).get("sha256",""))')"
           fi
           if [ "$current" = "$published" ]; then
-            echo "GTFS inchangé : rien à publier."
+            echo "GTFS et référentiel inchangés : rien à publier."
             echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"

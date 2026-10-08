@@ -459,16 +459,34 @@ def file_url(base_url: str, version: str, name: str) -> str:
     return base if "{name}" in base_url else base.rstrip("/") + "/" + name
 
 
+def inputs_sha256(data_dir: Path) -> str:
+    """Empreinte de tout ce qui, hors GTFS, détermine la base : référentiel, schéma et générateur.
+
+    Le traitement quotidien reconstruit la base quand elle change, même si le GTFS n'a pas bougé."""
+    h = hashlib.sha256()
+    for path in (data_dir / "lines.json", data_dir / "places.json", data_dir / "adjustments.json",
+                 SCHEMA_PATH, Path(__file__).resolve()):
+        h.update(path.name.encode("utf-8") + b"\0" + path.read_bytes() + b"\0")
+    return h.hexdigest()
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("gtfs_zip", type=Path)
-    ap.add_argument("--out", type=Path, required=True)
+    ap.add_argument("gtfs_zip", type=Path, nargs="?")
+    ap.add_argument("--out", type=Path)
     ap.add_argument("--data", type=Path, default=ROOT / "data")
     ap.add_argument("--previous-manifest", type=Path)
     ap.add_argument("--today", type=date.fromisoformat, default=None)
     # Adresse publique du dossier de la base ; {version} et {name} y sont remplacés (release GitHub, ADR-8).
     ap.add_argument("--base-url", default="")
+    ap.add_argument("--print-inputs-sha256", action="store_true",
+                    help="affiche l'empreinte du référentiel, du schéma et du générateur, puis s'arrête")
     args = ap.parse_args()
+    if args.print_inputs_sha256:
+        print(inputs_sha256(args.data))
+        return 0
+    if args.gtfs_zip is None or args.out is None:
+        ap.error("le fichier GTFS et --out sont requis")
 
     report = Report()
     lines_doc, places_doc, adjustments_doc = load_inputs(args.data)
@@ -502,6 +520,7 @@ def main() -> int:
                 "version": version,
                 "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
                 "source": {"url": SOURCE_URL, "sha256": result["meta"]["source_sha256"]},
+                "inputs": {"sha256": inputs_sha256(args.data)},
                 "validity": {"start": result["meta"]["validity_start"], "end": result["meta"]["validity_end"], "days": result["window_days"]},
                 "file": {"name": gz_name, "url": file_url(args.base_url, version, gz_name),
                          "encoding": "gzip", "bytes_gzip": gz_path.stat().st_size, "sha256_gzip": sha256_file(gz_path),
