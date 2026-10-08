@@ -101,6 +101,7 @@ class Timetable:
         self.meta = meta
         self._terminus = None
         self._max_departure = None
+        self._pattern_stops = {}
 
     def max_departure(self) -> int:
         """Heure GTFS la plus tardive de la base, en secondes (au-delà de 24 h pour les services de nuit)."""
@@ -342,8 +343,58 @@ class Timetable:
         return board
 
     # -- accueil : départs d'un lieu (R-100, décision D-13) ------------------------------------
-    def place_departures(self, place_id: str, now: datetime) -> list:
+    # -- destination (R-102, décision D-14) -----------------------------------------------------
+    def destination_stop_points(self, destination: tuple) -> frozenset:
+        """Quais d'une destination : ("place", id), ("airport", secteur) ou ("stop_area", parent_station GTFS).
+
+        Lieu aéroportuaire : ses quais et ceux de ses sous-lieux. Lieu ville (Paris) : les quais de ses
+        points de montée, toutes lignes confondues (gares et terminus parisiens). Aéroport : les quais de tous
+        ses lieux (une gare comme celle du métro 14 à Orly, rattachée par IDFM aux terminaux 1-2-3, compte pour
+        tout l'aéroport). Zone d'arrêt : ses quais. Une destination inconnue de la base lève une erreur."""
+        kind, ident = destination
+        if kind == "airport":
+            if ident not in SECTORS:
+                raise KeyError(f"aéroport inconnu : {ident}")
+            return frozenset(r[0] for r in self.con.execute(
+                """SELECT DISTINCT sp.gtfs_id FROM place_stop_point x JOIN place pl ON pl.id = x.place_id
+                   JOIN stop_point sp ON sp.id = x.stop_point_id WHERE pl.sector = ?""", (ident,)))
+        if kind == "place":
+            row = self.con.execute("SELECT kind FROM place WHERE id = ?", (ident,)).fetchone()
+            if row is None:
+                raise KeyError(f"lieu inconnu dans la base : {ident}")
+            if row[0] == "airport":
+                return frozenset(self.stop_points_of_place(ident))
+            return frozenset(r[0] for r in self.con.execute(
+                """SELECT sp.gtfs_id FROM place_boarding pb JOIN stop_point sp ON sp.stop_area_id = pb.stop_area_id
+                   WHERE pb.place_id = ?""", (ident,)))
+        if kind == "stop_area":
+            if self.con.execute("SELECT 1 FROM stop_area WHERE gtfs_id = ?", (ident,)).fetchone() is None:
+                raise KeyError(f"zone d'arrêt inconnue dans la base : {ident}")
+            return frozenset(r[0] for r in self.con.execute(
+                """SELECT sp.gtfs_id FROM stop_point sp JOIN stop_area a ON a.id = sp.stop_area_id
+                   WHERE a.gtfs_id = ?""", (ident,)))
+        raise ValueError(f"destination invalide : {destination}")
+
+    def pattern_stops(self, pattern_id: int) -> list:
+        """Quais d'une mission dans l'ordre : (rang, stop_id GTFS, descente interdite)."""
+        if pattern_id not in self._pattern_stops:
+            self._pattern_stops[pattern_id] = [(seq, sp, dropoff == 1) for seq, sp, dropoff in self.con.execute(
+                """SELECT ps.seq, sp.gtfs_id, ps.dropoff FROM pattern_stop ps JOIN stop_point sp ON sp.id = ps.stop_point_id
+                   WHERE ps.pattern_id = ? ORDER BY ps.seq""", (pattern_id,))]
+        return self._pattern_stops[pattern_id]
+
+    def reaches(self, pattern_id: int, seq: int, targets: frozenset) -> bool:
+        """La mission, montée au rang seq, dessert-elle ensuite l'un de ces quais, en descente autorisée ?"""
+        return any(s > seq and sp in targets and not no_drop for s, sp, no_drop in self.pattern_stops(pattern_id))
+
+    def place_departures(self, place_id: str, now: datetime, destination: Optional[tuple] = None) -> list:
         """Cartes de l'accueil pour un lieu, dans l'ordre d'affichage.
+
+        destination (R-102, D-14) : si fournie, seuls restent les départs dont la mission dessert ensuite,
+        en descente autorisée, un quai de la destination (destination_stop_points) ; une carte sans aucun
+        de ces départs disparaît, y compris celle d'un point de montée qui ne mène plus à un aéroport. Depuis
+        Paris, les cartes ne sont alors plus groupées par aéroport : une carte par point de montée (clé
+        « destination », secteur nul), pour les missions qui mènent à la destination.
 
         - Lieu aéroportuaire : une carte par ligne et par sens (direction_id GTFS), pour les missions qui
           permettent de monter à un quai du lieu ou de ses sous-lieux ; triées par prochain départ.
@@ -356,15 +407,13 @@ class Timetable:
         if row is None:
             raise KeyError(f"lieu inconnu dans la base : {place_id}")
         kind, place_sector = row
-        groups = {}      # (code, key) -> {"sector", "stop_area", "allowed": {(mission, rang)}, "sps": {quai}, "patterns": {mission}}
+        groups = {}      # (code, key) -> {"sector", "stop_area", "allowed": {(mission, rang): quai}}
+        targets = self.destination_stop_points(destination) if destination is not None else None
 
         def add(code, key, sector, area, pid, seq, sp):
-            g = groups.setdefault((code, key), {"sector": sector, "stop_area": area, "allowed": set(),
-                                                "sps": set(), "patterns": set()})
-            if pid is not None:
-                g["allowed"].add((pid, seq))
-                g["sps"].add(sp)
-                g["patterns"].add(pid)
+            g = groups.setdefault((code, key), {"sector": sector, "stop_area": area, "allowed": {}})
+            if pid is not None and (targets is None or self.reaches(pid, seq, targets)):
+                g["allowed"][(pid, seq)] = sp
 
         if kind == "airport":
             for code, direction, pid, seq, sp in self.con.execute(
@@ -380,6 +429,15 @@ class Timetable:
                 """SELECT l.code, a.gtfs_id FROM place_boarding pb JOIN line l ON l.id = pb.line_id
                    JOIN stop_area a ON a.id = pb.stop_area_id WHERE pb.place_id = ?""", (place_id,)).fetchall()
             for code, area in boarding:
+                if targets is not None:
+                    for pid, seq, sp in self.con.execute(
+                            """SELECT DISTINCT b.pattern_id, b.seq, bp.gtfs_id
+                               FROM stop_area a JOIN stop_point bp ON bp.stop_area_id = a.id
+                               JOIN pattern_stop b ON b.stop_point_id = bp.id AND b.pickup != 1
+                               JOIN pattern p ON p.id = b.pattern_id JOIN line l ON l.id = p.line_id
+                               WHERE a.gtfs_id = ? AND l.code = ?""", (area, code)):
+                        add(code, "destination", None, area, pid, seq, sp)
+                    continue
                 found = False
                 for sector, pid, seq, sp in self.con.execute(
                         """SELECT DISTINCT pl.sector, b.pattern_id, b.seq, bp.gtfs_id
@@ -400,13 +458,16 @@ class Timetable:
 
         out = []
         for (code, key), g in groups.items():
-            board = self.board(code, sorted(g["sps"]), now, allowed=frozenset(g["allowed"]))
+            if targets is not None and not g["allowed"]:
+                continue
+            patterns = {pid for pid, _ in g["allowed"]}
+            board = self.board(code, sorted(set(g["allowed"].values())), now, allowed=frozenset(g["allowed"]))
             if board.passages:
                 title = board.passages[0].destination
-            elif g["patterns"]:
+            elif patterns:
                 # destination la plus fréquente des missions retenues (nombre de trajets), puis ordre alphabétique
                 weights = defaultdict(int)
-                for pid in g["patterns"]:
+                for pid in patterns:
                     weights[self.terminus(pid)] += self.trip_count(pid)
                 title = sorted(weights.items(), key=lambda x: (-x[1], x[0]))[0][0]
             else:

@@ -26,7 +26,7 @@ import sys
 import tempfile
 import time
 from collections import Counter, defaultdict
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -416,6 +416,54 @@ def home_june(tt: Timetable) -> None:
     check("R-55 : départ de 08:00:00 retiré à 08:01:00", first("2026-07-01T08:01:00"), "08:06:00")
 
 
+def home_destination(tt: Timetable) -> None:
+    """Destination (R-102, D-14) : invariants sur toute base, puis scénarios réels de juin 2026."""
+    start = date.fromisoformat(tt.meta["validity_start"])
+    day = start + timedelta(days=1)              # lendemain du premier jour : la veille est couverte (R-153)
+    now = datetime(day.year, day.month, day.day, 10, 0, tzinfo=PARIS)
+    cases = [("paris", ("airport", "ORLY")), ("paris", ("airport", "ROISSY")), ("paris", ("place", "bourget-gare")),
+             ("cdg-t2-gare", ("place", "paris")), ("orly-4", ("place", "paris")), ("cdg-t1", ("place", "cdg-t2"))]
+    bad = []
+    for origin, dest in cases:
+        targets = tt.destination_stop_points(dest)
+        for g in tt.place_departures(origin, now, dest):
+            for x in g.board.passages:
+                if not tt.reaches(x.pattern_id, x.seq, targets):
+                    bad.append((origin, dest, g.line, x.stop_point))
+            if origin == "paris" and (g.key, g.sector) != ("destination", None):
+                bad.append((origin, dest, g.line, g.key))
+    check("destination : chaque départ affiché dessert ensuite la destination (descente autorisée)", bad, [])
+    full = {(g.line, g.key) for g in tt.place_departures("cdg-t2-gare", now)}
+    sub = {(g.line, g.key) for g in tt.place_departures("cdg-t2-gare", now, ("place", "paris"))}
+    check("destination : sous-ensemble des cartes sans destination", sub <= full, True)
+    for bad_dest in (("place", "lieu-inexistant"), ("stop_area", "IDFM:0"), ("airport", "LUNE")):
+        try:
+            tt.place_departures("paris", now, bad_dest)
+            check(f"destination inconnue refusée {bad_dest}", "aucune erreur", "KeyError")
+        except KeyError:
+            check(f"destination inconnue refusée {bad_dest}", "KeyError", "KeyError")
+
+    snap = json.loads((CASES / "snapshot.json").read_text(encoding="utf-8"))
+    if snap["source_zip_sha256"] != tt.meta["source_sha256"]:
+        print("(scénarios de destination de juin ignorés : la base ne provient pas du GTFS de référence)")
+        return
+    at8 = at("2026-07-01T08:00")
+    lines = lambda o, d: [(g.line, g.stop_area) for g in tt.place_departures(o, at8, d)]  # noqa: E731
+    check("Paris → aéroport d'Orly : métro 14 depuis la gare de Lyon et les Noctilien",
+          lines("paris", ("airport", "ORLY")),
+          [("METRO_14", "IDFM:73626"), ("BUS_N131", "IDFM:73626"), ("BUS_N139", "IDFM:73626"), ("BUS_N22", "IDFM:71264"),
+           ("BUS_N31", "IDFM:73626")])
+    check("Paris → Orly 4 : le métro 14 s'arrête aux terminaux 1-2-3 (zone IDFM:63284), pas à Orly 4",
+          "METRO_14" in [l for l, _ in lines("paris", ("place", "orly-4"))], False)
+    dests = sorted({tt.terminus(x.pattern_id) for g in tt.place_departures("paris", at8, ("place", "bourget-gare"))
+                    if g.line == "RER_B" for x in g.board.passages})
+    check("Paris → gare du Bourget : une seule carte RER B, trains qui s'y arrêtent (R-43)",
+          ([l for l, _ in lines("paris", ("place", "bourget-gare"))].count("RER_B"), dests),
+          (1, sorted(["Aéroport Charles de Gaulle 2 (Terminal 2)", "Mitry - Claye", "Aulnay-sous-Bois"])))
+    check("Terminal 5 → Terminal 1 : aucune ligne directe (correspondance à la gare)",
+          tt.place_departures("cdg-t2e", at8, ("place", "cdg-t1")), [])
+
+
 # --------------------------------------------------------------------------- 3. performance
 def performance(tt: Timetable) -> dict:
     busiest = tt.con.execute(
@@ -451,6 +499,7 @@ def main() -> int:
         place_names(tt)
         home_structure(tt, db)
         home_june(tt)
+        home_destination(tt)
         perf = performance(tt)
         tt.con.close()
     for f in failures:
