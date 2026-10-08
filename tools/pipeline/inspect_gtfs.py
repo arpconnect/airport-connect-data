@@ -6,6 +6,7 @@ disparue (stop_missing, place_stop_missing) : on retrouve le quai qui l'a rempla
     python3 tools/pipeline/inspect_gtfs.py IDFM-gtfs.zip --near 49.00396,2.57918 [--radius 300]
     python3 tools/pipeline/inspect_gtfs.py IDFM-gtfs.zip --name "CDG T2" --area IDFM:73699
     python3 tools/pipeline/inspect_gtfs.py IDFM-gtfs.zip --stop IDFM:487507
+    python3 tools/pipeline/inspect_gtfs.py IDFM-gtfs.zip --route IDFM:C00231   (nom, couleurs, réseau)
 
 Les filtres se cumulent (ET). Bibliothèque standard uniquement.
 """
@@ -45,11 +46,26 @@ def main() -> int:
     ap.add_argument("--name", help="sous-chaîne du nom, sans tenir compte de la casse")
     ap.add_argument("--area", action="append", default=[], help="parent_station (répétable)")
     ap.add_argument("--stop", action="append", default=[], help="stop_id exact (répétable)")
+    ap.add_argument("--route", action="append", default=[], help="route_id exact (répétable) : nom et couleurs")
     args = ap.parse_args()
-    if not (args.near or args.name or args.area or args.stop):
-        ap.error("au moins un filtre : --near, --name, --area ou --stop")
+    if not (args.near or args.name or args.area or args.stop or args.route):
+        ap.error("au moins un filtre : --near, --name, --area, --stop ou --route")
 
     z = zipfile.ZipFile(args.gtfs_zip)
+    if args.route:
+        agencies = {a["agency_id"]: a["agency_name"] for a in rows(z, "agency.txt")}
+        seen = set()
+        for r in rows(z, "routes.txt"):
+            if r["route_id"] in args.route:
+                seen.add(r["route_id"])
+                print(f"{r['route_id']:<14} court={r['route_short_name']!r:<10} long={r['route_long_name']!r} "
+                      f"couleur=#{r.get('route_color', '')} texte=#{r.get('route_text_color', '')} "
+                      f"réseau={agencies.get(r.get('agency_id'), '?')!r}")
+        for rid in args.route:
+            if rid not in seen:
+                print(f"ABSENTE du GTFS : {rid}")
+        if not (args.near or args.name or args.area or args.stop):
+            return 0
     near = tuple(float(x) for x in args.near.split(",")) if args.near else None
     found = {}
     for s in rows(z, "stops.txt"):
