@@ -1,63 +1,975 @@
 {
-  "schema": "airport-connect/rules-v2@1",
-  "rule": "Fusion des horaires théoriques (base) et d'une réponse temps réel PRIM, et disjoncteur par ligne",
-  "spec": ["R-150", "R-152", "R-154", "R-155", "R-55"],
+  "schema": "airport-connect/rules-v2@2",
+  "rule": "Lecture d'une réponse « Prochains passages » (SIRI Lite stop-monitoring) et fusion avec les horaires théoriques de la base ; disjoncteur par quai",
+  "spec": [
+    "R-55",
+    "R-150",
+    "R-151",
+    "R-152",
+    "R-154",
+    "R-155",
+    "R-158",
+    "R-159"
+  ],
   "notes": [
     "Contrairement à tests/characterization/ (comportement v1), ces cas décrivent le comportement CIBLE de la v2.",
     "Temps en secondes Unix ; now = 1000000. Ligne demandée : IDFM:C01299 (351), quai demandé : IDFM:10219.",
-    "Seuils proposés : réponse périmée au-delà de 120 s, disjoncteur ouvert 300 s après 3 échecs consécutifs.",
-    "Règle temps réel stricte (D-4) appliquée : data_freshness doit valoir « realtime »."
+    "Mission 1 : quai IDFM:10219 au rang 3, puis IDFM:30000 (zone Z2) et IDFM:20000 (zone Z1, Roissypôle). Mission 2 (courte) : IDFM:10219 au rang 2, puis IDFM:30000 (Rond-Point).",
+    "Chaque passage lu est écrit en réponse SIRI (heures ISO 8601 en UTC) par le vérificateur, puis lu et fusionné : « items » = [heure affichée, état, origine, destination].",
+    "Seuils : rattachement à 90 puis 300 s, heure recopiée « mesurée » si enregistrée 10 min au plus avant la réponse, rejet au-delà de 6 h, disjoncteur ouvert 300 s après 3 échecs consécutifs."
   ],
   "context": {
     "route_id": "IDFM:C01299",
-    "stop_id": "IDFM:10219",
+    "stop_point": "IDFM:10219",
     "now": 1000000,
-    "theoretical": [
-      {"epoch": 1000300, "headsign": "Roissypôle"},
-      {"epoch": 1000900, "headsign": "Roissypôle"},
-      {"epoch": 1001500, "headsign": "Roissypôle"}
+    "zones": {
+      "IDFM:20000": "IDFM:Z1",
+      "IDFM:20001": "IDFM:Z1",
+      "IDFM:30000": "IDFM:Z2"
+    },
+    "patterns": {
+      "1": [
+        "IDFM:9000",
+        "IDFM:9001",
+        "IDFM:9002",
+        "IDFM:10219",
+        "IDFM:30000",
+        "IDFM:20000"
+      ],
+      "2": [
+        "IDFM:9001",
+        "IDFM:9002",
+        "IDFM:10219",
+        "IDFM:30000"
+      ]
+    },
+    "names": {
+      "IDFM:20000": "Roissypôle",
+      "IDFM:30000": "Rond-Point"
+    },
+    "events": [
+      {
+        "epoch": 1000300,
+        "pattern": 1,
+        "seq": 3,
+        "headsign": "Roissypôle",
+        "destination": "Roissypôle"
+      },
+      {
+        "epoch": 1000600,
+        "pattern": 2,
+        "seq": 2,
+        "headsign": "Rond-Point",
+        "destination": "Rond-Point"
+      },
+      {
+        "epoch": 1000900,
+        "pattern": 1,
+        "seq": 3,
+        "headsign": "Roissypôle",
+        "destination": "Roissypôle"
+      },
+      {
+        "epoch": 1001500,
+        "pattern": 1,
+        "seq": 3,
+        "headsign": "Roissypôle",
+        "destination": "Roissypôle"
+      }
     ]
   },
   "merge_cases": [
-    {"id": "aucune-reponse", "response": null,
-     "expected": {"states": ["theoretical", "theoretical", "theoretical"], "epochs": [1000300, 1000900, 1001500], "reason": "no_response", "rejected": 0, "realtime_used": false}},
-    {"id": "reponse-perimee-121s", "response": {"received_at": 999879, "departures": [
-       {"line_id": "line:IDFM:C01299", "stop_point_id": "stop_point:IDFM:10219", "base_epoch": 1000300, "epoch": 1000420, "data_freshness": "realtime", "headsign": "Roissypôle"}]},
-     "expected": {"states": ["theoretical", "theoretical", "theoretical"], "epochs": [1000300, 1000900, 1001500], "reason": "stale", "rejected": 0, "realtime_used": false}},
-    {"id": "reponse-a-120s-encore-valide", "response": {"received_at": 999880, "departures": [
-       {"line_id": "line:IDFM:C01299", "stop_point_id": "stop_point:IDFM:10219", "base_epoch": 1000300, "epoch": 1000420, "data_freshness": "realtime", "headsign": "Roissypôle"}]},
-     "expected": {"states": ["realtime", "theoretical", "theoretical"], "epochs": [1000420, 1000900, 1001500], "reason": null, "rejected": 0, "realtime_used": true}},
-    {"id": "retard-2-min", "response": {"received_at": 999990, "departures": [
-       {"line_id": "line:IDFM:C01299", "stop_point_id": "stop_point:IDFM:10219", "base_epoch": 1000300, "epoch": 1000420, "data_freshness": "realtime", "headsign": "Roissypôle"}]},
-     "expected": {"states": ["realtime", "theoretical", "theoretical"], "epochs": [1000420, 1000900, 1001500], "reason": null, "rejected": 0, "realtime_used": true}},
-    {"id": "avance-reordonne", "response": {"received_at": 999990, "departures": [
-       {"line_id": "line:IDFM:C01299", "stop_point_id": "stop_point:IDFM:10219", "base_epoch": 1001500, "epoch": 1000600, "data_freshness": "realtime", "headsign": "Roissypôle"}]},
-     "expected": {"states": ["theoretical", "realtime", "theoretical"], "epochs": [1000300, 1000600, 1000900], "reason": null, "rejected": 0, "realtime_used": true}},
-    {"id": "autre-ligne-au-meme-arret-rejetee", "response": {"received_at": 999990, "departures": [
-       {"line_id": "line:IDFM:C01407", "stop_point_id": "stop_point:IDFM:10219", "base_epoch": 1000300, "epoch": 1000310, "data_freshness": "realtime", "headsign": "Juvisy RER"}]},
-     "expected": {"states": ["theoretical", "theoretical", "theoretical"], "epochs": [1000300, 1000900, 1001500], "reason": null, "rejected": 1, "realtime_used": false}},
-    {"id": "autre-quai-rejete", "response": {"received_at": 999990, "departures": [
-       {"line_id": "line:IDFM:C01299", "stop_point_id": "stop_point:IDFM:10218", "base_epoch": 1000300, "epoch": 1000310, "data_freshness": "realtime", "headsign": "Nation - Trône"}]},
-     "expected": {"states": ["theoretical", "theoretical", "theoretical"], "epochs": [1000300, 1000900, 1001500], "reason": null, "rejected": 1, "realtime_used": false}},
-    {"id": "fraicheur-vide-non-temps-reel", "response": {"received_at": 999990, "departures": [
-       {"line_id": "line:IDFM:C01299", "stop_point_id": "stop_point:IDFM:10219", "base_epoch": 1000300, "epoch": 1000420, "data_freshness": "", "headsign": "Roissypôle"}]},
-     "expected": {"states": ["theoretical", "theoretical", "theoretical"], "epochs": [1000300, 1000900, 1001500], "reason": null, "rejected": 0, "realtime_used": false}},
-    {"id": "passage-supplementaire-sans-equivalent", "response": {"received_at": 999990, "departures": [
-       {"line_id": "line:IDFM:C01299", "stop_point_id": "stop_point:IDFM:10219", "base_epoch": null, "epoch": 1000100, "data_freshness": "realtime", "headsign": "Roissypôle"}]},
-     "expected": {"states": ["realtime", "theoretical", "theoretical", "theoretical"], "epochs": [1000100, 1000300, 1000900, 1001500], "reason": null, "rejected": 0, "realtime_used": true}},
-    {"id": "passages-depasses-retires", "now": 1000324, "response": {"received_at": 1000320, "departures": [
-       {"line_id": "line:IDFM:C01299", "stop_point_id": "stop_point:IDFM:10219", "base_epoch": 1000300, "epoch": 1000300, "data_freshness": "realtime", "headsign": "Roissypôle"}]},
-     "expected": {"states": ["realtime", "theoretical", "theoretical"], "epochs": [1000300, 1000900, 1001500], "reason": null, "rejected": 0, "realtime_used": true}},
-    {"id": "temps-reel-retire-a-moins-25s", "now": 1000325, "response": {"received_at": 1000320, "departures": [
-       {"line_id": "line:IDFM:C01299", "stop_point_id": "stop_point:IDFM:10219", "base_epoch": 1000300, "epoch": 1000300, "data_freshness": "realtime", "headsign": "Roissypôle"}]},
-     "expected": {"states": ["theoretical", "theoretical"], "epochs": [1000900, 1001500], "reason": null, "rejected": 0, "realtime_used": false}}
+    {
+      "id": "aucun-passage-lu",
+      "visits": [],
+      "expected": {
+        "items": [
+          [
+            1000300,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0
+      }
+    },
+    {
+      "id": "retard-2-min-rattache",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "delayed",
+          "recorded": 999970,
+          "aimed": 1000300,
+          "expected": 1000420
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000420,
+            "realtime",
+            "paired",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0
+      }
+    },
+    {
+      "id": "heure-prevue-arrondie-29s",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "onTime",
+          "recorded": 999970,
+          "aimed": 1000271,
+          "expected": 1000330
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000330,
+            "realtime",
+            "paired",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0
+      }
+    },
+    {
+      "id": "horaire-adapte-170s-second-passage",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "onTime",
+          "recorded": 999940,
+          "aimed": 1000130,
+          "expected": 1000130
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000130,
+            "realtime",
+            "paired",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0
+      }
+    },
+    {
+      "id": "terminus-de-la-mission-courte",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:30000:",
+          "status": "onTime",
+          "recorded": 999970,
+          "aimed": 1000600,
+          "expected": 1000660
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000300,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1000660,
+            "realtime",
+            "paired",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0
+      }
+    },
+    {
+      "id": "ajoute-mesure-et-place",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "onTime",
+          "recorded": 999970,
+          "aimed": 1002000,
+          "expected": 1001100
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000300,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001100,
+            "realtime",
+            "added",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0
+      }
+    },
+    {
+      "id": "non-place-autre-carte",
+      "allowed": [
+        [
+          2,
+          2
+        ]
+      ],
+      "events": [
+        1
+      ],
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "onTime",
+          "recorded": 999970,
+          "aimed": 1002000,
+          "expected": 1000700
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 1
+      }
+    },
+    {
+      "id": "non-ajoute-non-mesure",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "noReport",
+          "recorded": 999970,
+          "aimed": 1002000,
+          "expected": 1002000
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000300,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 1
+      }
+    },
+    {
+      "id": "heure-annoncee-seule-fait-foi",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "onTime",
+          "recorded": 999970,
+          "expected": 1000500
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000500,
+            "realtime",
+            "added",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0
+      }
+    },
+    {
+      "id": "supprime-reste-affiche",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "cancelled",
+          "recorded": 999970,
+          "aimed": 1000300,
+          "expected": 1000300
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000300,
+            "cancelled",
+            "paired",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0
+      }
+    },
+    {
+      "id": "grille-recopiee-non-mesuree",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "onTime",
+          "recorded": 996400,
+          "aimed": 1000300,
+          "expected": 1000300
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000300,
+            "theoretical",
+            "paired",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0
+      }
+    },
+    {
+      "id": "enregistrement-recent-mesure",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "onTime",
+          "recorded": 999700,
+          "aimed": 1000300,
+          "expected": 1000300
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000300,
+            "realtime",
+            "paired",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0
+      }
+    },
+    {
+      "id": "noReport-garde-l-heure-du-GTFS",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "noReport",
+          "recorded": 999970,
+          "aimed": 1000300,
+          "expected": 1000360
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000300,
+            "theoretical",
+            "paired",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0
+      }
+    },
+    {
+      "id": "doublon-de-producteurs",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "noReport",
+          "recorded": 992800,
+          "aimed": 1000300,
+          "expected": 1000300
+        },
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "delayed",
+          "recorded": 999980,
+          "aimed": 1000300,
+          "expected": 1000390
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000390,
+            "realtime",
+            "paired",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0
+      }
+    },
+    {
+      "id": "quai-BP-meme-numero",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:BP:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "onTime",
+          "recorded": 999970,
+          "aimed": 1000300,
+          "expected": 1000420
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000420,
+            "realtime",
+            "paired",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0
+      }
+    },
+    {
+      "id": "rejets-et-arrivee-seule",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:99999:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "onTime",
+          "recorded": 999970,
+          "aimed": 1000300,
+          "expected": 1000420
+        },
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "C01299",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "onTime",
+          "recorded": 999970,
+          "aimed": 1000300,
+          "expected": 1000420
+        },
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "onTime",
+          "recorded": 999970,
+          "aimed": 1025200,
+          "expected": 1025200
+        },
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "onTime",
+          "recorded": 999970,
+          "arrival": 1000300
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000300,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 3,
+        "unplaced": 0
+      }
+    },
+    {
+      "id": "autre-ligne-ignoree",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01407:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "onTime",
+          "recorded": 999970,
+          "aimed": 1000300,
+          "expected": 1000420
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000300,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0
+      }
+    },
+    {
+      "id": "temps-reel-parti-retire-R55",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "early",
+          "recorded": 999970,
+          "aimed": 1000300,
+          "expected": 999970
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0
+      }
+    },
+    {
+      "id": "reponse-en-erreur",
+      "error": true,
+      "visits": [],
+      "expected": {
+        "status": "error"
+      }
+    }
   ],
   "breaker_cases": [
-    {"id": "trois-echecs-ouvrent-300s", "events": [[0, false, null], [10, false, null], [20, false, null]],
-     "probes": [[319, false], [320, true]]},
-    {"id": "un-succes-remet-a-zero", "events": [[0, false, null], [10, false, null], [20, true, null], [30, false, null]],
-     "probes": [[31, true]]},
-    {"id": "retry-after-respecte", "events": [[0, false, 60]],
-     "probes": [[59, false], [60, true]]}
+    {
+      "id": "trois-echecs-ouvrent-300s",
+      "events": [
+        [
+          0,
+          false,
+          null
+        ],
+        [
+          10,
+          false,
+          null
+        ],
+        [
+          20,
+          false,
+          null
+        ]
+      ],
+      "probes": [
+        [
+          319,
+          false
+        ],
+        [
+          320,
+          true
+        ]
+      ]
+    },
+    {
+      "id": "un-succes-remet-a-zero",
+      "events": [
+        [
+          0,
+          false,
+          null
+        ],
+        [
+          10,
+          false,
+          null
+        ],
+        [
+          20,
+          true,
+          null
+        ],
+        [
+          30,
+          false,
+          null
+        ]
+      ],
+      "probes": [
+        [
+          31,
+          true
+        ]
+      ]
+    },
+    {
+      "id": "retry-after-respecte",
+      "events": [
+        [
+          0,
+          false,
+          60
+        ]
+      ],
+      "probes": [
+        [
+          59,
+          false
+        ],
+        [
+          60,
+          true
+        ]
+      ]
+    }
   ]
 }

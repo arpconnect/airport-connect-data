@@ -14,6 +14,7 @@ Toutes les heures sont calculées selon la norme GTFS : midi local moins 12 h + 
 from __future__ import annotations
 
 import math
+import re
 import sqlite3
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -26,6 +27,7 @@ NOT_STARTED_MIN = 60     # R-56
 LIMIT = 4                # R-56
 RETAIN_S = 59            # R-55 : un passage théorique reste affiché (« 0 min ») jusqu'à 59 s après son heure
 SECTORS = ("ROISSY", "ORLY", "BOURGET", "BEAUVAIS")
+FAMILY_RANK = {"TRAIN": 0, "METRO": 1, "TRAM_TRAIN": 2, "TRAM": 3, "SHUTTLE": 4, "BUS": 5, "NIGHT_BUS": 6}   # R-160
 OFFLINE_LIMIT = 3                # R-119 : trajets proposés hors connexion
 OFFLINE_HORIZON_S = 12 * 3600    # R-119 : départs pris en compte, à partir de maintenant
 OFFLINE_SAME_STOP_S = 120        # R-119 : changement de véhicule au même quai, temps minimal
@@ -39,6 +41,18 @@ def _undominated(journeys: list) -> list:
         return (k["departure"] >= j["departure"] and k["arrival"] <= j["arrival"] and k["transfers"] <= j["transfers"]
                 and (k["departure"], k["arrival"], k["transfers"]) != (j["departure"], j["arrival"], j["transfers"]))
     return [j for j in journeys if not any(dominates(k, j) for k in journeys if k is not j)]
+
+
+def natural_key(name: str) -> tuple:
+    """Ordre naturel d'un numéro de ligne (R-160) : suites de chiffres comparées par valeur, le reste en minuscules,
+    un nombre avant un texte à rang égal (« 133 » < « 1601 » < « A01 PPM » ; « N22 » < « N131 »)."""
+    return tuple((0, int(t), "") if t.isdigit() else (1, 0, t.lower()) for t in re.findall(r"\d+|\D+", name))
+
+
+def _best_place(place_of: dict, stop_points) -> Optional[str]:
+    """Lieu le plus précis (sous-lieu d'abord), puis premier dans l'ordre du sélecteur, parmi ceux des quais."""
+    found = [place_of[sp] for sp in stop_points if sp in place_of]
+    return min(found, key=lambda x: (-x[1], x[2]))[0] if found else None
 
 
 def kept(epoch: float, now_s: float) -> bool:
@@ -91,6 +105,10 @@ class StopBoard:
     incomplete: bool = False                 # R-92 : horaires théoriques incomplets (itinéraire modifié)
     adjustment_id: Optional[str] = None      # aménagement à l'origine de "not_served" ou de incomplete
     replacements: list = field(default_factory=list)   # list[Replacement] si status == "not_served"
+    # Pour la fusion avec le temps réel (R-152) : tous les passages théoriques candidats des jours consultés, et les
+    # clés (quai, heure, girouette) de ceux du bloc de service retenu, que la base afficherait (R-56).
+    candidates: list = field(default_factory=list, repr=False, compare=False)
+    eligible: frozenset = field(default_factory=frozenset, repr=False, compare=False)
 
 
 @dataclass
@@ -376,7 +394,9 @@ class Timetable:
         past = next((b for b in reversed(ordered) if not kept(b[-1].epoch, now_s)), None)
         selected = active or (upcoming if upcoming and upcoming[0].epoch - now_s <= reveal else None)
         visible = [e for e in selected if kept(e.epoch, now_s)][:limit] if selected else []
-        board = StopBoard(status="ok", passages=visible)
+        board = StopBoard(status="ok", passages=visible, candidates=sorted(events, key=lambda e: (
+            e.epoch, e.stop_point, e.headsign, e.pattern_id, e.seq)),
+            eligible=frozenset((e.stop_point, e.epoch, e.headsign) for e in selected) if selected else frozenset())
         if not visible:
             if upcoming is not None:
                 board.boundary = "service_not_started" if upcoming[0].epoch - now_s <= window else "service_ended"
@@ -532,6 +552,156 @@ class Timetable:
             return (SECTORS.index(grp.sector) if grp.sector else 0,
                     first is None, first if first is not None else 0.0, *line_rank(grp), grp.key)
         return sorted(out, key=rank)
+
+    # -- onglet Lignes et fiche ligne (R-160 à R-163) ------------------------------------------------
+    def line_catalogue(self) -> list:
+        """Onglet Lignes (R-160) : pour chaque aéroport, dans l'ordre ROISSY, ORLY, BOURGET, BEAUVAIS, ses lignes
+        actives par famille (train, métro, tram-train, tram, navette, bus, Noctilien), puis par numéro dans l'ordre
+        naturel (« 133 » avant « 1601 »), puis ses lignes futures. Une ligne qui dessert plusieurs aéroports
+        figure sous chacun."""
+        rows = self.con.execute(
+            """SELECT s.sector, l.code, l.app_type, l.state, COALESCE(l.short_name, l.display_name)
+               FROM line_sector s JOIN line l ON l.id = s.line_id""").fetchall()
+        out = []
+        for sector in SECTORS:
+            items = [r for r in rows if r[0] == sector]
+            if not items:
+                continue
+            items.sort(key=lambda r: (r[3] != "active", FAMILY_RANK[r[2]], natural_key(r[4]), r[1]))
+            out.append({"sector": sector, "lines": [r[1] for r in items]})
+        return out
+
+    def _direction_patterns(self, line_code: str) -> dict:
+        """Missions d'une ligne par sens (direction_id GTFS ; None si absent) : [(mission, trajets, quais)]."""
+        out = defaultdict(list)
+        for pid, direction, trips in self.con.execute(
+                """SELECT p.id, p.direction, (SELECT COUNT(*) FROM trip t WHERE t.pattern_id = p.id)
+                   FROM pattern p JOIN line l ON l.id = p.line_id WHERE l.code = ? ORDER BY p.id""", (line_code,)):
+            stops = self.con.execute(
+                """SELECT ps.seq, sp.gtfs_id, a.gtfs_id, sp.name, ps.pickup FROM pattern_stop ps
+                   JOIN stop_point sp ON sp.id = ps.stop_point_id JOIN stop_area a ON a.id = sp.stop_area_id
+                   WHERE ps.pattern_id = ? ORDER BY ps.seq""", (pid,)).fetchall()
+            out[direction].append((pid, trips, stops))
+        return out
+
+    def line_directions(self, line_code: str) -> list:
+        """Sens d'une ligne pour sa fiche (R-161) : dans l'ordre des direction_id (0, 1, puis sans sens).
+
+        Chaque sens donne ses terminus (noms GTFS des derniers quais de ses missions, R-30 : ceux qui portent au
+        moins 20 % de ses trajets, deux au plus, au moins le premier ; par trajets décroissants puis nom) et ses
+        arrêts dans l'ordre de parcours. Un arrêt est un nom de quai dans une zone d'arrêt (clé « zone|nom ») :
+        les quais de même nom d'une zone n'en font qu'un, les arrêts distincts d'une même zone (navettes des
+        terminaux) restent distincts. L'ordre fusionne les missions du sens (graphe des arrêts successifs, pondéré
+        par les trajets ; une mission qui repasse par un arrêt n'en garde que le premier passage) : on prend toujours
+        un arrêt dont tous les prédécesseurs sont placés, de préférence le successeur le plus emprunté du dernier
+        placé, sinon le plus emprunté ; en cas de boucle, l'arrêt dont les arcs entrants non placés pèsent le moins.
+        Égalités : nombre de trajets décroissant, puis clé.
+
+        Un arrêt dont un quai appartient à un lieu des aéroports porte ce lieu (« place »), pour afficher son nom
+        de lieu (R-35) : le sous-lieu le plus précis d'abord, puis l'ordre du sélecteur."""
+        place_of = {}
+        for sp, pid, has_parent, order in self.con.execute(
+                """SELECT sp.gtfs_id, pl.id, pl.parent_id IS NOT NULL, pl.sort_order FROM place_stop_point x
+                   JOIN place pl ON pl.id = x.place_id JOIN stop_point sp ON sp.id = x.stop_point_id"""):
+            cur = place_of.get(sp)
+            if cur is None or (-has_parent, order) < (-cur[1], cur[2]):
+                place_of[sp] = (pid, has_parent, order)
+        result = []
+        groups = self._direction_patterns(line_code)
+        for direction in sorted(groups, key=lambda d: (d is None, d if d is not None else 0)):
+            pats = groups[direction]
+            total = sum(t for _, t, _ in pats)
+            weight, edges, incoming = defaultdict(int), defaultdict(lambda: defaultdict(int)), defaultdict(dict)
+            quais, pickup, names, areas = defaultdict(set), defaultdict(bool), {}, {}
+            termini = defaultdict(int)
+            for pid, trips, stops in pats:
+                termini[self.terminus(pid)] += trips
+                seq_nodes = []
+                for _, sp, area, name, pick in stops:
+                    key = f"{area}|{name}"
+                    quais[key].add(sp)
+                    names[key], areas[key] = name, area
+                    if pick != 1:
+                        pickup[key] = True
+                    if key not in seq_nodes:
+                        seq_nodes.append(key)
+                for key in seq_nodes:
+                    weight[key] += trips
+                for a, b in zip(seq_nodes, seq_nodes[1:]):
+                    edges[a][b] += trips
+            for a, succ in edges.items():
+                for b, w in succ.items():
+                    incoming[b][a] = w
+            remaining, order, last = set(weight), [], None
+            while remaining:
+                avail = [k for k in remaining if not any(p in remaining for p in incoming[k])]
+                if not avail:
+                    avail = [min(remaining, key=lambda k: (sum(w for p, w in incoming[k].items() if p in remaining),
+                                                           -weight[k], k))]
+                follow = [k for k in avail if last is not None and edges[last].get(k, 0) > 0]
+                if follow:
+                    nxt = min(follow, key=lambda k: (-edges[last][k], -weight[k], k))
+                else:
+                    nxt = min(avail, key=lambda k: (-weight[k], k))
+                order.append(nxt)
+                remaining.discard(nxt)
+                last = nxt
+            ranked = sorted(termini.items(), key=lambda x: (-x[1], x[0]))
+            kept_termini = [n for n, w in ranked if w * 5 >= total][:2] or [ranked[0][0]]
+            result.append({
+                "direction": direction,
+                "termini": kept_termini,
+                "stops": [{"key": k, "name": names[k], "stop_area": areas[k], "stop_points": sorted(quais[k]),
+                           "pickup": bool(pickup[k]), "trips": weight[k],
+                           "place": _best_place(place_of, quais[k])} for k in order],
+            })
+        return result
+
+    def line_stop_scope(self, line_code: str, direction: Optional[int], key: str) -> tuple:
+        """Quais d'un arrêt de la fiche ligne dans un sens, et couples (mission, rang) du sens où l'on peut y
+        monter (R-32, R-162). Un sens ou un arrêt inconnu lève une erreur."""
+        groups = self._direction_patterns(line_code)
+        if direction not in groups:
+            raise KeyError(f"sens inconnu : {line_code} {direction}")
+        allowed, sps = set(), set()
+        for pid, _, stops in groups[direction]:
+            for seq, sp, area, name, pick in stops:
+                if f"{area}|{name}" == key:
+                    sps.add(sp)
+                    if pick != 1:
+                        allowed.add((pid, seq))
+        if not sps:
+            raise KeyError(f"arrêt inconnu : {line_code} {direction} {key}")
+        return sorted(sps), frozenset(allowed)
+
+    def line_stop_board(self, line_code: str, direction: Optional[int], key: str, now: datetime,
+                        limit: int = LIMIT) -> StopBoard:
+        """Prochains passages d'un arrêt de la fiche ligne, dans un sens (R-162) : missions de ce sens où l'on
+        peut monter à l'un de ses quais (R-32). Un arrêt où l'on ne peut que descendre (terminus) rend l'état
+        « terminus »."""
+        sps, allowed = self.line_stop_scope(line_code, direction, key)
+        if not allowed:
+            return StopBoard(status="terminus")
+        return self.board(line_code, sps, now, limit=limit, allowed=allowed)
+
+    def line_patterns_at(self, line_code: str, stop_point: str) -> list:
+        """Couples (mission, rang) de la ligne où l'on peut monter à ce quai (R-32)."""
+        return [(p, q) for p, q in self.con.execute(
+            """SELECT ps.pattern_id, ps.seq FROM pattern_stop ps JOIN stop_point sp ON sp.id = ps.stop_point_id
+               JOIN pattern p ON p.id = ps.pattern_id JOIN line l ON l.id = p.line_id
+               WHERE sp.gtfs_id = ? AND l.code = ? AND ps.pickup != 1 ORDER BY ps.pattern_id, ps.seq""",
+            (stop_point, line_code))]
+
+    def serves_area(self, pattern_id: int, seq: int, stop_point: str) -> bool:
+        """La mission, après le rang seq, dessert-elle la zone d'arrêt de ce quai (terminus annoncé par le temps
+        réel, R-152) ? Un quai inconnu de la base : non."""
+        if self._stops is None:
+            self._stop_info()
+        info = self._stops.get(stop_point)
+        if info is None:
+            return False
+        area = info[1]
+        return any(s > seq and self._stops[sp][1] == area for s, sp, _ in self.pattern_stops(pattern_id))
 
     # -- itinéraires hors connexion (R-119) ------------------------------------------------------
     def offline_journeys(self, origins: Iterable[str], targets: Iterable[str], now: datetime,

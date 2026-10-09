@@ -129,10 +129,7 @@ def realtime_v2() -> None:
     doc = json.loads((ROOT / "tests" / "rules-v2" / "realtime_merge.json").read_text(encoding="utf-8"))
     ctx = doc["context"]
     for c in doc["merge_cases"]:
-        res = v2.merge_board(ctx["theoretical"], c["response"], ctx["route_id"], ctx["stop_id"], c.get("now", ctx["now"]))
-        got = {"states": [p["state"] for p in res.passages], "epochs": [p["epoch"] for p in res.passages],
-               "reason": res.reason, "rejected": res.rejected, "realtime_used": res.realtime_used}
-        check("rules-v2/realtime_merge.json", c["id"], got, c["expected"])
+        check("rules-v2/realtime_merge.json", c["id"], v2.run_rule_case(ctx, c), c["expected"])
     for c in doc["breaker_cases"]:
         br = v2.CircuitBreaker()
         for t, ok, retry in c["events"]:
@@ -371,6 +368,14 @@ def app_timetable() -> None:
     text = json.dumps(jg.build(), ensure_ascii=False, indent=1, sort_keys=True) + "\n"
     check("app (généré)", jg.OUT.relative_to(ROOT).as_posix(),
           jg.OUT.exists() and jg.OUT.read_text(encoding="utf-8") == text, True)
+    # Temps réel (spec § 16.2) : lecture et fusion de référence sur les réponses SIRI enregistrées.
+    rg = _load_tool("realtime_goldens")
+    check("app (généré)", rg.OUT.relative_to(ROOT).as_posix(),
+          rg.OUT.exists() and rg.OUT.read_text(encoding="utf-8") == rg.render(), True)
+    captures = json.loads((rg.FIXTURES / "captures.json").read_text(encoding="utf-8"))["captures"]
+    for name, meta in sorted(captures.items()):
+        body = gzip.decompress((rg.FIXTURES / f"{name}.json.gz").read_bytes())
+        check("app (SIRI)", name, (len(body), hashlib.sha256(body).hexdigest()), (meta["bytes"], meta["sha256"]))
     names = {}
     for lang in ("values", "values-en"):
         tree = ET.parse(ROOT / "app/src/main/res" / lang / "strings.xml")
