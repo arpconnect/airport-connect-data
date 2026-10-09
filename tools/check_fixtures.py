@@ -249,8 +249,8 @@ def design_tokens(lines: dict) -> None:
     icons = sorted(p.stem for p in (ROOT / "design" / "icons").glob("*.svg"))
     check("design/icons", "jeu de pictogrammes complet", icons, sorted([
         "aeroport", "alerte", "bus", "changer", "departs", "direction", "favori", "fermer", "incomplet", "info",
-        "lignes", "metro", "navette", "non-desservi", "nuit", "plan", "prevu", "retour", "temps-reel", "trafic",
-        "train", "tram"]))
+        "lignes", "marche", "metro", "navette", "non-desservi", "nuit", "plan", "position", "prevu", "retour",
+        "temps-reel", "trafic", "train", "tram"]))
 
 
 def _iso_required(v) -> bool:
@@ -366,6 +366,11 @@ def app_timetable() -> None:
     out = goldens.OUT
     check("app (généré)", out.relative_to(ROOT).as_posix(),
           out.exists() and out.read_text(encoding="utf-8") == goldens.render(), True)
+    # Itinéraires (spec § 12) : résultats attendus de la lecture de référence sur les réponses PRIM enregistrées.
+    jg = _load_tool("journey_goldens")
+    text = json.dumps(jg.build(), ensure_ascii=False, indent=1, sort_keys=True) + "\n"
+    check("app (généré)", jg.OUT.relative_to(ROOT).as_posix(),
+          jg.OUT.exists() and jg.OUT.read_text(encoding="utf-8") == text, True)
     names = {}
     for lang in ("values", "values-en"):
         tree = ET.parse(ROOT / "app/src/main/res" / lang / "strings.xml")

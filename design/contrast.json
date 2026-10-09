@@ -144,6 +144,12 @@
       "bg": "banner",
       "min": 3,
       "use": "liseré d'une pastille posée sur banner (badge-outline)"
+    },
+    {
+      "fg": "surface",
+      "bg": "ink",
+      "min": 4.5,
+      "use": "puce de profil choisie : texte et anneau de focus sur encre pleine"
     }
   ],
   "line_badges": {
