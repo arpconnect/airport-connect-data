@@ -30,14 +30,14 @@ import sqlite3
 import sys
 import tempfile
 import zipfile
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_PATH = ROOT / "schema" / "timetable.sql"
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 MAX_WINDOW_DAYS = 62            # bits utilisables dans un INTEGER SQLite signé (63) avec marge
 MIN_REMAINING_DAYS_WARN = 14    # alerte si la validité restante est plus courte
 MAX_TRIP_LOSS_RATIO = 0.5       # une ligne qui perd plus de la moitié de ses trajets bloque la publication
@@ -348,6 +348,40 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
             st_rows.append((tid, seq, dep, max(dwell, 0)))
     cur.executemany("INSERT INTO stop_time VALUES (?,?,?,?)", st_rows)
 
+    # Correspondances officielles entre quais de la base (R-119) : transfers.txt, type 2 (temps minimal publié).
+    # Une ligne en double garde le temps le plus long ; un fichier absent ne bloque pas la publication (alerte),
+    # les itinéraires hors connexion n'ayant alors que les changements au même quai.
+    transfers, ignored = {}, Counter()
+    with zipfile.ZipFile(zip_path) as zf:
+        if "transfers.txt" not in zf.namelist():
+            report.warn("transfers_missing", "transfers.txt absent du GTFS")
+        else:
+            for t in _rows(zf, "transfers.txt"):
+                a, b = t.get("from_stop_id", ""), t.get("to_stop_id", "")
+                if a not in point_id or b not in point_id:
+                    continue
+                if a == b:
+                    ignored["same_stop"] += 1
+                    continue
+                if t.get("transfer_type", "") != "2":
+                    ignored["type_" + (t.get("transfer_type") or "vide")] += 1
+                    continue
+                try:
+                    secs = int(t.get("min_transfer_time") or "")
+                except ValueError:
+                    ignored["time_invalid"] += 1
+                    continue
+                if secs < 0:
+                    ignored["time_invalid"] += 1
+                    continue
+                key = (point_id[a], point_id[b])
+                if key in transfers:
+                    ignored["duplicate"] += 1
+                transfers[key] = max(secs, transfers.get(key, 0))
+    if ignored:
+        report.warn("transfers_ignored", dict(sorted(ignored.items())))
+    cur.executemany("INSERT INTO transfer VALUES (?,?,?)", [(a, b, t) for (a, b), t in sorted(transfers.items())])
+
     # Aménagements publiés uniquement (R-90 à R-93). Ils ne bloquent jamais la publication :
     # une incohérence avec le GTFS du jour produit une alerte et l'élément concerné est ignoré.
     published = apply_adjustments(cur, published_adj, line_id, area_id, point_id, stops_all, children,
@@ -389,7 +423,7 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
             "lines_future": sum(1 for l in lines_doc["lines"] if l["state"] == "future"),
             "stop_areas": len(area_id), "stop_points": len(point_id), "places": len(places_doc["places"]),
             "services": len(svc_id), "patterns": len(patterns), "trips": len(trip_rows), "stop_times": len(st_rows),
-            "duplicate_trips_removed": duplicates, "adjustments_published": published,
+            "duplicate_trips_removed": duplicates, "adjustments_published": published, "transfers": len(transfers),
             "trips_per_line": dict(sorted(trips_per_line.items())),
         },
     }

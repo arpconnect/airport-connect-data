@@ -1,8 +1,9 @@
--- Base d'horaires Airport Connect — schéma 2
+-- Base d'horaires Airport Connect — schéma 3
 -- Fichier SQLite en lecture seule, produit côté serveur par tools/pipeline/build_timetable.py,
 -- téléchargé par l'application (spec § 17). PRAGMA user_version = version du schéma.
 -- Historique : 1 (8 octobre 2026), première publication ; 2 (8 octobre 2026), lieu « ville » (Paris) et ses
--- points de montée (place.kind, place.sort_order, place_boarding ; spec R-100, décision D-13).
+-- points de montée (place.kind, place.sort_order, place_boarding ; spec R-100, décision D-13) ; 3 (9 octobre 2026),
+-- correspondances officielles entre quais (transfer, GTFS transfers.txt) pour les itinéraires hors connexion (R-119).
 -- L'application lit exactement une version : une base d'une autre version n'est jamais adoptée (ADR-2).
 -- Conventions :
 --   * identifiants internes INTEGER compacts, attribués de façon déterministe (tri des identifiants GTFS) ;
@@ -11,7 +12,7 @@
 --   * heures en secondes depuis « midi moins 12 h » du jour de service (norme GTFS), > 86 400 autorisé ;
 --   * jours de service : bit i de service.days = actif le jour meta.base_date + i (fenêtre ≤ 62 jours).
 
-PRAGMA user_version = 2;
+PRAGMA user_version = 3;
 
 CREATE TABLE meta (
   key   TEXT PRIMARY KEY,
@@ -138,6 +139,17 @@ CREATE TABLE stop_time (
   departure INTEGER NOT NULL,                        -- secondes depuis midi − 12 h
   dwell     INTEGER NOT NULL DEFAULT 0,              -- departure − arrival (≥ 0)
   PRIMARY KEY (trip_id, seq)
+) WITHOUT ROWID;
+
+-- Correspondances entre quais de la base (spec R-119) : lignes de transfers.txt du GTFS IDFM de type 2 (temps
+-- minimal de correspondance, marche comprise), entre deux quais différents présents dans la base. Ce sont les temps
+-- publiés par IDFM, utilisés tels quels ; aucune distance n'est estimée.
+CREATE TABLE transfer (
+  from_stop_point_id INTEGER NOT NULL REFERENCES stop_point(id),
+  to_stop_point_id   INTEGER NOT NULL REFERENCES stop_point(id),
+  min_time           INTEGER NOT NULL CHECK (min_time >= 0),   -- secondes (min_transfer_time)
+  PRIMARY KEY (from_stop_point_id, to_stop_point_id),
+  CHECK (from_stop_point_id != to_stop_point_id)
 ) WITHOUT ROWID;
 
 -- Aménagements durables de desserte (spec R-90 à R-93), seules les entrées publiées.

@@ -1,5 +1,5 @@
 """
-Lecteur de référence de la base d'horaires (schéma 2).
+Lecteur de référence de la base d'horaires (schéma 3).
 
 Il fixe, en Python exécutable, les requêtes que l'application Kotlin reproduit à l'identique
 (app/src/main/java/com/airportconnect/app/data/timetable/TimetableReader.kt, vérifié par les cas de
@@ -13,6 +13,7 @@ Toutes les heures sont calculées selon la norme GTFS : midi local moins 12 h + 
 
 from __future__ import annotations
 
+import math
 import sqlite3
 from collections import defaultdict
 from dataclasses import dataclass, field
@@ -25,6 +26,19 @@ NOT_STARTED_MIN = 60     # R-56
 LIMIT = 4                # R-56
 RETAIN_S = 59            # R-55 : un passage théorique reste affiché (« 0 min ») jusqu'à 59 s après son heure
 SECTORS = ("ROISSY", "ORLY", "BOURGET", "BEAUVAIS")
+OFFLINE_LIMIT = 3                # R-119 : trajets proposés hors connexion
+OFFLINE_HORIZON_S = 12 * 3600    # R-119 : départs pris en compte, à partir de maintenant
+OFFLINE_SAME_STOP_S = 120        # R-119 : changement de véhicule au même quai, temps minimal
+OFFLINE_MAX_SCANS = 6            # R-119 : recherches successives au plus (départs de plus en plus tardifs)
+
+
+def _undominated(journeys: list) -> list:
+    """R-119 : un trajet est écarté si un autre part au plus tôt en même temps, arrive au plus tard en même temps
+    et ne demande pas plus de correspondances (et l'un des trois strictement mieux). L'ordre est conservé."""
+    def dominates(k, j):
+        return (k["departure"] >= j["departure"] and k["arrival"] <= j["arrival"] and k["transfers"] <= j["transfers"]
+                and (k["departure"], k["arrival"], k["transfers"]) != (j["departure"], j["arrival"], j["transfers"]))
+    return [j for j in journeys if not any(dominates(k, j) for k in journeys if k is not j)]
 
 
 def kept(epoch: float, now_s: float) -> bool:
@@ -102,6 +116,7 @@ class Timetable:
         self._terminus = None
         self._max_departure = None
         self._pattern_stops = {}
+        self._stops = None
 
     def max_departure(self) -> int:
         """Heure GTFS la plus tardive de la base, en secondes (au-delà de 24 h pour les services de nuit)."""
@@ -142,6 +157,34 @@ class Timetable:
             """SELECT sp.gtfs_id FROM place_stop_point ps JOIN stop_point sp ON sp.id = ps.stop_point_id
                WHERE ps.place_id = ? OR ps.place_id IN (SELECT id FROM place WHERE parent_id = ?)
                ORDER BY sp.gtfs_id""", (place_id, place_id))]
+
+    def journey_ref(self, place_id: str) -> str | None:
+        """Point Navitia d'un lieu pour le calcul d'itinéraires (R-115) ; None pour un lieu ville (Paris), qui n'a
+        pas de point précis.
+
+        Un lieu qui couvre exactement une zone d'arrêt (tous ses quais présents dans la base, et rien d'autre) est
+        désigné par cette zone : « stop_area:IDFM:69212 ». Sinon (un terminal formé de quelques quais d'une grande
+        zone, ou un lieu à cheval sur deux zones), il l'est par le centre de ses quais, « lon;lat » à 6 décimales :
+        Navitia y ajoute la marche jusqu'aux quais voisins. Les quais du lieu comprennent ceux de ses sous-lieux,
+        comme pour une destination (R-102), et la moyenne se fait dans l'ordre des stop_id GTFS."""
+        rows = self.con.execute(
+            """SELECT DISTINCT sp.gtfs_id, a.gtfs_id, sp.lat, sp.lon FROM place_stop_point x
+               JOIN stop_point sp ON sp.id = x.stop_point_id JOIN stop_area a ON a.id = sp.stop_area_id
+               WHERE x.place_id = ? OR x.place_id IN (SELECT c.id FROM place c WHERE c.parent_id = ?)
+               ORDER BY sp.gtfs_id""", (place_id, place_id)).fetchall()
+        if not rows:
+            return None
+        areas = {r[1] for r in rows}
+        if len(areas) == 1:
+            area = next(iter(areas))
+            whole = {r[0] for r in self.con.execute(
+                "SELECT sp.gtfs_id FROM stop_point sp JOIN stop_area a ON a.id = sp.stop_area_id WHERE a.gtfs_id = ?",
+                (area,))}
+            if whole == {r[0] for r in rows}:
+                return f"stop_area:{area}"
+        lat = sum(r[2] for r in rows) / len(rows)
+        lon = sum(r[3] for r in rows) / len(rows)
+        return f"{lon:.6f};{lat:.6f}"
 
     def place_label(self, place_id: str) -> dict:
         """Libellé d'un lieu (R-35) : nom affiché, et ancien nom en mention secondaire s'il est porté par la base.
@@ -489,3 +532,197 @@ class Timetable:
             return (SECTORS.index(grp.sector) if grp.sector else 0,
                     first is None, first if first is not None else 0.0, *line_rank(grp), grp.key)
         return sorted(out, key=rank)
+
+    # -- itinéraires hors connexion (R-119) ------------------------------------------------------
+    def offline_journeys(self, origins: Iterable[str], targets: Iterable[str], now: datetime,
+                         limit: int = OFFLINE_LIMIT) -> dict:
+        """Itinéraires théoriques sur les seules lignes de la base, quand PRIM est injoignable (R-119).
+
+        origins : quais de départ (stop_id GTFS), où l'on se trouve à l'instant `now` ; targets : quais d'arrivée.
+        Algorithme « Connection Scan » à l'arrivée la plus tôt, sur les jours de service de la veille, du jour et du
+        lendemain, pour les départs des 12 h qui suivent. Une correspondance se fait au même quai (2 min au moins)
+        ou vers un autre quai par une ligne de transfers.txt (temps publié par IDFM, marche comprise), une seule
+        à la fois ; jamais par une distance estimée. La montée et la descente suivent R-32, les quais non desservis
+        R-91. Jusqu'à `limit` trajets, chacun partant au moins une seconde après le précédent ; une marche seule
+        clôt la recherche. Classement comme en ligne (R-118).
+
+        Rend {"status", "incomplete", "journeys"} ; status : "ok", "no_solution", "base_expired" (R-173),
+        "already_there" (un quai de départ est un quai d'arrivée) ou "no_stop" (aucun quai d'un côté).
+        incomplete : le jour de service de la veille n'est pas couvert et ses trajets peuvent encore circuler
+        (R-153) ; des trajets peuvent manquer. Les trajets ont la forme de la lecture des itinéraires en ligne
+        (tools/app/journeys_reference.py) : heures théoriques, sans temps réel ni perturbation."""
+        origins, targets = sorted(set(origins)), frozenset(targets)
+        today = now.astimezone(self.tz).date()
+        if today < self.valid_start or today > self.valid_end:
+            return {"status": "base_expired", "incomplete": False, "journeys": []}
+        if not origins or not targets:
+            return {"status": "no_stop", "incomplete": False, "journeys": []}
+        if targets.intersection(origins):
+            return {"status": "already_there", "incomplete": False, "journeys": []}
+        now_s = math.ceil(now.timestamp())
+        yesterday = today - timedelta(days=1)
+        incomplete = yesterday < self.valid_start and now_s < self.epoch(yesterday, self.max_departure())
+        conns = self._offline_connections(today, now_s)
+        transfers = self._offline_transfers()
+        found, start = [], now_s
+        for _ in range(OFFLINE_MAX_SCANS):
+            j = self._scan(conns, transfers, origins, targets, start)
+            if j is None:
+                break
+            if j["signature"] not in {f["signature"] for f in found}:
+                found.append(j)
+            if j["walk_only"] or len(_undominated(found)) >= limit:
+                break
+            start = j["departure"] + 1
+        if not found:
+            return {"status": "no_solution", "incomplete": incomplete, "journeys": []}
+        kept_ = sorted(_undominated(found), key=lambda j: (j["arrival"], -j["departure"], j["transfers"], j["walking"],
+                                                          j["signature"]))
+        return {"status": "ok", "incomplete": incomplete, "journeys": kept_[:limit]}
+
+    def _offline_transfers(self) -> dict:
+        """Correspondances par quai de départ, dans l'ordre des stop_id GTFS d'arrivée."""
+        out = defaultdict(list)
+        for a, b, t in self.con.execute(
+                """SELECT a.gtfs_id, b.gtfs_id, t.min_time FROM transfer t
+                   JOIN stop_point a ON a.id = t.from_stop_point_id JOIN stop_point b ON b.id = t.to_stop_point_id
+                   ORDER BY a.gtfs_id, b.gtfs_id"""):
+            out[a].append((b, t))
+        return out
+
+    def _offline_connections(self, today: date, now_s: int) -> list:
+        """Connexions (départ d'un quai, arrivée au quai suivant d'un même trajet) des jours de service de la
+        veille, du jour et du lendemain, au départ dans [now_s, now_s + 12 h], triées par (départ, arrivée, jour,
+        trajet, rang). Chaque connexion dit si l'on peut monter au premier quai et descendre au second."""
+        end = now_s + OFFLINE_HORIZON_S
+        # R-91 : quais non desservis par l'aménagement en vigueur le jour de la consultation (comme board()).
+        blocked = set()
+        for (code,) in self.con.execute("SELECT code FROM line ORDER BY code").fetchall():
+            for adj in self.adjustments(code, today):
+                blocked.update((code, r.stop_point) for r in adj.not_served)
+        conns = []
+        for d in (today - timedelta(days=1), today, today + timedelta(days=1)):
+            if not self.valid_start <= d <= self.valid_end:
+                continue
+            idx = (d - self.base).days
+            origin = int(self.service_day_origin(d))
+            prev = None
+            for tid, pid, seq, dep, dwell, sp, pickup, dropoff, code in self.con.execute(
+                    """SELECT t.id, t.pattern_id, st.seq, st.departure, st.dwell, sp.gtfs_id, ps.pickup, ps.dropoff, l.code
+                       FROM trip t JOIN service s ON s.id = t.service_id
+                       JOIN stop_time st ON st.trip_id = t.id
+                       JOIN pattern_stop ps ON ps.pattern_id = t.pattern_id AND ps.seq = st.seq
+                       JOIN stop_point sp ON sp.id = ps.stop_point_id
+                       JOIN pattern p ON p.id = t.pattern_id JOIN line l ON l.id = p.line_id
+                       WHERE ((s.days >> ?) & 1) = 1 ORDER BY t.id, st.seq""", (idx,)):
+                cur = (tid, seq, origin + dep, origin + dep - dwell, sp, pickup, dropoff)
+                if prev is not None and prev[0] == tid and now_s <= prev[2] <= end:
+                    conns.append((prev[2], cur[3], d.toordinal(), tid, prev[1], pid, code, prev[4], cur[4],
+                                  prev[5] != 1 and (code, prev[4]) not in blocked,
+                                  cur[6] != 1 and (code, cur[4]) not in blocked))
+                prev = cur
+        conns.sort(key=lambda c: (c[0], c[1], c[2], c[3], c[4]))
+        return conns
+
+    def _scan(self, conns: list, transfers: dict, origins: list, targets: frozenset, start: int) -> Optional[dict]:
+        """Arrivée la plus tôt pour un départ à `start`. États par quai : arrivée par un véhicule (d'où partent
+        les correspondances), présence au quai, quai prêt pour une montée. Les états précédents sont gardés dans
+        des tuples immuables :
+          ("origin", quai) ; ("walk", de, vers, durée, départ, état précédent) ;
+          ("vehicle", montée, quai de descente, rang de descente, heure d'arrivée),
+          montée = (quai, rang, heure, état de préparation du quai, mission, ligne)."""
+        inf = float("inf")
+        vehicle, reach, ready = {}, {}, {}
+        best, best_sp = inf, None
+
+        def walk(frm: str, t0: int, prev: tuple) -> None:
+            nonlocal best, best_sp
+            for w, t in transfers.get(frm, ()):
+                a = t0 + t
+                wp = ("walk", frm, w, t, t0, prev)
+                if a < ready.get(w, (inf,))[0]:
+                    ready[w] = (a, wp)
+                if a < reach.get(w, (inf,))[0]:
+                    reach[w] = (a, wp)
+                    if w in targets and a < best:
+                        best, best_sp = a, w
+
+        for o in origins:
+            reach[o] = ready[o] = (start, ("origin", o))
+        for o in origins:
+            walk(o, start, ("origin", o))
+        boarded = {}
+        for dep, arr, day, tid, seq, pid, code, frm, to, can_board, can_alight in conns:
+            if dep >= best:
+                break
+            key = (day, tid)
+            b = boarded.get(key)
+            if b is None and can_board and ready.get(frm, (inf,))[0] <= dep:
+                b = boarded[key] = (frm, seq, dep, ready[frm][1], pid, code)
+            if b is None or not can_alight or arr >= vehicle.get(to, (inf,))[0]:
+                continue
+            parent = ("vehicle", b, to, seq + 1, arr)
+            vehicle[to] = (arr, parent)
+            if arr < reach.get(to, (inf,))[0]:
+                reach[to] = (arr, parent)
+                if to in targets and arr < best:
+                    best, best_sp = arr, to
+            if arr + OFFLINE_SAME_STOP_S < ready.get(to, (inf,))[0]:
+                ready[to] = (arr + OFFLINE_SAME_STOP_S, parent)
+            walk(to, arr, parent)
+        if best_sp is None:
+            return None
+        return self._offline_journey(reach[best_sp][1], best)
+
+    def _stop_info(self) -> dict:
+        if self._stops is None:
+            self._stops = {sp: (name, area) for sp, name, area in self.con.execute(
+                "SELECT sp.gtfs_id, sp.name, a.gtfs_id FROM stop_point sp JOIN stop_area a ON a.id = sp.stop_area_id")}
+        return self._stops
+
+    def _offline_journey(self, last: tuple, arrival: int) -> dict:
+        """Étapes du trajet, dans le format de la lecture des itinéraires en ligne."""
+        steps, node = [], last
+        while node[0] != "origin":
+            steps.append(node)
+            node = node[5] if node[0] == "walk" else node[1][3]
+        steps.reverse()
+        stops = self._stop_info()
+        lines = {code: (route_id, short, color, text_color, network) for code, route_id, short, color, text_color, network
+                 in self.con.execute("SELECT code, route_id, short_name, color, text_color, network FROM line")}
+        legs, here = [], None            # here : instant de présence au quai courant
+        for i, s in enumerate(steps):
+            if s[0] == "walk":
+                _, frm, to, dur, begin, _prev = s
+                if i == 0 and len(steps) > 1:
+                    begin = steps[1][1][2] - dur      # marche de départ : juste à temps pour la montée (comme Navitia)
+                if dur > 0:
+                    legs.append({"kind": "walk", "departure": begin, "arrival": begin + dur, "duration": dur,
+                                 "from": stops[frm][0], "to": stops[to][0]})
+                here = begin + dur
+                continue
+            _, (frm, board_seq, board_time, _rp, pid, code), to, alight_seq, alight_time = s
+            if here is not None and board_time > here:
+                legs.append({"kind": "wait", "duration": board_time - here})
+            route_id, short, color, text_color, network = lines[code]
+            names = [stops[sp][0] for seq, sp, _drop in self.pattern_stops(pid) if board_seq <= seq <= alight_seq]
+            legs.append({
+                "kind": "pt", "line": f"line:{route_id}", "code": short or code, "mode": "", "physical_mode": "",
+                "network": network or "", "color": color.lstrip("#").upper() if color else None,
+                "text_color": text_color.lstrip("#").upper() if text_color else None,
+                "direction": self.terminus(pid), "vehicle_journey": None,
+                "from": {"stop_point": f"stop_point:{frm}", "stop_area": f"stop_area:{stops[frm][1]}", "name": stops[frm][0]},
+                "to": {"stop_point": f"stop_point:{to}", "stop_area": f"stop_area:{stops[to][1]}", "name": stops[to][0]},
+                "departure": board_time, "arrival": alight_time, "base_departure": board_time,
+                "base_arrival": alight_time, "realtime": False, "stops": alight_seq - board_seq,
+                "stop_names": names, "wheelchair": False, "notices": [],
+            })
+            here = alight_time
+        pts = [l for l in legs if l["kind"] == "pt"]
+        departure = legs[0]["departure"] if legs else arrival
+        walking = sum(l["duration"] for l in legs if l["kind"] == "walk")
+        signature = ("|".join(f"{l['line']}@{l['from']['stop_point']}@{l['departure']}" for l in pts)
+                     if pts else f"walk@{departure}@{arrival}")
+        return {"departure": departure, "arrival": arrival, "duration": arrival - departure,
+                "transfers": max(len(pts) - 1, 0), "walking": walking, "walk_only": not pts,
+                "signature": signature, "disrupted_lines": [], "legs": legs}

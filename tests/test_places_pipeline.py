@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Teste le générateur sur les lieux (schéma 2) avec un GTFS fictif minimal, sans réseau :
+Teste le générateur sur les lieux et les correspondances (schéma 3) avec un GTFS fictif minimal, sans réseau :
 
     python3 tests/test_places_pipeline.py
 
@@ -9,7 +9,9 @@ Teste le générateur sur les lieux (schéma 2) avec un GTFS fictif minimal, san
 - erreurs bloquantes : sorte inconnue, ville avec secteur, ligne ou zone d'arrêt inconnue, doublon ;
 - alertes : point de montée que la ligne ne dessert plus vers un aéroport, nom différent du GTFS ;
 - départs du lieu par le lecteur de référence, y compris une ligne qui ne mène plus à l'aéroport ;
-- début de validité borné au jour de la construction, et jour de service de la veille non couvert (R-153).
+- début de validité borné au jour de la construction, et jour de service de la veille non couvert (R-153) ;
+- correspondances (R-119) : seules les lignes de type 2 entre deux quais différents de la base sont gardées, un
+  doublon garde le temps le plus long, et les lignes écartées sont signalées.
 """
 
 from __future__ import annotations
@@ -50,7 +52,7 @@ def _csv(rows: list) -> str:
     return out.getvalue()
 
 
-def make_gtfs(path: Path) -> None:
+def make_gtfs(path: Path, with_transfers: bool = True) -> None:
     """Ligne X (ville → aéroport, et retour) et ligne Y (ville → banlieue, sans aéroport), un jour de service."""
     stops = [
         {"stop_id": "ZC", "stop_name": "Gare Centrale", "stop_lat": "48.88", "stop_lon": "2.35", "location_type": "1", "parent_station": ""},
@@ -90,6 +92,15 @@ def make_gtfs(path: Path) -> None:
         z.writestr("calendar.txt", _csv([{"service_id": "S", "monday": "1", "tuesday": "1", "wednesday": "1", "thursday": "1",
                                           "friday": "1", "saturday": "1", "sunday": "1", "start_date": "20260701", "end_date": "20260710"}]))
         z.writestr("calendar_dates.txt", "service_id,date,exception_type\n")
+        if with_transfers:
+            z.writestr("transfers.txt", _csv([
+                {"from_stop_id": "C1", "to_stop_id": "B1", "transfer_type": "2", "min_transfer_time": "300"},
+                {"from_stop_id": "B1", "to_stop_id": "C1", "transfer_type": "2", "min_transfer_time": "300"},
+                {"from_stop_id": "C1", "to_stop_id": "B1", "transfer_type": "2", "min_transfer_time": "400"},
+                {"from_stop_id": "C1", "to_stop_id": "C1", "transfer_type": "2", "min_transfer_time": "60"},
+                {"from_stop_id": "A1", "to_stop_id": "M1", "transfer_type": "0", "min_transfer_time": ""},
+                {"from_stop_id": "C1", "to_stop_id": "INCONNU", "transfer_type": "2", "min_transfer_time": "60"},
+            ]))
 
 
 def line(code, route, sectors):
@@ -128,7 +139,12 @@ def main() -> int:
         check("base valide : aucune erreur", errors, [])
         check("base valide : aucune alerte de point de montée", [w for w in warns if w.startswith("boarding")], [])
         con = sqlite3.connect(db)
-        check("schéma 2 : user_version", con.execute("PRAGMA user_version").fetchone()[0], 2)
+        check("schéma 3 : user_version", con.execute("PRAGMA user_version").fetchone()[0], 3)
+        check("correspondances : type 2 entre quais différents, doublon au temps le plus long",
+              con.execute("""SELECT a.gtfs_id, b.gtfs_id, t.min_time FROM transfer t JOIN stop_point a ON a.id = t.from_stop_point_id
+                             JOIN stop_point b ON b.id = t.to_stop_point_id ORDER BY 1, 2""").fetchall(),
+              [("B1", "C1", 300), ("C1", "B1", 400)])
+        check("correspondances écartées signalées", "transfers_ignored" in warns, True)
         check("lieux : sorte, secteur et ordre du sélecteur",
               con.execute("SELECT id, kind, sector, sort_order FROM place ORDER BY sort_order").fetchall(),
               [("paris", "city", None, 0), ("aero", "airport", "ROISSY", 1)])
@@ -204,6 +220,16 @@ def main() -> int:
             check(name, errors, exp_errors)
             if exp_warn:
                 check(f"{name} ({exp_warn})", exp_warn in warns, True)
+
+        # GTFS sans transfers.txt : publication possible, alerte, table vide (R-119).
+        bare = tmp / "sans-correspondances.zip"
+        make_gtfs(bare, with_transfers=False)
+        db, errors, warns = build(tmp, bare, PLACES, "bare")
+        check("sans transfers.txt : aucune erreur", errors, [])
+        check("sans transfers.txt : alerte", "transfers_missing" in warns, True)
+        con = sqlite3.connect(db)
+        check("sans transfers.txt : aucune correspondance", con.execute("SELECT COUNT(*) FROM transfer").fetchone()[0], 0)
+        con.close()
     for f in failures:
         print("ÉCHEC", f)
     print(f"{passed} contrôles conformes, {len(failures)} échec(s)")

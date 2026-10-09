@@ -32,6 +32,7 @@ jobs:
           python3 -I tools/check_fixtures.py
           python3 -I tests/test_adjustments_pipeline.py
           python3 -I tests/test_places_pipeline.py
+          python3 -I tests/test_offline_router.py
 
       - name: Télécharger le GTFS IDFM
         run: |
