@@ -342,6 +342,18 @@ def android_resources() -> None:
         rel = path.relative_to(gen.ROOT).as_posix()
         check("app (généré)", rel, path.exists() and path.read_bytes() == data, True)
     app_timetable()
+    app_plans()
+
+
+def app_plans() -> None:
+    """Lot 3 : catalogue des plans embarqué lisible et complet (tools/app/embed_plans.py), catalogues réels des tests
+    identiques à ceux publiés."""
+    emb = _load_tool("embed_plans")
+    cat = json.loads(emb.TARGET.read_text(encoding="utf-8"))
+    check("app (plans)", "catalogue embarqué", emb.problems(cat), [])
+    for name in ("catalogue-2026-10-08.json", "catalogue-2026-10-14.json"):
+        test = json.loads((ROOT / "app/src/test/resources/plans" / name).read_text(encoding="utf-8"))
+        check("app (plans)", f"{name} : format", test.get("schema"), emb.SCHEMA)
 
 
 def _load_tool(name: str):
