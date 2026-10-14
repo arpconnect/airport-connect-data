@@ -57,7 +57,7 @@ HTML = b"<!DOCTYPE html><html><head><title>Plan RER</title></head><body>page</bo
 
 class FakeHttp:
     def __init__(self):
-        self.docs, self.fail, self.api_down, self.calls = {}, set(), False, []
+        self.docs, self.fail, self.forbidden, self.api_down, self.calls = {}, set(), set(), False, []
         for rec in FIX["line_documents"]["results"]:
             u = rec["url"]
             if u.endswith(".jpg") or ".jpg?" in u:
@@ -91,6 +91,8 @@ class FakeHttp:
             return fp.Response(200, {"content-type": "application/json"}, json.dumps(payload).encode(), url)
         if url in self.fail:
             raise IOError("HTTP 503")
+        if urllib.parse.urlsplit(url).hostname in self.forbidden:
+            return fp.Response(403, {"content-type": "text/html"}, b"<html>Access Denied</html>", url)
         body, h = self.docs[url]
         etag = '"' + fp.hashlib.sha256(body).hexdigest()[:16] + '"'
         if headers and headers.get("If-None-Match") == etag:
@@ -117,7 +119,7 @@ cat, rep = run(http)
 p = by_id(cat)
 check("1 : aucune erreur", rep["errors"], [])
 check("1 : comptes (48 lignes + plan Noctilien ; A01 et A04 sans plan)", cat["counts"],
-      {"ok": 49, "kept_previous": 0, "error": 0, "no_plan": 2})
+      {"ok": 49, "kept_previous": 0, "device": 0, "error": 0, "no_plan": 2})
 check("1 : 51 entrées (50 lignes actives + 1 plan de réseau)", len(cat["plans"]), 51)
 check("1 : 351, plan IDFM du 24 août 2026",
       (p["BUS_351"]["source"]["via"], p["BUS_351"]["document"]["date"], p["BUS_351"]["document"]["date_source"],
@@ -287,6 +289,32 @@ for pl in prev["plans"]:
 run(http, previous=prev)
 check("8 : pas d'If-Modified-Since vers un serveur aux dates non fiables",
       [h for h in seen if "If-Modified-Since" in h], [])
+
+# 9. ratp.fr refuse la CI (HTTP 403, constat réel du 8 octobre 2026) : documents confiés à l'appareil (R-187)
+http9 = FakeHttp()
+http9.forbidden.add("www.ratp.fr")
+cat9d, rep9d = run(http9)
+p9 = by_id(cat9d)
+ratp = ["METRO_14", "RER_B", "RER_C", "T7"]
+check("9 : les 4 plans RATP confiés à l'appareil", sorted(i for i, x in p9.items() if x["status"] == "device"), ratp)
+check("9 : comptes", cat9d["counts"], {"ok": 45, "kept_previous": 0, "device": 4, "error": 0, "no_plan": 2})
+check("9 : pas d'échec bloquant (un plan confié à l'appareil n'est pas un échec)", rep9d["errors"], [])
+check("9 : RER B, la page web refusée n'est jamais retenue, le PDF de repli l'est",
+      (p9["RER_B"]["file"]["url"], p9["RER_B"]["source"]["via"], p9["RER_B"]["document"]),
+      (SOURCES["fallbacks"]["RER_B"]["url"], "fallback", {"media_type": "application/pdf"}))
+check("9 : RER C, page Transilien (pas un document) puis PDF RATP confié à l'appareil",
+      (p9["RER_C"]["file"]["url"], [x["error"] for x in p9["RER_C"]["problems"]]),
+      (SOURCES["fallbacks"]["RER_C"]["url"], ["pas un document (page web ou format inconnu)", "HTTP 403"]))
+check("9 : ni empreinte, ni taille, ni date inventées", sorted(set(k for i in ratp for k in p9[i]["document"])), ["media_type"])
+check("9 : alerte par plan", codes(rep9d, "plan_device_fetch"), ratp)
+cat9k, _ = run(http9, previous=cat)
+check("9 : une version vérifiée déjà connue est préférée (conservée)", by_id(cat9k)["T7"]["status"], "kept_previous")
+check("9 : version stable d'un jour à l'autre", run(http9)[0]["version"], cat9d["version"])
+check("9 : 403 d'un hôte non déclaré = erreur", (lambda h: (h.forbidden.add("ilico.iledefrance-mobilites.fr"),
+      by_id(run(h)[0])["BUS_351"]["status"])[1])(FakeHttp()), "error")
+check("9 : format tiré de l'extension, adresse sans extension refusée",
+      (fp.device_media("https://www.ratp.fr/a/b.PDF"), fp.device_media("https://www.ratp.fr/plans-lignes/rer/b")),
+      ("application/pdf", None))
 
 fill = jpeg(800, 600).replace(b"\xff\xc0", b"\xff\xff\xff\xc0", 1)
 check("8 : JPEG avec octets de remplissage", fp.image_size(fill, "image/jpeg"), (800, 600))

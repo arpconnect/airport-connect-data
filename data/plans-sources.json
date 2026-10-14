@@ -53,6 +53,9 @@
       "lines_group": "NOCTILIEN"
     }
   },
+  "device_fetch_hosts": {
+    "www.ratp.fr": "ratp.fr refuse les requêtes des serveurs de GitHub Actions (HTTP 403, relevé du 8 octobre 2026) mais sert ses PDF à une connexion ordinaire (vérifié le 14 octobre 2026) : faute d'autre source, le document est téléchargé par l'appareil, qui en vérifie la signature (R-187)."
+  },
   "untrusted_last_modified_hosts": {
     "www.parisaeroport.fr": "Le serveur renvoie le même Last-Modified (22 novembre 2018) pour tous ses fichiers, y compris le plan N2 mis à jour en 2021 : cet en-tête ne date pas le document."
   },

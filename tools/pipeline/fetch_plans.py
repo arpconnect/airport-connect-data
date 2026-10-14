@@ -280,9 +280,21 @@ def _age_days(ddate: str, today: date):
     return (today - date.fromisoformat(ddate if len(ddate) == 10 else ddate + "-01")).days
 
 
+DEVICE_EXTENSIONS = {".pdf": "application/pdf", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png",
+                     ".webp": "image/webp"}
+
+
+def device_media(url: str):
+    """Format annoncé par l'extension d'une adresse de document (R-187) ; None si l'adresse n'en a pas."""
+    path = urllib.parse.urlsplit(url).path.lower()
+    return next((m for ext, m in DEVICE_EXTENSIONS.items() if path.endswith(ext)), None)
+
+
 def resolve(entry: dict, prev: dict, http: Http, limits: dict, today: date, mirror_dir, report: dict,
-            untrusted_lm=()) -> dict:
-    """Télécharge le premier document valide parmi les sources de l'entrée."""
+            untrusted_lm=(), device_hosts=()) -> dict:
+    """Télécharge le premier document valide parmi les sources de l'entrée. Un document d'un hôte qui refuse les
+    serveurs d'hébergement (HTTP 403, `device_fetch_hosts`) est confié à l'appareil s'il n'y a ni autre source
+    valide ni version connue (R-187)."""
     base = {"id": entry["id"], "kind": entry["kind"], "lines": entry["lines"]}
     known = {k: v for k, v in (prev or {}).items() if k != "problems"} if prev and prev.get("document") else None
     if not entry["tries"]:
@@ -295,6 +307,7 @@ def resolve(entry: dict, prev: dict, http: Http, limits: dict, today: date, mirr
         report["warnings"].append({"code": "plan_source_missing", "detail": entry["id"]})
         return {**base, "status": "no_plan", "reason": "Aucune source connue.", "info_url": None}
     problems = []
+    device = None
     for t in entry["tries"]:
         cond = {}
         # requête conditionnelle seulement si la version connue suffit telle quelle
@@ -314,6 +327,9 @@ def resolve(entry: dict, prev: dict, http: Http, limits: dict, today: date, mirr
             return _carry(known, base, mirror_dir, status="ok", title=t["title"], checked_on=today.isoformat())
         if r.status != 200:
             problems.append({"url": t["url"], "error": f"HTTP {r.status}"})
+            if (device is None and r.status == 403 and urllib.parse.urlsplit(t["url"]).hostname in device_hosts
+                    and device_media(t["url"])):
+                device = t
             continue
         if len(r.body) > limits["max_bytes"]:
             problems.append({"url": t["url"], "error": "document trop lourd"})
@@ -364,6 +380,17 @@ def resolve(entry: dict, prev: dict, http: Http, limits: dict, today: date, mirr
     if known:
         report["warnings"].append({"code": "plan_kept_previous", "detail": {"plan": entry["id"], "problems": problems}})
         return _carry(known, base, mirror_dir, status="kept_previous", problems=problems)
+    if device is not None:
+        # R-187 : le serveur refuse la CI mais sert les connexions ordinaires ; l'appareil télécharge et vérifie la
+        # signature du fichier. Sans empreinte connue, aucune date ni taille n'est annoncée (rien n'est inventé).
+        report["warnings"].append({"code": "plan_device_fetch", "detail": {"plan": entry["id"], "url": device["url"]}})
+        host = urllib.parse.urlsplit(device["url"]).hostname
+        return {**base, "status": "device", "title": device["title"],
+                "source": {"url": device["url"], "via": device["via"], "provider": host,
+                           "dataset": device["dataset"], "dataset_licence": device["dataset_licence"]},
+                "document": {"media_type": device_media(device["url"])},
+                "file": {"url": device["url"]},
+                "problems": problems}
     report["warnings"].append({"code": "plan_unavailable", "detail": {"plan": entry["id"], "problems": problems}})
     return {**base, "status": "error", "problems": problems}
 
@@ -377,7 +404,8 @@ def build(lines_doc: dict, sources: dict, previous: dict, http: Http, today: dat
         report["errors"].append({"code": "source_unreachable", "detail": str(e)})
         return None, report
     plans = [resolve(e, prev_by_id.get(e["id"]), http, sources["limits"], today, mirror_dir, report,
-                     tuple(sources.get("untrusted_last_modified_hosts", {}))) for e in entries]
+                     tuple(sources.get("untrusted_last_modified_hosts", {})),
+                     tuple(sources.get("device_fetch_hosts", {}))) for e in entries]
     tried = [p for p in plans if p["status"] != "no_plan"]
     failed = [p for p in tried if p["status"] in ("error", "kept_previous")]
     if tried and len(failed) / len(tried) > sources["limits"]["max_failure_ratio"]:
@@ -395,7 +423,7 @@ def build(lines_doc: dict, sources: dict, previous: dict, http: Http, today: dat
         "version": hashlib.sha256(stable.encode()).hexdigest()[:16],     # change ssi le contenu change
         "generated_at": datetime.now(timezone.utc).replace(microsecond=0).isoformat(),
         "distribution": "mirror" if mirror_dir is not None else "link",
-        "counts": {s: sum(1 for p in plans if p["status"] == s) for s in ("ok", "kept_previous", "error", "no_plan")},
+        "counts": {s: sum(1 for p in plans if p["status"] == s) for s in ("ok", "kept_previous", "device", "error", "no_plan")},
         "plans": plans,
     }
     return catalogue, report
@@ -431,7 +459,7 @@ def main() -> int:
         return 2
     (args.out / "catalogue.json").write_text(json.dumps(catalogue, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     c = catalogue["counts"]
-    print(f"OK {catalogue['version']} : {c['ok']} plans, {c['kept_previous']} conservés, {c['error']} en erreur, "
+    print(f"OK {catalogue['version']} : {c['ok']} plans, {c['kept_previous']} conservés, {c['device']} téléchargés par l'appareil, {c['error']} en erreur, "
           f"{c['no_plan']} sans plan, {len(report['warnings'])} alerte(s)")
     return 0
 
