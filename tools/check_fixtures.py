@@ -47,6 +47,21 @@ def eta() -> None:
         check("eta_display.json", c["id"], got, c["expected"])
 
 
+def eta_v2() -> None:
+    """R-55 corrigée (D-16) : cas cibles de la v2, et théorique identique à la v1 sur tous les cas de la v1."""
+    import v2_eta
+    doc = json.loads((ROOT / "tests" / "rules-v2" / "eta_display.json").read_text(encoding="utf-8"))
+    for c in doc["cases"]:
+        i = c["input"]
+        check("rules-v2/eta_display.json", c["id"], v2_eta.eta_display(i["ms_until"], i["realtime"]), c["expected"])
+    for c in load("eta_display.json")["cases"]:
+        i = c["input"]
+        if i["ms_until"] is None or i["realtime"]:
+            continue
+        exp = c["expected"] if c["expected"]["kind"] != "hidden" else {"kind": "hidden"}
+        check("rules-v2/eta_display.json (théorique = v1)", c["id"], v2_eta.eta_display(i["ms_until"], False), exp)
+
+
 def _expand(pattern: dict) -> list:
     sd = date.fromisoformat(pattern["service_date"])
     fh, fm = (int(x) for x in pattern["first"].split(":"))
@@ -427,7 +442,7 @@ def adjustments(ids_lines: dict) -> None:
 
 
 def main() -> int:
-    for fn in (eta, boundary, scope, traffic, freshness, identity, lines_registry, realtime_v2, data_files):
+    for fn in (eta, eta_v2, boundary, scope, traffic, freshness, identity, lines_registry, realtime_v2, data_files):
         fn()
     for f in failures:
         print("ÉCHEC", f)
