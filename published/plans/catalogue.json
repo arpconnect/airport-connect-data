@@ -1,12 +1,12 @@
 {
   "schema": "airport-connect/plans-catalogue@1",
-  "version": "e3cad5b95699a6da",
-  "generated_at": "2026-10-15T19:20:39+00:00",
+  "version": "b48dbc4c494cbac1",
+  "generated_at": "2026-10-15T19:26:13+00:00",
   "distribution": "link",
   "counts": {
     "ok": 45,
-    "kept_previous": 4,
-    "device": 0,
+    "kept_previous": 0,
+    "device": 4,
     "error": 0,
     "no_plan": 0
   },
@@ -1493,7 +1493,7 @@
       "lines": [
         "METRO_14"
       ],
-      "status": "kept_previous",
+      "status": "device",
       "title": "Plan Métro 14",
       "source": {
         "url": "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/metro/plan-de-ligne_metro_ligne-14.pdf",
@@ -1557,7 +1557,7 @@
       "lines": [
         "RER_B"
       ],
-      "status": "kept_previous",
+      "status": "device",
       "title": "Plan de ligne RER B",
       "source": {
         "url": "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/rer/plan-de-ligne_rer_ligne-b.pdf",
@@ -1589,7 +1589,7 @@
       "lines": [
         "RER_C"
       ],
-      "status": "kept_previous",
+      "status": "device",
       "title": "Plan de ligne RER C",
       "source": {
         "url": "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/rer/plan-de-ligne_rer_ligne-c.pdf",
@@ -1657,7 +1657,7 @@
       "lines": [
         "T7"
       ],
-      "status": "kept_previous",
+      "status": "device",
       "title": "Plan Tramway T7",
       "source": {
         "url": "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/tram/plan-de-ligne_tram_ligne-t7.pdf",
