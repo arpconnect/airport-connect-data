@@ -25,6 +25,9 @@ from zoneinfo import ZoneInfo
 REVEAL_MIN = 15          # R-56
 NOT_STARTED_MIN = 60     # R-56
 LIMIT = 4                # R-56
+RESUME_LOOKAHEAD_DAYS = 7    # R-57, D-6 : « Reprise à » cherchée jusqu'à 7 jours après la fenêtre J-1 → J+1
+NEARBY_RADIUS_M = 800        # R-101, D-8 : « autour de moi », quais à 800 m au plus (environ 10 min à pied)
+EARTH_RADIUS_M = 6371008.8   # rayon moyen de la Terre (UGGI)
 RETAIN_S = 59            # R-55 : un passage théorique reste affiché (« 0 min ») jusqu'à 59 s après son heure
 SECTORS = ("ROISSY", "ORLY", "BOURGET")
 FAMILY_RANK = {"TRAIN": 0, "METRO": 1, "TRAM_TRAIN": 2, "TRAM": 3, "SHUTTLE": 4, "BUS": 5, "NIGHT_BUS": 6}   # R-160
@@ -101,7 +104,7 @@ class StopBoard:
     status: str                  # "ok" | "base_expired" | "no_service_soon" | "no_data" | "not_served"
     passages: list = field(default_factory=list)
     boundary: Optional[str] = None           # None | "service_not_started" | "service_ended"
-    next_service_start: Optional[float] = None   # pour « Reprise à HH:MM » (D-6)
+    next_service_start: Optional[float] = None   # « Reprise à HH:MM » (R-57, D-6) : premier départ du service suivant
     incomplete: bool = False                 # R-92 : horaires théoriques incomplets (itinéraire modifié)
     adjustment_id: Optional[str] = None      # aménagement à l'origine de "not_served" ou de incomplete
     replacements: list = field(default_factory=list)   # list[Replacement] si status == "not_served"
@@ -109,6 +112,15 @@ class StopBoard:
     # clés (quai, heure, girouette) de ceux du bloc de service retenu, que la base afficherait (R-56).
     candidates: list = field(default_factory=list, repr=False, compare=False)
     eligible: frozenset = field(default_factory=frozenset, repr=False, compare=False)
+
+
+def distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Distance à vol d'oiseau en mètres (haversine, sphère de rayon EARTH_RADIUS_M) ; même calcul dans l'application."""
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dp, dl = math.radians(lat2 - lat1), math.radians(lon2 - lon1)
+    sp, sl = math.sin(dp / 2), math.sin(dl / 2)
+    a = sp * sp + math.cos(p1) * math.cos(p2) * sl * sl
+    return 2 * EARTH_RADIUS_M * math.asin(math.sqrt(a))
 
 
 @dataclass
@@ -120,6 +132,7 @@ class DepartureGroup:
     stop_area: Optional[str]     # point de montée (lieu ville, parent_station GTFS), None sinon
     title: str                   # destination du premier passage affiché, sinon la plus fréquente des missions retenues
     board: StopBoard
+    distance_m: Optional[int] = None    # « autour de moi » (R-101) : distance du quai de montée le plus proche, en mètres
 
 
 class Timetable:
@@ -382,7 +395,10 @@ class Timetable:
                     f"""SELECT 1 FROM stop_point sp JOIN pattern_stop ps ON ps.stop_point_id = sp.id
                         JOIN pattern p ON p.id = ps.pattern_id JOIN line l ON l.id = p.line_id
                         WHERE sp.gtfs_id IN ({marks}) AND l.code = ? LIMIT 1""", (*sps, line_code)).fetchone() is not None
-            return StopBoard(status="no_service_soon" if served else "no_data")
+            if not served:
+                return StopBoard(status="no_data")
+            return StopBoard(status="no_service_soon",
+                             next_service_start=self._next_service_start(line_code, sps, days[-1], now_s, headsign_filter, allowed))
         blocks = {}
         for e in events:
             blocks.setdefault(e.service_date, []).append(e)
@@ -403,7 +419,27 @@ class Timetable:
                 board.next_service_start = upcoming[0].epoch
             elif past is not None:
                 board.boundary = "service_ended"
+                board.next_service_start = self._next_service_start(line_code, sps, days[-1], now_s, headsign_filter, allowed)
         return board
+
+    def _next_service_start(self, line_code: str, sps: list, last_day: date, now_s: float, headsign_filter,
+                            allowed: Optional[frozenset]) -> Optional[float]:
+        """R-57, D-6 : premier départ après la fenêtre J-1 → J+1, cherché jour de service par jour de service, jusqu'à
+        RESUME_LOOKAHEAD_DAYS jours plus loin et dans la validité de la base ; None s'il n'y en a pas (la ligne ne
+        reprend pas d'ici là : « Service terminé »)."""
+        d = last_day + timedelta(days=1)
+        end = min(self.valid_end, last_day + timedelta(days=RESUME_LOOKAHEAD_DAYS))
+        while d <= end:
+            events = self.passages_on_service_day(line_code, sps, d)
+            if allowed is not None:
+                events = [e for e in events if (e.pattern_id, e.seq) in allowed]
+            if headsign_filter:
+                events = [e for e in events if headsign_filter(e.headsign)]
+            future = [e.epoch for e in events if e.epoch > now_s]
+            if future:
+                return min(future)
+            d += timedelta(days=1)
+        return None
 
     # -- accueil : départs d'un lieu (R-100, décision D-13) ------------------------------------
     # -- destination (R-102, décision D-14) -----------------------------------------------------
@@ -552,6 +588,67 @@ class Timetable:
             return (SECTORS.index(grp.sector) if grp.sector else 0,
                     first is None, first if first is not None else 0.0, *line_rank(grp), grp.key)
         return sorted(out, key=rank)
+
+    # -- autour de moi (R-101, décision D-8) ---------------------------------------------------------
+    def nearby_departures(self, lat: float, lon: float, now: datetime, destination: Optional[tuple] = None) -> list:
+        """Cartes « autour de moi » : pour chaque ligne et chaque sens (direction_id GTFS), la zone d'arrêt la plus
+        proche de la position où l'on peut monter (quais à NEARBY_RADIUS_M au plus, à vol d'oiseau), et ses départs.
+
+        - Le quai le plus proche d'une zone donne sa distance (mètres, arrondis à l'unité) ; à distance égale, la zone
+          de plus petit identifiant GTFS l'emporte. Tous les quais de la zone retenue pour la ligne et le sens servent.
+        - destination (R-102) : seules comptent les montées dont la mission dessert ensuite la destination, avant le
+          choix de la zone la plus proche (la carte montre l'arrêt d'où l'on peut s'y rendre).
+        - Ordre : distance croissante, puis cartes avec passage d'abord, par prochain départ, puis ligne et sens.
+        La position n'est jamais conservée ni transmise : le calcul se fait sur l'appareil."""
+        targets = self.destination_stop_points(destination) if destination is not None else None
+        best = {}   # (code, key) -> (distance, zone)
+        rows = self._boarding_rows()
+        for code, direction, pid, seq, sp, area, slat, slon in rows:
+            d = distance_m(lat, lon, slat, slon)
+            if d > NEARBY_RADIUS_M:
+                continue
+            if targets is not None and not self.reaches(pid, seq, targets):
+                continue
+            key = (code, f"direction:{'none' if direction is None else direction}")
+            cur = best.get(key)
+            if cur is None or (d, area) < cur:
+                best[key] = (d, area)
+        out = []
+        for (code, key), (_, area) in best.items():
+            allowed, dist = {}, None
+            for c, direction, pid, seq, sp, a, slat, slon in rows:
+                if c != code or a != area or f"direction:{'none' if direction is None else direction}" != key:
+                    continue
+                if targets is not None and not self.reaches(pid, seq, targets):
+                    continue
+                allowed[(pid, seq)] = sp
+                d = distance_m(lat, lon, slat, slon)
+                dist = d if dist is None else min(dist, d)
+            board = self.board(code, sorted(set(allowed.values())), now, allowed=frozenset(allowed))
+            if board.passages:
+                title = board.passages[0].destination
+            else:
+                weights = defaultdict(int)
+                for pid in {pid for pid, _ in allowed}:
+                    weights[self.terminus(pid)] += self.trip_count(pid)
+                title = sorted(weights.items(), key=lambda x: (-x[1], x[0]))[0][0]
+            out.append(DepartureGroup(code, key, None, area, title, board, int(round(dist))))
+
+        def rank(g):
+            first = g.board.passages[0].epoch if g.board.passages else None
+            return (g.distance_m, first is None, first if first is not None else 0.0, g.line, g.key)
+        return sorted(out, key=rank)
+
+    def _boarding_rows(self) -> list:
+        """Quais où l'on peut monter (R-32), avec ligne, sens, mission, rang, zone d'arrêt et coordonnées."""
+        if getattr(self, "_boardings", None) is None:
+            self._boardings = self.con.execute(
+                """SELECT l.code, p.direction, ps.pattern_id, ps.seq, sp.gtfs_id, a.gtfs_id, sp.lat, sp.lon
+                   FROM pattern_stop ps JOIN stop_point sp ON sp.id = ps.stop_point_id
+                   JOIN stop_area a ON a.id = sp.stop_area_id JOIN pattern p ON p.id = ps.pattern_id
+                   JOIN line l ON l.id = p.line_id
+                   WHERE ps.pickup != 1 ORDER BY ps.pattern_id, ps.seq""").fetchall()
+        return self._boardings
 
     # -- onglet Lignes et fiche ligne (R-160 à R-163) ------------------------------------------------
     def line_catalogue(self) -> list:

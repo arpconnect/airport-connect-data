@@ -344,6 +344,21 @@ def home_structure(tt: Timetable, db_path: Path) -> None:
         check(f"accueil {pid} : cartes avec départ d'abord, par prochain départ",
               firsts == sorted(firsts) and all(g.board.passages for g in gs[:len(firsts)]), True)
         check(f"accueil {pid} : une carte par ligne et par sens", len({(g.line, g.key) for g in gs}), len(gs))
+    # D-6 : une fin de service ou une absence de passage proche annonce sa reprise, toujours dans le futur
+    resumes = [g.board.next_service_start for pid in ("paris", "cdg-t2", "orly-4") for g in tt.place_departures(pid, now)
+               if g.board.next_service_start is not None]
+    check("D-6 : « Reprise à » toujours après l'instant consulté", all(r > now.timestamp() for r in resumes), True)
+    # R-101, D-8 : autour de moi, depuis le premier quai de chaque lieu aéroportuaire
+    import timetable_reader as tr
+    for pid in ("cdg-t2", "orly-4", "bourget-gare"):
+        lat, lon = tt.con.execute("""SELECT sp.lat, sp.lon FROM place_stop_point x JOIN stop_point sp ON sp.id = x.stop_point_id
+                                     WHERE x.place_id = ? OR x.place_id IN (SELECT id FROM place WHERE parent_id = ?)
+                                     ORDER BY sp.gtfs_id LIMIT 1""", (pid, pid)).fetchone()
+        gs = tt.nearby_departures(lat, lon, now)
+        check(f"autour de moi {pid} : des cartes, à {tr.NEARBY_RADIUS_M} m au plus, triées par distance",
+              (bool(gs), all(g.distance_m <= tr.NEARBY_RADIUS_M for g in gs), [g.distance_m for g in gs] == sorted(g.distance_m for g in gs)),
+              (True, True, True))
+        check(f"autour de moi {pid} : une carte par ligne et par sens", len({(g.line, g.key) for g in gs}), len(gs))
     try:
         tt.place_departures("lieu-inexistant", now)
         check("accueil : lieu inconnu refusé", "aucune erreur", "KeyError")
