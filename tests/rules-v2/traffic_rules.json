@@ -1,0 +1,738 @@
+{
+ "schema": "airport-connect/rules-v2@1",
+ "rule": "Info trafic : texte des messages, rattachement, filtre d'axe des RER, périodes, statut et fraîcheur (R-80 à R-82, R-85)",
+ "reference": "tools/reference/v2_traffic.py",
+ "notes": [
+  "Instants en UTC (ISO 8601, suffixe Z) ; périodes d'IDFM en heure de Paris (AAAAMMJJTHHMMSS), fin exclue.",
+  "axis : missions fictives d'un RER, quais [zone d'arrêt, quai] dans l'ordre ; les zones IDFM:73699 (Aéroport CDG 2 TGV), IDFM:62978 (Saint-Rémy-lès-Chevreuse), IDFM:71135 (Gare d'Austerlitz) et IDFM:63244 (Massy - Palaiseau) sont les vraies extrémités des axes, les autres zones sont inventées.",
+  "Mission B1 : CDG 2 → IDFM:1 → IDFM:2 (bifurcation) → IDFM:3 → Saint-Rémy. Mission B2 (branche exclue) : IDFM:10 → IDFM:11 → IDFM:2 → IDFM:3 → Saint-Rémy. Zones couvertes : IDFM:73699, IDFM:1, IDFM:2, IDFM:3, IDFM:62978."
+ ],
+ "fixtures": {
+  "rer_b": [
+   [
+    [
+     "IDFM:73699",
+     "IDFM:sp73699"
+    ],
+    [
+     "IDFM:1",
+     "IDFM:sp1"
+    ],
+    [
+     "IDFM:2",
+     "IDFM:sp2"
+    ],
+    [
+     "IDFM:3",
+     "IDFM:sp3"
+    ],
+    [
+     "IDFM:62978",
+     "IDFM:sp62978"
+    ]
+   ],
+   [
+    [
+     "IDFM:10",
+     "IDFM:sp10"
+    ],
+    [
+     "IDFM:11",
+     "IDFM:sp11"
+    ],
+    [
+     "IDFM:2",
+     "IDFM:sp2b"
+    ],
+    [
+     "IDFM:3",
+     "IDFM:sp3"
+    ],
+    [
+     "IDFM:62978",
+     "IDFM:sp62978"
+    ]
+   ]
+  ]
+ },
+ "html_cases": [
+  {
+   "id": "paragraphes-et-entites",
+   "html": "<p>L&#8217;arr&#234;t A&#233;roport Orly 4 n'est pas desservi.</p><p>Reprise&nbsp;: 07h00.</p>",
+   "expected": "L’arrêt Aéroport Orly 4 n'est pas desservi.\n\nReprise : 07h00."
+  },
+  {
+   "id": "pseudo-balise-rer",
+   "html": "<p>En direction de Gare de Juvisy <RER>. Raison : travaux.</p>",
+   "expected": "En direction de Gare de Juvisy <RER>. Raison : travaux."
+  },
+  {
+   "id": "sauts-de-ligne",
+   "html": "Ligne 1<br>Ligne 2<br/>Ligne 3<BR />",
+   "expected": "Ligne 1\nLigne 2\nLigne 3"
+  },
+  {
+   "id": "listes-imbriquees",
+   "html": "<p>Travaux :</p><ul>\t<li>soirées du 19/10\t<ul><li>Porte de Choisy - Musée Mac Val</li></ul></li></ul><p>Merci.</p>",
+   "expected": "Travaux :\n\n• soirées du 19/10\n• Porte de Choisy - Musée Mac Val\n\nMerci."
+  },
+  {
+   "id": "lien-et-gras",
+   "html": "<p>Réservez sur le <a href=\"https://www.aerobus.fr/\">site <strong>Aérobus</strong></a>.</p>",
+   "expected": "Réservez sur le site Aérobus."
+  },
+  {
+   "id": "entite-inconnue-gardee",
+   "html": "A &foo; B &amp; C &#x41;",
+   "expected": "A &foo; B & C A"
+  },
+  {
+   "id": "vide",
+   "html": null,
+   "expected": ""
+  },
+  {
+   "id": "espaces",
+   "html": "<p>  A   B\t\tC  </p>\n\n\n<p></p><p>D</p>",
+   "expected": "A B C\n\nD"
+  },
+  {
+   "id": "liste-simple",
+   "html": "<p>Arrêts :</p><ul><li>A</li><li>B</li></ul>Fin",
+   "expected": "Arrêts :\n\n• A\n• B\nFin"
+  }
+ ],
+ "title_cases": [
+  {
+   "id": "bus",
+   "title": "Bus 152 : Mesures de sécurité - Arrêt(s) non desservi(s)",
+   "expected": "152"
+  },
+  {
+   "id": "noctilien",
+   "title": "Bus N22 : Travaux - Arrêt(s) non desservi(s)",
+   "expected": "n22"
+  },
+  {
+   "id": "rer-colle",
+   "title": "RERC: entre St-Martin d'Étamp. et Paris Austerlitz",
+   "expected": "c"
+  },
+  {
+   "id": "rer-espace",
+   "title": "RER C : entre Dourdan et Paris Austerlitz",
+   "expected": "c"
+  },
+  {
+   "id": "tramway",
+   "title": "Tramway T7 : Malaise voyageur - Trafic perturbé",
+   "expected": "t7"
+  },
+  {
+   "id": "metro",
+   "title": "Métro 14 : Trafic perturbé",
+   "expected": "14"
+  },
+  {
+   "id": "tiret-pas-deux-points",
+   "title": "Tramway T11 -  Mouvement social du 12/10 au 16/10",
+   "expected": null
+  },
+  {
+   "id": "titre-libre",
+   "title": "Info trafic 351 : arrêts non desservis Bondy",
+   "expected": null
+  },
+  {
+   "id": "sans-titre",
+   "title": null,
+   "expected": null
+  }
+ ],
+ "timing_cases": [
+  {
+   "id": "en-cours",
+   "now": "2026-10-14T18:30:00Z",
+   "periods": [
+    [
+     "20261014T200000",
+     "20261014T220000"
+    ]
+   ],
+   "expected": {
+    "state": "current",
+    "until": "2026-10-14T20:00:00Z",
+    "periods": 1,
+    "last_end": "2026-10-14T20:00:00Z"
+   }
+  },
+  {
+   "id": "debut-inclus",
+   "now": "2026-10-14T18:00:00Z",
+   "periods": [
+    [
+     "20261014T200000",
+     "20261014T220000"
+    ]
+   ],
+   "expected": {
+    "state": "current",
+    "until": "2026-10-14T20:00:00Z",
+    "periods": 1,
+    "last_end": "2026-10-14T20:00:00Z"
+   }
+  },
+  {
+   "id": "fin-exclue",
+   "now": "2026-10-14T20:00:00Z",
+   "periods": [
+    [
+     "20261014T200000",
+     "20261014T220000"
+    ]
+   ],
+   "expected": {
+    "state": "hidden",
+    "periods": 1,
+    "last_end": "2026-10-14T20:00:00Z"
+   }
+  },
+  {
+   "id": "chevauchement-fin-la-plus-tardive",
+   "now": "2026-10-14T19:00:00Z",
+   "periods": [
+    [
+     "20261014T200000",
+     "20261014T220000"
+    ],
+    [
+     "20261014T203000",
+     "20261015T010000"
+    ]
+   ],
+   "expected": {
+    "state": "current",
+    "until": "2026-10-14T23:00:00Z",
+    "periods": 2,
+    "last_end": "2026-10-14T23:00:00Z"
+   }
+  },
+  {
+   "id": "a-venir-prochaine-periode",
+   "now": "2026-10-14T18:20:00Z",
+   "periods": [
+    [
+     "20261012T000000",
+     "20261012T030000"
+    ],
+    [
+     "20261016T000000",
+     "20261016T030000"
+    ],
+    [
+     "20261015T000000",
+     "20261015T030000"
+    ]
+   ],
+   "expected": {
+    "state": "upcoming",
+    "next": "2026-10-14T22:00:00Z",
+    "next_end": "2026-10-15T01:00:00Z",
+    "periods": 3,
+    "last_end": "2026-10-16T01:00:00Z"
+   }
+  },
+  {
+   "id": "a-venir-7-jours-pile",
+   "now": "2026-10-14T22:00:00Z",
+   "periods": [
+    [
+     "20261022T000000",
+     "20261022T030000"
+    ]
+   ],
+   "expected": {
+    "state": "upcoming",
+    "next": "2026-10-21T22:00:00Z",
+    "next_end": "2026-10-22T01:00:00Z",
+    "periods": 1,
+    "last_end": "2026-10-22T01:00:00Z"
+   }
+  },
+  {
+   "id": "au-dela-de-7-jours",
+   "now": "2026-10-14T21:59:59Z",
+   "periods": [
+    [
+     "20261022T000000",
+     "20261022T030000"
+    ]
+   ],
+   "expected": {
+    "state": "hidden",
+    "periods": 1,
+    "last_end": "2026-10-22T01:00:00Z"
+   }
+  },
+  {
+   "id": "terminee",
+   "now": "2026-10-14T18:20:00Z",
+   "periods": [
+    [
+     "20261014T200706",
+     "20261014T200806"
+    ]
+   ],
+   "expected": {
+    "state": "hidden",
+    "periods": 1,
+    "last_end": "2026-10-14T18:08:06Z"
+   }
+  },
+  {
+   "id": "heure-ambigue-octobre",
+   "now": "2026-10-25T00:10:00Z",
+   "periods": [
+    [
+     "20261025T020000",
+     "20261025T023000"
+    ]
+   ],
+   "expected": {
+    "state": "current",
+    "until": "2026-10-25T00:30:00Z",
+    "periods": 1,
+    "last_end": "2026-10-25T00:30:00Z"
+   }
+  },
+  {
+   "id": "heure-inexistante-mars",
+   "now": "2027-03-28T01:00:00Z",
+   "periods": [
+    [
+     "20270328T023000",
+     "20270328T040000"
+    ]
+   ],
+   "expected": {
+    "state": "upcoming",
+    "next": "2027-03-28T01:30:00Z",
+    "next_end": "2027-03-28T02:00:00Z",
+    "periods": 1,
+    "last_end": "2027-03-28T02:00:00Z"
+   }
+  },
+  {
+   "id": "sans-periode",
+   "now": "2026-10-14T18:20:00Z",
+   "periods": [],
+   "expected": {
+    "state": "current",
+    "until": null,
+    "periods": 0,
+    "last_end": null
+   }
+  },
+  {
+   "id": "periodes-illisibles",
+   "now": "2026-10-14T18:20:00Z",
+   "periods": [
+    [
+     "2026-10-14",
+     "20261015T000000"
+    ],
+    [
+     "20261015T000000",
+     "20261014T000000"
+    ]
+   ],
+   "expected": {
+    "state": "hidden",
+    "periods": 0,
+    "last_end": null
+   }
+  },
+  {
+   "id": "une-illisible-une-lisible",
+   "now": "2026-10-14T18:20:00Z",
+   "periods": [
+    [
+     "",
+     "20261015T000000"
+    ],
+    [
+     "20261014T000000",
+     "20261015T000000"
+    ]
+   ],
+   "expected": {
+    "state": "current",
+    "until": "2026-10-14T22:00:00Z",
+    "periods": 1,
+    "last_end": "2026-10-14T22:00:00Z"
+   }
+  }
+ ],
+ "axis_cases": [
+  {
+   "id": "branche-exclue-jusqua-la-bifurcation",
+   "line": "RER_B",
+   "sections": [
+    [
+     "line:IDFM:C01743",
+     "stop_area:IDFM:10",
+     "stop_area:IDFM:2"
+    ]
+   ],
+   "stop_points": [],
+   "title": "Trafic perturbé",
+   "message": "",
+   "expected": false,
+   "line_id": "line:IDFM:C01743"
+  },
+  {
+   "id": "troncon-de-l-axe",
+   "line": "RER_B",
+   "sections": [
+    [
+     "line:IDFM:C01743",
+     "stop_area:IDFM:73699",
+     "stop_area:IDFM:2"
+    ]
+   ],
+   "stop_points": [],
+   "title": "Trafic perturbé",
+   "message": "",
+   "expected": true,
+   "line_id": "line:IDFM:C01743"
+  },
+  {
+   "id": "troncon-a-l-envers",
+   "line": "RER_B",
+   "sections": [
+    [
+     "line:IDFM:C01743",
+     "stop_area:IDFM:3",
+     "stop_area:IDFM:1"
+    ]
+   ],
+   "stop_points": [],
+   "title": "",
+   "message": "",
+   "expected": true,
+   "line_id": "line:IDFM:C01743"
+  },
+  {
+   "id": "branche-et-axe",
+   "line": "RER_B",
+   "sections": [
+    [
+     "line:IDFM:C01743",
+     "stop_area:IDFM:10",
+     "stop_area:IDFM:62978"
+    ]
+   ],
+   "stop_points": [],
+   "title": "",
+   "message": "",
+   "expected": true,
+   "line_id": "line:IDFM:C01743"
+  },
+  {
+   "id": "bifurcation-seule",
+   "line": "RER_B",
+   "sections": [],
+   "stop_points": [
+    "stop_point:IDFM:sp2b"
+   ],
+   "title": "",
+   "message": "",
+   "expected": true,
+   "line_id": "line:IDFM:C01743"
+  },
+  {
+   "id": "bifurcation-et-branche",
+   "line": "RER_B",
+   "sections": [],
+   "stop_points": [
+    "stop_point:IDFM:sp2",
+    "stop_point:IDFM:sp11"
+   ],
+   "title": "",
+   "message": "",
+   "expected": false,
+   "line_id": "line:IDFM:C01743"
+  },
+  {
+   "id": "quai-de-branche",
+   "line": "RER_B",
+   "sections": [],
+   "stop_points": [
+    "stop_point:IDFM:sp10"
+   ],
+   "title": "Travaux à Saint-Rémy-lès-Chevreuse",
+   "message": "",
+   "expected": false,
+   "line_id": "line:IDFM:C01743"
+  },
+  {
+   "id": "extremite-inconnue",
+   "line": "RER_B",
+   "sections": [
+    [
+     "line:IDFM:C01743",
+     "stop_area:IDFM:10",
+     "stop_area:IDFM:999"
+    ]
+   ],
+   "stop_points": [],
+   "title": "",
+   "message": "",
+   "expected": false,
+   "line_id": "line:IDFM:C01743"
+  },
+  {
+   "id": "texte-libre-robinson",
+   "line": "RER_B",
+   "sections": [
+    [
+     "line:IDFM:C01727",
+     "stop_area:IDFM:1",
+     "stop_area:IDFM:3"
+    ]
+   ],
+   "stop_points": [
+    "stop_point:IDFM:inconnu"
+   ],
+   "title": "Travaux entre Bourg-la-Reine et Robinson",
+   "message": "",
+   "expected": false,
+   "line_id": "line:IDFM:C01743"
+  },
+  {
+   "id": "texte-libre-tronc",
+   "line": "RER_B",
+   "sections": [],
+   "stop_points": [],
+   "title": "Incident voyageur",
+   "message": "<p>Trafic ralenti à Gare du Nord.</p>",
+   "expected": true,
+   "line_id": "line:IDFM:C01743"
+  },
+  {
+   "id": "texte-libre-message",
+   "line": "RER_B",
+   "sections": [],
+   "stop_points": [],
+   "title": "Travaux",
+   "message": "<p>Entre Aulnay-sous-Bois et Mitry&nbsp;- Claye.</p>",
+   "expected": false,
+   "line_id": "line:IDFM:C01743"
+  },
+  {
+   "id": "ligne-sans-axe",
+   "line": "BUS_351",
+   "sections": [],
+   "stop_points": [],
+   "title": "Déviation à Mitry",
+   "message": "",
+   "expected": true,
+   "line_id": "line:IDFM:C01299"
+  }
+ ],
+ "status_cases": [
+  {
+   "id": "aucune",
+   "items": [],
+   "expected": {
+    "level": "clear",
+    "label": null,
+    "detail": null,
+    "current": 0,
+    "upcoming": 0
+   }
+  },
+  {
+   "id": "a-venir-seulement",
+   "items": [
+    {
+     "state": "upcoming",
+     "severity": "BLOQUANTE",
+     "cause": "TRAVAUX",
+     "short_message": null
+    }
+   ],
+   "expected": {
+    "level": "upcoming",
+    "label": null,
+    "detail": null,
+    "current": 0,
+    "upcoming": 1
+   }
+  },
+  {
+   "id": "travaux-bloquants",
+   "items": [
+    {
+     "state": "current",
+     "severity": "BLOQUANTE",
+     "cause": "TRAVAUX",
+     "short_message": "Arrêt(s) non desservi(s)"
+    },
+    {
+     "state": "current",
+     "severity": "PERTURBEE",
+     "cause": "PERTURBATION",
+     "short_message": null
+    },
+    {
+     "state": "upcoming",
+     "severity": "INFORMATION",
+     "cause": "INFORMATION",
+     "short_message": null
+    }
+   ],
+   "expected": {
+    "level": "blocking",
+    "label": "works",
+    "detail": "Arrêt(s) non desservi(s)",
+    "current": 2,
+    "upcoming": 1
+   }
+  },
+  {
+   "id": "perturbation",
+   "items": [
+    {
+     "state": "current",
+     "severity": "PERTURBEE",
+     "cause": "PERTURBATION",
+     "short_message": "Trafic perturbé"
+    }
+   ],
+   "expected": {
+    "level": "disrupted",
+    "label": "disrupted",
+    "detail": "Trafic perturbé",
+    "current": 1,
+    "upcoming": 0
+   }
+  },
+  {
+   "id": "information-cause-perturbation",
+   "items": [
+    {
+     "state": "current",
+     "severity": "INFORMATION",
+     "cause": "PERTURBATION",
+     "short_message": null
+    }
+   ],
+   "expected": {
+    "level": "info",
+    "label": "information",
+    "detail": null,
+    "current": 1,
+    "upcoming": 0
+   }
+  },
+  {
+   "id": "cause-information-perturbee",
+   "items": [
+    {
+     "state": "current",
+     "severity": "PERTURBEE",
+     "cause": "INFORMATION",
+     "short_message": null
+    }
+   ],
+   "expected": {
+    "level": "disrupted",
+    "label": "disrupted",
+    "detail": null,
+    "current": 1,
+    "upcoming": 0
+   }
+  },
+  {
+   "id": "message-autre-ignore",
+   "items": [
+    {
+     "state": "current",
+     "severity": "INFORMATION",
+     "cause": "INFORMATION",
+     "short_message": "Autre"
+    }
+   ],
+   "expected": {
+    "level": "info",
+    "label": "information",
+    "detail": null,
+    "current": 1,
+    "upcoming": 0
+   }
+  },
+  {
+   "id": "severite-inconnue",
+   "items": [
+    {
+     "state": "current",
+     "severity": "MAJEURE",
+     "cause": "TRAVAUX",
+     "short_message": null
+    }
+   ],
+   "expected": {
+    "level": "info",
+    "label": "information",
+    "detail": null,
+    "current": 1,
+    "upcoming": 0
+   }
+  }
+ ],
+ "reading_cases": [
+  {
+   "id": "fraiche",
+   "received": "2026-10-14T18:20:17Z",
+   "last_updated": "2026-10-14T18:19:18Z",
+   "now": "2026-10-14T18:22:00Z",
+   "expected": "ok"
+  },
+  {
+   "id": "10-min-pile",
+   "received": "2026-10-14T18:20:00Z",
+   "last_updated": "2026-10-14T18:19:18Z",
+   "now": "2026-10-14T18:30:00Z",
+   "expected": "ok"
+  },
+  {
+   "id": "reponse-trop-ancienne",
+   "received": "2026-10-14T18:20:00Z",
+   "last_updated": "2026-10-14T18:19:18Z",
+   "now": "2026-10-14T18:30:01Z",
+   "expected": "stale"
+  },
+  {
+   "id": "source-30-min-pile",
+   "received": "2026-10-14T18:50:00Z",
+   "last_updated": "2026-10-14T18:20:00Z",
+   "now": "2026-10-14T18:50:00Z",
+   "expected": "ok"
+  },
+  {
+   "id": "source-figee",
+   "received": "2026-10-14T18:50:01Z",
+   "last_updated": "2026-10-14T18:20:00Z",
+   "now": "2026-10-14T18:51:00Z",
+   "expected": "stale"
+  },
+  {
+   "id": "sans-date-source",
+   "received": "2026-10-14T18:20:00Z",
+   "last_updated": null,
+   "now": "2026-10-14T18:21:00Z",
+   "expected": "stale"
+  }
+ ]
+}

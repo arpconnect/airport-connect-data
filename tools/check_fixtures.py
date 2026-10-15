@@ -152,6 +152,46 @@ def realtime_v2() -> None:
         check("rules-v2/realtime_merge.json", c["id"], [[t, br.allow(t)] for t, _ in c["probes"]], c["probes"])
 
 
+def _utc(value):
+    return None if value is None else int(datetime.fromisoformat(value.replace("Z", "+00:00")).timestamp())
+
+
+def _utc_text(seconds):
+    from datetime import timezone
+    return None if seconds is None else datetime.fromtimestamp(seconds, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def traffic_v2() -> None:
+    import v2_traffic as tv
+    name = "rules-v2/traffic_rules.json"
+    doc = json.loads((ROOT / "tests" / "rules-v2" / "traffic_rules.json").read_text(encoding="utf-8"))
+    for c in doc["html_cases"]:
+        check(name, c["id"], tv.html_to_text(c["html"]), c["expected"])
+    for c in doc["title_cases"]:
+        check(name, c["id"], tv.title_line(c["title"]), c["expected"])
+    for c in doc["timing_cases"]:
+        got = tv.timing({"applicationPeriods": [{"begin": b, "end": e} for b, e in c["periods"]]}, _utc(c["now"]))
+        got = {k: (_utc_text(v) if k in ("until", "next", "next_end", "last_end") else v) for k, v in got.items()}
+        check(name, c["id"], got, c["expected"])
+    patterns = {"RER_B": [[tuple(x) for x in p] for p in doc["fixtures"]["rer_b"]]}
+    for c in doc["axis_cases"]:
+        d = {"title": c["title"], "message": c["message"],
+             "impactedSections": [{"lineId": l, "from": {"type": "stop_area", "id": a}, "to": {"type": "stop_area", "id": b}}
+                                  for l, a, b in c["sections"]]}
+        check(name, c["id"], tv.keep_on_axis(c["line"], d, c["line_id"], c["stop_points"], patterns.get(c["line"], [])),
+              c["expected"])
+    for c in doc["status_cases"]:
+        check(name, c["id"], tv.line_status(c["items"]), c["expected"])
+    for c in doc["reading_cases"]:
+        check(name, c["id"], tv.reading_state(_utc(c["received"]), _utc(c["last_updated"]), _utc(c["now"])), c["expected"])
+    # R-82 en v2 : la règle v1 en texte libre (dernier recours) reste celle de traffic_axis_filter.json.
+    for c in load("traffic_axis_filter.json")["cases"]:
+        if len(c["line_names"]) == 1 and not c["stops"] and c["line_names"][0] in ("RER B", "RER C"):
+            code = "RER_B" if c["line_names"][0] == "RER B" else "RER_C"
+            got = tv.keep_on_axis(code, {"title": c["summary"]}, "line:x", [], [])
+            check("traffic_axis_filter.json (v2, texte libre)", c["id"], got, c["expected"])
+
+
 def data_files() -> None:
     places = json.loads((ROOT / "data" / "places.json").read_text(encoding="utf-8"))["places"]
     ids = [p["id"] for p in places]
@@ -399,6 +439,13 @@ def app_timetable() -> None:
     rg = _load_tool("realtime_goldens")
     check("app (généré)", rg.OUT.relative_to(ROOT).as_posix(),
           rg.OUT.exists() and rg.OUT.read_text(encoding="utf-8") == rg.render(), True)
+    # Info trafic (spec § 9) : perturbations et statuts de référence sur la réponse enregistrée du 14 octobre 2026.
+    tg = _load_tool("traffic_goldens")
+    check("app (généré)", tg.OUT.relative_to(ROOT).as_posix(),
+          tg.OUT.exists() and tg.OUT.read_text(encoding="utf-8") == tg.render(), True)
+    for cname, meta in sorted(json.loads((tg.FIXTURES / "captures.json").read_text(encoding="utf-8"))["captures"].items()):
+        body = gzip.decompress((tg.FIXTURES / f"{cname}.json.gz").read_bytes())
+        check("app (trafic)", cname, (len(body), hashlib.sha256(body).hexdigest()), (meta["bytes"], meta["sha256"]))
     captures = json.loads((rg.FIXTURES / "captures.json").read_text(encoding="utf-8"))["captures"]
     for name, meta in sorted(captures.items()):
         body = gzip.decompress((rg.FIXTURES / f"{name}.json.gz").read_bytes())
@@ -454,7 +501,8 @@ def adjustments(ids_lines: dict) -> None:
 
 
 def main() -> int:
-    for fn in (eta, eta_v2, boundary, scope, traffic, freshness, identity, lines_registry, realtime_v2, data_files):
+    for fn in (eta, eta_v2, boundary, scope, traffic, traffic_v2, freshness, identity, lines_registry, realtime_v2,
+               data_files):
         fn()
     for f in failures:
         print("ÉCHEC", f)
