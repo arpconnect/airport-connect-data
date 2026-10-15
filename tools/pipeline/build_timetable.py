@@ -26,6 +26,7 @@ import io
 import json
 import math
 import os
+import re
 import sqlite3
 import sys
 import tempfile
@@ -37,7 +38,8 @@ from zoneinfo import ZoneInfo
 
 ROOT = Path(__file__).resolve().parents[2]
 SCHEMA_PATH = ROOT / "schema" / "timetable.sql"
-SCHEMA_VERSION = 3
+# Version du schéma : celle que déclare schema/timetable.sql (PRAGMA user_version), jamais recopiée à la main.
+SCHEMA_VERSION = int(re.search(r"^PRAGMA user_version = (\d+);$", SCHEMA_PATH.read_text(encoding="utf-8"), re.M).group(1))
 MAX_WINDOW_DAYS = 62            # bits utilisables dans un INTEGER SQLite signé (63) avec marge
 MIN_REMAINING_DAYS_WARN = 14    # alerte si la validité restante est plus courte
 MAX_TRIP_LOSS_RATIO = 0.5       # une ligne qui perd plus de la moitié de ses trajets bloque la publication
@@ -543,9 +545,14 @@ def apply_adjustments(cur, adjustments: list, line_id: dict, area_id: dict, poin
     return written
 
 
-def compare_previous(prev_manifest: dict, counts: dict, report: Report) -> None:
+def compare_previous(prev_manifest: dict, counts: dict, report: Report, active: set) -> None:
+    """Une ligne active qui perd plus de la moitié de ses trajets bloque la publication ; une ligne retirée du
+    référentiel (décision produit, par exemple D-3) est seulement signalée."""
     prev = prev_manifest.get("counts", {}).get("trips_per_line", {})
     for code, before in prev.items():
+        if code not in active:
+            report.warn("line_retired", {"line": code, "before": before})
+            continue
         now = counts["trips_per_line"].get(code, 0)
         if before and (before - now) / before > MAX_TRIP_LOSS_RATIO:
             report.error("line_trip_drop", {"line": code, "before": before, "now": now})
@@ -605,7 +612,8 @@ def main() -> int:
             elif remaining < MIN_REMAINING_DAYS_WARN:
                 report.warn("feed_short_validity", {"remaining_days": remaining})
             if args.previous_manifest and args.previous_manifest.exists():
-                compare_previous(json.loads(args.previous_manifest.read_text(encoding="utf-8")), result["counts"], report)
+                compare_previous(json.loads(args.previous_manifest.read_text(encoding="utf-8")), result["counts"], report,
+                                 {l["id"] for l in lines_doc["lines"] if l["state"] == "active"})
 
             raw = db_path.read_bytes()
             db_sha = hashlib.sha256(raw).hexdigest()

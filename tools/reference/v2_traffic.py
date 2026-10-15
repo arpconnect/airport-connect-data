@@ -53,7 +53,10 @@ AXES = {
 V1_LINE_NAMES = {"RER_B": "RER B", "RER_C": "RER C"}
 
 # R-81 : titre d'une perturbation d'arrêt créée pour une ligne précise (« Bus 152 : Mesures de sécurité - … »).
-_TITLE_LINE = re.compile(r"^\s*(?:bus|tramway|tram|m[ée]tro|rer|train|noctilien|ligne)\s*([0-9a-z]+)\s*:", re.I)
+# Espaces de `str.isspace`, écrits en clair comme dans l'application (le moteur d'Android et la JVM lisent `\s`
+# différemment).
+_WS = "[\t\n\x0b\x0c\r\x1c-\x1f \x85\xa0  -     　]"
+_TITLE_LINE = re.compile(rf"^{_WS}*(?:bus|tramway|tram|m[ée]tro|rer|train|noctilien|ligne){_WS}*([0-9a-z]+){_WS}*:", re.I)
 
 
 _LOCAL = re.compile(r"[0-9]{8}T[0-9]{6}")
@@ -88,7 +91,7 @@ def strip_prefix(ident: str) -> str:
 # ---------------------------------------------------------------------------------------------------------------
 _BLOCK_TAGS = {"p", "div", "h1", "h2", "h3", "h4", "h5", "h6", "table"}
 _INLINE_TAGS = {"strong", "b", "em", "i", "u", "span", "a", "font", "small", "sup", "sub", "td", "th", "tbody", "thead"}
-_TAG = re.compile(r"<(/?)([A-Za-z][A-Za-z0-9]*)\b[^<>]*?(/?)>")
+_TAG = re.compile(r"<(/?)([A-Za-z][A-Za-z0-9]*)(?!\w)[^<>]*?(/?)>")
 _ENTITY = re.compile(r"&(#[0-9]+|#[xX][0-9a-fA-F]+|[A-Za-z][A-Za-z0-9]*);")
 _NAMED = {
     "nbsp": " ", "amp": "&", "lt": "<", "gt": ">", "quot": '"', "apos": "'", "rsquo": "’", "lsquo": "‘",

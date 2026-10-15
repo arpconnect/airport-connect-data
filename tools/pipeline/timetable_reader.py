@@ -1,5 +1,5 @@
 """
-Lecteur de référence de la base d'horaires (schéma 3).
+Lecteur de référence de la base d'horaires (schéma 4).
 
 Il fixe, en Python exécutable, les requêtes que l'application Kotlin reproduit à l'identique
 (app/src/main/java/com/airportconnect/app/data/timetable/TimetableReader.kt, vérifié par les cas de
@@ -26,7 +26,7 @@ REVEAL_MIN = 15          # R-56
 NOT_STARTED_MIN = 60     # R-56
 LIMIT = 4                # R-56
 RETAIN_S = 59            # R-55 : un passage théorique reste affiché (« 0 min ») jusqu'à 59 s après son heure
-SECTORS = ("ROISSY", "ORLY", "BOURGET", "BEAUVAIS")
+SECTORS = ("ROISSY", "ORLY", "BOURGET")
 FAMILY_RANK = {"TRAIN": 0, "METRO": 1, "TRAM_TRAIN": 2, "TRAM": 3, "SHUTTLE": 4, "BUS": 5, "NIGHT_BUS": 6}   # R-160
 OFFLINE_LIMIT = 3                # R-119 : trajets proposés hors connexion
 OFFLINE_HORIZON_S = 12 * 3600    # R-119 : départs pris en compte, à partir de maintenant
@@ -462,7 +462,7 @@ class Timetable:
         - Lieu aéroportuaire : une carte par ligne et par sens (direction_id GTFS), pour les missions qui
           permettent de monter à un quai du lieu ou de ses sous-lieux ; triées par prochain départ.
         - Lieu ville (Paris) : pour chaque point de montée (ligne, zone d'arrêt), une carte par aéroport
-          desservi ensuite en descente autorisée ; groupées par aéroport (ROISSY, ORLY, BOURGET, BEAUVAIS),
+          desservi ensuite en descente autorisée ; groupées par aéroport (ROISSY, ORLY, BOURGET),
           puis triées par prochain départ. Un point de montée que la ligne ne dessert plus vers un aéroport
           garde ses cartes (une par secteur de la ligne), en « Horaires indisponibles » (R-153).
         Une carte sans passage visible vient après celles qui en ont, dans l'ordre des lignes du secteur."""
@@ -555,7 +555,7 @@ class Timetable:
 
     # -- onglet Lignes et fiche ligne (R-160 à R-163) ------------------------------------------------
     def line_catalogue(self) -> list:
-        """Onglet Lignes (R-160) : pour chaque aéroport, dans l'ordre ROISSY, ORLY, BOURGET, BEAUVAIS, ses lignes
+        """Onglet Lignes (R-160) : pour chaque aéroport, dans l'ordre ROISSY, ORLY, BOURGET, ses lignes
         actives par famille (train, métro, tram-train, tram, navette, bus, Noctilien), puis par numéro dans l'ordre
         naturel (« 133 » avant « 1601 »), puis ses lignes futures. Une ligne qui dessert plusieurs aéroports
         figure sous chacun."""

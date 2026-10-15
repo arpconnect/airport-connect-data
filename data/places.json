@@ -19,8 +19,6 @@
        {"line": "BUS_350", "stop_area": "IDFM:72064", "name": "Porte de la Chapelle"},
        {"line": "BUS_351", "stop_area": "IDFM:71673", "name": "Nation"},
        {"line": "BUS_152", "stop_area": "IDFM:72430", "name": "Porte de la Villette"},
-       {"line": "BUS_A01", "stop_area": "IDFM:71379", "name": "Neuilly - Porte Maillot"},
-       {"line": "BUS_A04", "stop_area": "IDFM:72430", "name": "Porte de la Villette"},
        {"line": "BUS_N22", "stop_area": "IDFM:71264", "name": "Châtelet"},
        {"line": "BUS_N31", "stop_area": "IDFM:73626", "name": "Gare de Lyon"},
        {"line": "BUS_N131", "stop_area": "IDFM:73626", "name": "Gare de Lyon"},
@@ -62,8 +60,6 @@
     {"id": "bourget-gare", "kind": "airport", "sector": "BOURGET", "label_fr": "Le Bourget (gare RER B / T11)", "label_en": "Le Bourget (RER B / T11 station)", "short_label": "Le Bourget",
      "stop_areas": ["IDFM:72641"], "stop_points": []},
     {"id": "bourget-musee", "kind": "airport", "sector": "BOURGET", "label_fr": "Musée de l'Air et de l'Espace (côté aéroport)", "label_en": "Air and Space Museum (airport side)", "short_label": "Musée de l'Air",
-     "stop_areas": ["IDFM:72732"], "stop_points": []},
-    {"id": "beauvais", "kind": "airport", "sector": "BEAUVAIS", "label_fr": "Aéroport Paris-Beauvais", "label_en": "Paris-Beauvais Airport", "short_label": "Beauvais",
-     "stop_areas": ["IDFM:74073"], "stop_points": []}
+     "stop_areas": ["IDFM:72732"], "stop_points": []}
   ]
 }

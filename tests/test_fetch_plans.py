@@ -141,8 +141,10 @@ check("1 : 703, date tirée de l'identifiant uniqid du fichier", p["BUS_703"]["d
 check("1 : Noctilien, plan du réseau de nuit daté par le jeu IDFM",
       (p["NOCTILIEN"]["kind"], p["NOCTILIEN"]["document"]["date"], p["NOCTILIEN"]["source"]["dataset_licence"],
        len(p["NOCTILIEN"]["lines"]) > 0), ("network", "2026-09", "CC BY-NC-ND 4.0", True))
-check("1 : A01 et A04 sans plan, avec page d'information",
-      [(p[k]["status"], bool(p[k]["info_url"])) for k in ("BUS_A01", "BUS_A04")], [("no_plan", True), ("no_plan", True)])
+# A01 et A04 figurent encore dans le référentiel du 8 octobre 2026 ; Beauvais est retiré depuis (décision D-3) et
+# data/plans-sources.json ne leur déclare plus de page d'information : sans plan, sans source connue.
+check("1 : A01 et A04 (lignes retirées depuis, D-3) sans plan ni page d'information",
+      [(p[k]["status"], p[k]["info_url"]) for k in ("BUS_A01", "BUS_A04")], [("no_plan", None), ("no_plan", None)])
 check("1 : documents de plus de deux ans signalés", codes(rep, "plan_old"),
       sorted(["BUS_N1", "BUS_N2", "BUS_703", "BUS_TBUS1", "BUS_607", "BUS_609", "BUS_610", "BUS_9518", "RER_C"]))
 check("1 : renumérotations repérées dans le référentiel IDFM",

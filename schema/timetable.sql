@@ -1,9 +1,10 @@
--- Base d'horaires Airport Connect — schéma 3
+-- Base d'horaires Airport Connect — schéma 4
 -- Fichier SQLite en lecture seule, produit côté serveur par tools/pipeline/build_timetable.py,
 -- téléchargé par l'application (spec § 17). PRAGMA user_version = version du schéma.
 -- Historique : 1 (8 octobre 2026), première publication ; 2 (8 octobre 2026), lieu « ville » (Paris) et ses
 -- points de montée (place.kind, place.sort_order, place_boarding ; spec R-100, décision D-13) ; 3 (9 octobre 2026),
--- correspondances officielles entre quais (transfer, GTFS transfers.txt) pour les itinéraires hors connexion (R-119).
+-- correspondances officielles entre quais (transfer, GTFS transfers.txt) pour les itinéraires hors connexion (R-119) ;
+-- 4 (15 octobre 2026), aéroport de Beauvais retiré (décision D-3) : secteurs ROISSY, ORLY et BOURGET seulement.
 -- L'application lit exactement une version : une base d'une autre version n'est jamais adoptée (ADR-2).
 -- Conventions :
 --   * identifiants internes INTEGER compacts, attribués de façon déterministe (tri des identifiants GTFS) ;
@@ -12,7 +13,7 @@
 --   * heures en secondes depuis « midi moins 12 h » du jour de service (norme GTFS), > 86 400 autorisé ;
 --   * jours de service : bit i de service.days = actif le jour meta.base_date + i (fenêtre ≤ 62 jours).
 
-PRAGMA user_version = 3;
+PRAGMA user_version = 4;
 
 CREATE TABLE meta (
   key   TEXT PRIMARY KEY,
@@ -40,7 +41,7 @@ CREATE TABLE line (
 
 CREATE TABLE line_sector (
   line_id    INTEGER NOT NULL REFERENCES line(id),
-  sector     TEXT    NOT NULL CHECK (sector IN ('ROISSY','ORLY','BOURGET','BEAUVAIS')),
+  sector     TEXT    NOT NULL CHECK (sector IN ('ROISSY','ORLY','BOURGET')),
   sort_order INTEGER,
   shortcut   INTEGER NOT NULL DEFAULT 0 CHECK (shortcut IN (0,1)),
   PRIMARY KEY (line_id, sector)
@@ -76,7 +77,7 @@ CREATE TABLE place (
   id          TEXT PRIMARY KEY,
   parent_id   TEXT REFERENCES place(id),
   kind        TEXT NOT NULL CHECK (kind IN ('airport','city')),
-  sector      TEXT CHECK (sector IN ('ROISSY','ORLY','BOURGET','BEAUVAIS')),   -- NULL pour un lieu « ville »
+  sector      TEXT CHECK (sector IN ('ROISSY','ORLY','BOURGET')),   -- NULL pour un lieu « ville »
   sort_order  INTEGER NOT NULL UNIQUE,               -- ordre du sélecteur de l'accueil (ordre de data/places.json)
   label_fr    TEXT NOT NULL,
   label_en    TEXT NOT NULL,

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Teste le générateur sur les lieux et les correspondances (schéma 3) avec un GTFS fictif minimal, sans réseau :
+Teste le générateur sur les lieux et les correspondances (schéma 4) avec un GTFS fictif minimal, sans réseau :
 
     python3 tests/test_places_pipeline.py
 
@@ -139,7 +139,7 @@ def main() -> int:
         check("base valide : aucune erreur", errors, [])
         check("base valide : aucune alerte de point de montée", [w for w in warns if w.startswith("boarding")], [])
         con = sqlite3.connect(db)
-        check("schéma 3 : user_version", con.execute("PRAGMA user_version").fetchone()[0], 3)
+        check("schéma 4 : user_version", con.execute("PRAGMA user_version").fetchone()[0], 4)
         check("correspondances : type 2 entre quais différents, doublon au temps le plus long",
               con.execute("""SELECT a.gtfs_id, b.gtfs_id, t.min_time FROM transfer t JOIN stop_point a ON a.id = t.from_stop_point_id
                              JOIN stop_point b ON b.id = t.to_stop_point_id ORDER BY 1, 2""").fetchall(),

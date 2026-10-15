@@ -36,16 +36,7 @@
       "reason": "Le jeu IDFM pointe vers la page web https://www.transilien.com/fr/page-lignes/ligne-c, qui ne propose aucun fichier ; RATP publie le plan de la ligne C."
     }
   },
-  "no_plan": {
-    "BUS_A01": {
-      "reason": "Navette Aérobus Beauvais ⇄ Paris Porte Maillot : aucun plan publié. Le jeu IDFM ne référence qu'une fiche horaire, sous forme de page web de l'aéroport.",
-      "info_url": "https://www.aeroportparisbeauvais.com/acces-et-parking/navette-aerobus-paris-aeroport/"
-    },
-    "BUS_A04": {
-      "reason": "Navette Aérobus Beauvais ⇄ Paris La Villette : aucun plan publié. Le jeu IDFM ne référence qu'une fiche horaire, sous forme de page web de l'aéroport.",
-      "info_url": "https://www.aeroportparisbeauvais.com/acces-et-parking/navette-aerobus-paris-aeroport"
-    }
-  },
+  "no_plan": {},
   "network_plans": {
     "NOCTILIEN": {
       "record_id": "6",

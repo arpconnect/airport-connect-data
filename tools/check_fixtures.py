@@ -197,7 +197,7 @@ def data_files() -> None:
     ids = [p["id"] for p in places]
     check("places.json", "identifiants uniques", len(ids) == len(set(ids)), True)
     lines = {l["id"]: l for l in json.loads((ROOT / "data" / "lines.json").read_text(encoding="utf-8"))["lines"]}
-    sectors = ("ROISSY", "ORLY", "BOURGET", "BEAUVAIS")
+    sectors = ("ROISSY", "ORLY", "BOURGET")   # Beauvais retiré (décision D-3)
     for p in places:
         check("places.json", f"{p['id']} parent connu", p.get("parent") in (None, *ids), True)
         kind = p.get("kind")

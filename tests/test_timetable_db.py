@@ -38,6 +38,10 @@ PARIS = ZoneInfo("Europe/Paris")
 CASES = ROOT / "tests" / "characterization" / "gtfs-2026-06"
 AIRPORT_HINTS = ("orly", "gaulle", "roissy", "terminal", "cdg", "aéroport", "aeroport", "bourget", "drancy", "garonor")
 failures, passed = [], 0
+# Lignes des cas réels de juin 2026 retirées depuis du référentiel (décision D-3 : navettes A01 et A04 de Beauvais) :
+# leurs cas ne s'appliquent plus, et la base ne doit plus les contenir. Une ligne gardée qui manquerait reste une erreur.
+RETIRED = frozenset(json.loads((CASES / "snapshot.json").read_text(encoding="utf-8"))["coverage"]) - frozenset(
+    l["id"] for l in json.loads((ROOT / "data" / "lines.json").read_text(encoding="utf-8"))["lines"])
 
 
 def check(name, got, expected):
@@ -81,7 +85,10 @@ def completeness(tt: Timetable) -> None:
     per_line = dict(tt.con.execute(
         "SELECT l.code, COUNT(t.id) FROM line l LEFT JOIN pattern p ON p.line_id = l.id LEFT JOIN trip t ON t.pattern_id = p.id GROUP BY l.code"))
     for code, c in snap["coverage"].items():
+        if code in RETIRED:
+            continue
         check(f"couverture {code}", per_line.get(code, 0), c["trips"])
+    check("lignes retirées absentes de la base", sorted(c for c in RETIRED if c in per_line), [])
 
     # Noctilien : départs vers le pôle depuis l'arrêt de montée
     noct = json.loads((CASES / "noctilien_boarding.json").read_text(encoding="utf-8"))
@@ -100,6 +107,8 @@ def completeness(tt: Timetable) -> None:
     prof = json.loads((CASES / "shuttle_profiles.json").read_text(encoding="utf-8"))
     d = date.fromisoformat(prof["reference_date"])
     for line, p in prof["lines"].items():
+        if line in RETIRED:
+            continue
         trips = active_trips(tt, line, d)
         check(f"navette {line} trajets", len(trips), p["trips_on_reference_day"])
         by_dir = defaultdict(list)
@@ -308,7 +317,7 @@ def home_structure(tt: Timetable, db_path: Path) -> None:
         datetime(start.year, start.month, start.day, 10, 0, tzinfo=PARIS)
     groups = tt.place_departures("paris", now)
     check("accueil Paris : une carte au moins par aéroport", sorted({g.sector for g in groups}),
-          sorted(["ROISSY", "ORLY", "BOURGET", "BEAUVAIS"]))
+          sorted(["ROISSY", "ORLY", "BOURGET"]))
     # chaque passage d'une carte Paris → secteur S part du point de montée et dessert ensuite un quai de S
     bad = []
     for g in groups:
@@ -326,8 +335,8 @@ def home_structure(tt: Timetable, db_path: Path) -> None:
     check("accueil Paris : chaque départ mène à un aéroport du secteur de sa carte", bad, [])
     order = [(g.sector, g.board.passages[0].epoch if g.board.passages else None) for g in groups]
     sorted_ok = all(
-        (["ROISSY", "ORLY", "BOURGET", "BEAUVAIS"].index(a[0]), a[1] is None, a[1] or 0) <=
-        (["ROISSY", "ORLY", "BOURGET", "BEAUVAIS"].index(b[0]), b[1] is None, b[1] or 0) for a, b in zip(order, order[1:]))
+        (["ROISSY", "ORLY", "BOURGET"].index(a[0]), a[1] is None, a[1] or 0) <=
+        (["ROISSY", "ORLY", "BOURGET"].index(b[0]), b[1] is None, b[1] or 0) for a, b in zip(order, order[1:]))
     check("accueil Paris : cartes groupées par aéroport puis triées par prochain départ", sorted_ok, True)
     for pid in ("cdg-t2", "orly-4"):
         gs = tt.place_departures(pid, now)
@@ -381,8 +390,6 @@ def home_june(tt: Timetable) -> None:
         ("BUS_152", "sector:BOURGET", "ZAC Les Tulipes Nord", "ok", None, ["08:10:00", "08:20:00"]),
         ("BUS_350", "sector:BOURGET", "Roissypôle", "ok", None, ["08:12:00", "08:27:00"]),
         ("BUS_N42", "sector:BOURGET", "Garonor", "ok", "service_ended", []),
-        ("BUS_A01", "sector:BEAUVAIS", "Aéroport Paris Beauvais", "ok", None, ["08:00:00", "08:30:00"]),
-        ("BUS_A04", "sector:BEAUVAIS", "Aéroport Paris Beauvais", "ok", None, ["09:00:00", "11:00:00"]),
     ])
     # RER B depuis la gare du Nord : la carte Roissy ne garde que les trains de l'aéroport ; la carte Le Bourget
     # garde tous les trains qui s'y arrêtent (aéroport, Mitry-Claye, Aulnay-sous-Bois) et écarte les autres (R-43)
