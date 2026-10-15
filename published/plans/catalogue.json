@@ -1,14 +1,14 @@
 {
   "schema": "airport-connect/plans-catalogue@1",
-  "version": "dc4508a33728bf5f",
-  "generated_at": "2026-10-15T05:11:27+00:00",
+  "version": "e3cad5b95699a6da",
+  "generated_at": "2026-10-15T19:20:39+00:00",
   "distribution": "link",
   "counts": {
     "ok": 45,
     "kept_previous": 4,
     "device": 0,
     "error": 0,
-    "no_plan": 2
+    "no_plan": 0
   },
   "plans": [
     {
@@ -946,26 +946,6 @@
       },
       "first_seen": "2026-10-08",
       "checked_on": "2026-10-15"
-    },
-    {
-      "id": "BUS_A01",
-      "kind": "line",
-      "lines": [
-        "BUS_A01"
-      ],
-      "status": "no_plan",
-      "reason": "Navette Aérobus Beauvais ⇄ Paris Porte Maillot : aucun plan publié. Le jeu IDFM ne référence qu'une fiche horaire, sous forme de page web de l'aéroport.",
-      "info_url": "https://www.aeroportparisbeauvais.com/acces-et-parking/navette-aerobus-paris-aeroport/"
-    },
-    {
-      "id": "BUS_A04",
-      "kind": "line",
-      "lines": [
-        "BUS_A04"
-      ],
-      "status": "no_plan",
-      "reason": "Navette Aérobus Beauvais ⇄ Paris La Villette : aucun plan publié. Le jeu IDFM ne référence qu'une fiche horaire, sous forme de page web de l'aéroport.",
-      "info_url": "https://www.aeroportparisbeauvais.com/acces-et-parking/navette-aerobus-paris-aeroport"
     },
     {
       "id": "BUS_EX100",
