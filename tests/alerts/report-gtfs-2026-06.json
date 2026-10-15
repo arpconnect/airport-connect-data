@@ -1,0 +1,47 @@
+{
+  "ok": true,
+  "errors": [],
+  "warnings": [
+    {
+      "code": "route_renumbering_announced",
+      "detail": {
+        "line": "BUS_EX100",
+        "now": "EX 100",
+        "future": "700"
+      }
+    },
+    {
+      "code": "route_renumbering_announced",
+      "detail": {
+        "line": "BUS_EX19",
+        "now": "EX 19",
+        "future": "7719"
+      }
+    },
+    {
+      "code": "adjustment_overrides_gtfs",
+      "detail": {
+        "adjustment": "bus-351-porte-de-montreuil",
+        "lagging_trips": 516,
+        "trips_per_stop": {
+          "IDFM:24730": 214,
+          "IDFM:27048": 103,
+          "IDFM:27062": 103,
+          "IDFM:28370": 195,
+          "IDFM:28373": 153,
+          "IDFM:28374": 96,
+          "IDFM:39739": 96,
+          "IDFM:7766": 206
+        },
+        "incomplete_stop_points": [
+          "IDFM:24859",
+          "IDFM:24861",
+          "IDFM:36720",
+          "IDFM:36721",
+          "IDFM:37462",
+          "IDFM:471489"
+        ]
+      }
+    }
+  ]
+}

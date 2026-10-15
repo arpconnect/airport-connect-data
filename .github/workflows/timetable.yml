@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  issues: write              # alertes de lignes (D-5)
 
 concurrency:
   group: publication          # partagé avec plans.yml : les deux traitements commitent sur main
@@ -33,6 +34,7 @@ jobs:
           python3 -I tests/test_adjustments_pipeline.py
           python3 -I tests/test_places_pipeline.py
           python3 -I tests/test_offline_router.py
+          python3 -I tests/test_line_alerts.py
 
       - name: Télécharger le GTFS IDFM
         run: |
@@ -108,3 +110,9 @@ jobs:
             git pull --quiet --rebase origin "${{ github.ref_name }}"
             commit_and_push "Battement mensuel $month" published/heartbeat
           fi
+
+      - name: Alertes de lignes (renumérotation, suppression ; D-5)
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 -I tools/pipeline/line_alerts.py --report dist/report.json --repo "${{ github.repository }}"

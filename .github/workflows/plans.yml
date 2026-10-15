@@ -11,6 +11,7 @@ on:
 
 permissions:
   contents: write
+  issues: write              # alertes de lignes (D-5)
 
 concurrency:
   group: publication          # partagé avec timetable.yml : les deux traitements commitent sur main
@@ -31,6 +32,7 @@ jobs:
         run: |
           python3 -I tools/check_fixtures.py
           python3 -I tests/test_fetch_plans.py
+          python3 -I tests/test_line_alerts.py
 
       - name: Construire le catalogue
         run: |
@@ -78,3 +80,9 @@ jobs:
       - name: Publier
         if: steps.changed.outputs.changed == 'true'
         run: bash tools/pipeline/publish_plans.sh dist-plans
+
+      - name: Alertes de lignes (renumérotation, suppression ; D-5)
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python3 -I tools/pipeline/line_alerts.py --report dist-plans/report.json --repo "${{ github.repository }}"

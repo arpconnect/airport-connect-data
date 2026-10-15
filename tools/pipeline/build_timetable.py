@@ -43,6 +43,8 @@ SCHEMA_VERSION = int(re.search(r"^PRAGMA user_version = (\d+);$", SCHEMA_PATH.re
 MAX_WINDOW_DAYS = 62            # bits utilisables dans un INTEGER SQLite signé (63) avec marge
 MIN_REMAINING_DAYS_WARN = 14    # alerte si la validité restante est plus courte
 MAX_TRIP_LOSS_RATIO = 0.5       # une ligne qui perd plus de la moitié de ses trajets bloque la publication
+SERVICE_END_WARN_DAYS = 7       # D-5 : une ligne qui s'arrête 7 jours ou plus avant son transporteur annonce sa fin
+FUTURE_NAME = re.compile(r"\(\s*futur(?:e)?\s+([^()]+?)\s*\)", re.I)   # « (future 700) » dans route_long_name
 SOURCE_URL = "https://eu.ftp.opendatasoft.com/stif/GTFS/IDFM-gtfs.zip"
 TIMEZONE = "Europe/Paris"
 
@@ -106,11 +108,23 @@ def read_feed(zip_path: Path, lines_doc: dict, places_doc: dict, report: Report)
         r = routes.get(l["idfm_route_id"])
         if r and l.get("gtfs") and r["route_short_name"] != l["gtfs"]["short_name"]:
             report.warn("route_renamed", {"line": l["id"], "before": l["gtfs"]["short_name"], "now": r["route_short_name"]})
+        # D-5 : IDFM annonce une renumérotation dans le nom long de la ligne, « EX 100 (future 700) »
+        m = FUTURE_NAME.search(r["route_long_name"] or "") if r else None
+        if m:
+            report.warn("route_renumbering_announced", {"line": l["id"], "now": r["route_short_name"], "future": m.group(1)})
 
+    # D-5 : horizon de chaque transporteur de nos lignes (toutes ses lignes du GTFS), pour reconnaître une ligne qui
+    # s'arrête avant les autres lignes de son transporteur.
+    our_agencies = {r["agency_id"] for r in routes.values()}
+    agency_of_route = {r["route_id"]: r["agency_id"] for r in _rows(z, "routes.txt") if r["agency_id"] in our_agencies}
+    agency_services = defaultdict(set)
     trips = {}
     for t in _rows(z, "trips.txt"):
         if t["route_id"] in routes:
             trips[t["trip_id"]] = t
+        ag = agency_of_route.get(t["route_id"])
+        if ag is not None:
+            agency_services[ag].add(t["service_id"])
 
     stop_times = defaultdict(list)
     for s in _rows(z, "stop_times.txt"):
@@ -130,12 +144,18 @@ def read_feed(zip_path: Path, lines_doc: dict, places_doc: dict, report: Report)
         stops_all[s["stop_id"]] = s
 
     services = {t["service_id"] for t in trips.values()}
-    cal = {c["service_id"]: c for c in _rows(z, "calendar.txt") if c["service_id"] in services}
+    wanted_services = services.union(*agency_services.values()) if agency_services else services
+    cal = {c["service_id"]: c for c in _rows(z, "calendar.txt") if c["service_id"] in wanted_services}
     cald = defaultdict(list)
     for c in _rows(z, "calendar_dates.txt"):
-        if c["service_id"] in services:
+        if c["service_id"] in wanted_services:
             cald[c["service_id"]].append((c["date"], c["exception_type"]))
-    return routes, agencies, trips, stop_times, stops_all, wanted_points, cal, cald
+    agency_last = {}
+    for ag, sids in agency_services.items():
+        days = [max(d) for d in (active_dates(sid, cal, cald) for sid in sids) if d]
+        if days:
+            agency_last[ag] = max(days)
+    return routes, agencies, trips, stop_times, stops_all, wanted_points, cal, cald, agency_last
 
 
 def active_dates(sid: str, cal: dict, cald: dict) -> set:
@@ -159,7 +179,8 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
     le GTFS IDFM publie aussi quelques jours passés, de façon partielle (constaté le 8 octobre 2026 : du 5 au
     7 octobre, seuls les trains SNCF y figurent). Ces jours restent dans les masques de service, mais la base
     ne les déclare pas valides : l'application n'en tire ni passage ni fin de service (R-153, R-173)."""
-    routes, agencies, trips, stop_times, stops_all, wanted_points, cal, cald = read_feed(zip_path, lines_doc, places_doc, report)
+    routes, agencies, trips, stop_times, stops_all, wanted_points, cal, cald, agency_last = read_feed(
+        zip_path, lines_doc, places_doc, report)
 
     # Services → masques de jours
     svc_dates = {sid: active_dates(sid, cal, cald) for sid in sorted({t["service_id"] for t in trips.values()})}
@@ -314,6 +335,7 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
     duplicates = 0
     code_of_route = {l["idfm_route_id"]: l["id"] for l in lines_doc["lines"] if l["idfm_route_id"]}
     trips_per_line = defaultdict(int)
+    last_day = {}                   # dernier jour de service de chaque ligne (D-5)
     for tid in sorted(trips):
         t = trips[tid]
         sts = stop_times.get(tid)
@@ -335,6 +357,8 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
         seen_trips.add(sig)
         trip_rows.append((pid, svc_id[t["service_id"]], times))
         trips_per_line[code] += 1
+        if svc_dates.get(t["service_id"]):
+            last_day[code] = max(last_day.get(code, base), max(svc_dates[t["service_id"]]))
     # tri déterministe des trajets : mission, service, premier départ
     trip_rows.sort(key=lambda x: (x[0], x[1], x[2]))
     for pid, key in enumerate(patterns, start=1):
@@ -417,6 +441,17 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
     for l in lines_doc["lines"]:
         if l["state"] == "active" and trips_per_line.get(l["id"], 0) == 0:
             report.error("line_without_trips", l["id"])
+    # D-5 : une ligne dont le dernier trajet précède de 7 jours ou plus le dernier trajet publié par son transporteur
+    # annonce sa fin de service (suppression, ou remplacement par une autre ligne). Les transporteurs ne publient pas
+    # tous aussi loin : la comparaison se fait donc avec les autres lignes du même transporteur, pas avec la fin du GTFS.
+    route_of = {l["id"]: l["idfm_route_id"] for l in lines_doc["lines"] if l["idfm_route_id"]}
+    for code, day in sorted(last_day.items()):
+        r = routes.get(route_of.get(code))
+        horizon = agency_last.get(r["agency_id"]) if r else None
+        if horizon and (horizon - day).days >= SERVICE_END_WARN_DAYS:
+            report.warn("line_service_ends", {"line": code, "last_service_date": day.isoformat(),
+                                              "operator_last_date": horizon.isoformat(),
+                                              "operator": agencies.get(r["agency_id"], r["agency_id"])})
 
     return {
         "meta": meta, "window_days": (last - start).days + 1, "first_service_date": base.isoformat(),

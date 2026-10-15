@@ -296,7 +296,10 @@ def resolve(entry: dict, prev: dict, http: Http, limits: dict, today: date, mirr
     serveurs d'hébergement (HTTP 403, `device_fetch_hosts`) est confié à l'appareil s'il n'y a ni autre source
     valide ni version connue (R-187)."""
     base = {"id": entry["id"], "kind": entry["kind"], "lines": entry["lines"]}
-    known = {k: v for k, v in (prev or {}).items() if k != "problems"} if prev and prev.get("document") else None
+    # Version connue : seulement un document vérifié (empreinte). Un plan confié à l'appareil (R-187) n'a pas
+    # d'empreinte : le reprendre comme version connue le ferait passer à tort en « kept_previous » au jour suivant.
+    known = {k: v for k, v in (prev or {}).items() if k != "problems"} \
+        if prev and (prev.get("document") or {}).get("sha256") else None
     if not entry["tries"]:
         if "no_plan" in entry:
             return {**base, "status": "no_plan", "reason": entry["no_plan"]["reason"], "info_url": entry["no_plan"]["info_url"]}

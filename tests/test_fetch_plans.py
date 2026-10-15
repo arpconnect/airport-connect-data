@@ -312,6 +312,14 @@ check("9 : alerte par plan", codes(rep9d, "plan_device_fetch"), ratp)
 cat9k, _ = run(http9, previous=cat)
 check("9 : une version vérifiée déjà connue est préférée (conservée)", by_id(cat9k)["T7"]["status"], "kept_previous")
 check("9 : version stable d'un jour à l'autre", run(http9)[0]["version"], cat9d["version"])
+# Jour suivant, avec le catalogue de la veille : un plan confié à l'appareil n'a pas d'empreinte, ce n'est pas une
+# version connue ; il reste confié à l'appareil (défaut constaté sur le catalogue publié du 15 octobre 2026, où les
+# 4 plans RATP étaient passés en « kept_previous » sans empreinte, donc non affichables).
+cat9n, rep9n = run(http9, previous=cat9d)
+check("9 : jour suivant, les 4 plans RATP restent confiés à l'appareil",
+      sorted(i for i, x in by_id(cat9n).items() if x["status"] == "device"), ratp)
+check("9 : jour suivant, même version du catalogue", cat9n["version"], cat9d["version"])
+check("9 : jour suivant, aucune version « conservée »", codes(rep9n, "plan_kept_previous"), [])
 check("9 : 403 d'un hôte non déclaré = erreur", (lambda h: (h.forbidden.add("ilico.iledefrance-mobilites.fr"),
       by_id(run(h)[0])["BUS_351"]["status"])[1])(FakeHttp()), "error")
 check("9 : format tiré de l'extension, adresse sans extension refusée",
