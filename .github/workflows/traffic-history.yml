@@ -54,7 +54,8 @@ jobs:
               observed="$(date -u -d "$(grep -i '^date:' work/headers.txt | tail -1 | cut -d' ' -f2- | tr -d '\r')" +%Y-%m-%dT%H:%M:%SZ)"
             fi
             echo "observed=$observed" >> "$GITHUB_OUTPUT"
-            echo "Lecture de l'info trafic : $observed ($(wc -c < work/bulk.json) octets)"
+            cache="$(grep -i '^x-airportconnect-cache:' work/headers.txt | tail -1 | cut -d' ' -f2- | tr -d '\r')"
+            echo "Lecture de l'info trafic : $observed ($(wc -c < work/bulk.json) octets, proxy : ${cache:-sans en-tête})"
           else
             echo "::warning title=Info trafic illisible::Lecture impossible à travers le proxy : passage sauté, lacune notée."
             echo "observed=" >> "$GITHUB_OUTPUT"
