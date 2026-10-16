@@ -310,7 +310,7 @@ def design_tokens(lines: dict) -> None:
     check("design/icons", "jeu de pictogrammes complet", icons, sorted([
         "aeroport", "alerte", "bus", "changer", "departs", "direction", "favori", "fermer", "incomplet", "info",
         "lignes", "marche", "metro", "navette", "non-desservi", "nuit", "plan", "position", "prevu", "retour",
-        "reglages", "temps-reel", "trafic", "train", "tram"]))
+        "reglages", "temps-reel", "titre", "trafic", "train", "tram"]))
 
 
 def _iso_required(v) -> bool:
@@ -392,6 +392,7 @@ def android_resources() -> None:
     app_timetable()
     app_plans()
     app_settings()
+    app_tickets()
 
 
 # Points à compléter avant la publication (affichés sans faire échouer la vérification).
@@ -434,6 +435,40 @@ def app_settings() -> None:
         check("app (mentions)", f"{e.get('name')} : non traduisible", e.get("translatable"), "false")
         if "À compléter" in (e.text or ""):
             notes.append(f"mentions légales : {e.get('name')} (res/values/legal.xml)")
+
+
+# Tarifs lus par l'onglet Titres (TicketsScreen) : titre → variantes attendues.
+FARE_KEYS = {
+    "airports": ["full", "reduced"], "metro_train_rer": ["full", "reduced"], "bus_tram": ["full", "reduced"],
+    "on_board_sms_card": ["full"], "navigo_jour": ["full"], "navigo_semaine": ["full"], "navigo_mois": ["full"],
+    "paris_visite": ["day1", "day2", "day3", "day5"], "liberte_plus": ["airports", "metro_train_rer", "bus_tram"],
+    "navigo_easy_card": ["full"],
+}
+
+
+def app_tickets() -> None:
+    """Onglet Titres (spec § 22) : tarifs datés et sourcés, applications d'achat déclarées au manifeste."""
+    import xml.etree.ElementTree as ET
+    doc = json.loads((ROOT / "app/src/main/assets/tickets/fares.json").read_text(encoding="utf-8"))
+    check("app (titres)", "schéma", doc["schema"], "airport-connect/fares@1")
+    check("app (titres)", "dates ISO", _iso_required(doc["valid_from"]) and _iso_required(doc["checked_on"]), True)
+    check("app (titres)", "relevé postérieur à l'entrée en vigueur", doc["checked_on"] >= doc["valid_from"], True)
+    check("app (titres)", "sources https", bool(doc["sources"]) and all(u.startswith("https://") for u in doc["sources"]), True)
+    check("app (titres)", "lien « tous les tarifs » https", doc["more_url"].startswith("https://"), True)
+    for key, variants in FARE_KEYS.items():
+        got = doc["fares"].get(key, {})
+        check("app (titres)", f"{key} : variantes", sorted(got), sorted(variants))
+        check("app (titres)", f"{key} : prix entiers positifs (centimes)",
+              all(isinstance(v, int) and v > 0 for v in got.values()), True)
+    check("app (titres)", "aucun tarif non affiché", sorted(doc["fares"]), sorted(FARE_KEYS))
+    ns = "{http://schemas.android.com/apk/res/android}"
+    manifest = ET.parse(ROOT / "app/src/main/AndroidManifest.xml").getroot()
+    queried = sorted(p.get(ns + "name") for q in manifest.iter("queries") for p in q.iter("package"))
+    check("app (titres)", "applications d'achat déclarées au manifeste (<queries>)",
+          sorted(a["package"] for a in doc["apps"]), queried)
+    if date.fromisoformat(doc["valid_from"]).year < date.today().year:
+        notes.append(f"tarifs de l'onglet Titres en vigueur depuis le {doc['valid_from']} : à revoir pour {date.today().year}"
+                     " (app/src/main/assets/tickets/fares.json)")
 
 
 def app_plans() -> None:

@@ -123,6 +123,14 @@ def distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     return 2 * EARTH_RADIUS_M * math.asin(math.sqrt(a))
 
 
+def next_departure(board: "StopBoard") -> float:
+    """Prochain départ d'une carte (R-104) : son premier passage affiché, sinon l'heure de reprise du service (R-57) ;
+    l'infini sans reprise connue."""
+    if board.passages:
+        return board.passages[0].epoch
+    return board.next_service_start if board.next_service_start is not None else math.inf
+
+
 @dataclass
 class DepartureGroup:
     """Une carte de l'accueil : une ligne et un sens (lieu aéroportuaire) ou un aéroport desservi (lieu ville)."""
@@ -583,10 +591,12 @@ class Timetable:
             order = orders.get((grp.line, grp.sector or sort_sector))
             return (order is None, order if order is not None else 0, grp.line)
 
+        # Ordre (R-104, D-18) : par aéroport, puis les cartes qui ont un passage, par prochain départ ; puis celles
+        # dont le service est terminé ou pas commencé, par heure de reprise (R-57), sans reprise connue en dernier ;
+        # à égalité, l'ordre des lignes de l'aéroport.
         def rank(grp):
-            first = grp.board.passages[0].epoch if grp.board.passages else None
             return (SECTORS.index(grp.sector) if grp.sector else 0,
-                    first is None, first if first is not None else 0.0, *line_rank(grp), grp.key)
+                    not grp.board.passages, next_departure(grp.board), *line_rank(grp), grp.key)
         return sorted(out, key=rank)
 
     # -- autour de moi (R-101, décision D-8) ---------------------------------------------------------
@@ -598,7 +608,8 @@ class Timetable:
           de plus petit identifiant GTFS l'emporte. Tous les quais de la zone retenue pour la ligne et le sens servent.
         - destination (R-102) : seules comptent les montées dont la mission dessert ensuite la destination, avant le
           choix de la zone la plus proche (la carte montre l'arrêt d'où l'on peut s'y rendre).
-        - Ordre : distance croissante, puis cartes avec passage d'abord, par prochain départ, puis ligne et sens.
+        - Ordre (R-104, D-18) : cartes avec passage d'abord, par prochain départ ; puis par heure de reprise (R-57) ;
+          à égalité, la plus proche, puis ligne et sens.
         La position n'est jamais conservée ni transmise : le calcul se fait sur l'appareil."""
         targets = self.destination_stop_points(destination) if destination is not None else None
         best = {}   # (code, key) -> (distance, zone)
@@ -635,8 +646,7 @@ class Timetable:
             out.append(DepartureGroup(code, key, None, area, title, board, int(round(dist))))
 
         def rank(g):
-            first = g.board.passages[0].epoch if g.board.passages else None
-            return (g.distance_m, first is None, first if first is not None else 0.0, g.line, g.key)
+            return (not g.board.passages, next_departure(g.board), g.distance_m, g.line, g.key)
         return sorted(out, key=rank)
 
     def _boarding_rows(self) -> list:

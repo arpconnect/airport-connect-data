@@ -353,6 +353,18 @@ def home_structure(tt: Timetable, db_path: Path) -> None:
     resumes = [g.board.next_service_start for pid in ("paris", "cdg-t2", "orly-4") for g in tt.place_departures(pid, now)
                if g.board.next_service_start is not None]
     check("D-6 : « Reprise à » toujours après l'instant consulté", all(r > now.timestamp() for r in resumes), True)
+    # R-104 (D-18) : la nuit, depuis Paris vers Roissy, les lignes en service passent devant celles qui ont fini, et
+    # celles qui ont fini sont rangées par heure de reprise (les Noctilien avant les lignes de jour).
+    import timetable_reader as trr
+    for h in range(0, 24):
+        at = now.replace(hour=h, minute=40)
+        gs = [g for g in tt.place_departures("paris", at) if g.sector == "ROISSY"]
+        keys = [(not g.board.passages, trr.next_departure(g.board)) for g in gs]
+        if keys != sorted(keys):
+            check(f"R-104 : Paris → Roissy à {h:02d}:40 trié par prochain départ puis reprise", keys, sorted(keys))
+            break
+    else:
+        check("R-104 : Paris → Roissy trié par prochain départ puis reprise, à chaque heure", True, True)
     # R-101, D-8 : autour de moi, depuis le premier quai de chaque lieu aéroportuaire
     import timetable_reader as tr
     for pid in ("cdg-t2", "orly-4", "bourget-gare"):
@@ -360,8 +372,10 @@ def home_structure(tt: Timetable, db_path: Path) -> None:
                                      WHERE x.place_id = ? OR x.place_id IN (SELECT id FROM place WHERE parent_id = ?)
                                      ORDER BY sp.gtfs_id LIMIT 1""", (pid, pid)).fetchone()
         gs = tt.nearby_departures(lat, lon, now)
-        check(f"autour de moi {pid} : des cartes, à {tr.NEARBY_RADIUS_M} m au plus, triées par distance",
-              (bool(gs), all(g.distance_m <= tr.NEARBY_RADIUS_M for g in gs), [g.distance_m for g in gs] == sorted(g.distance_m for g in gs)),
+        # R-104 (D-18) : passages d'abord, par prochain départ puis reprise ; à égalité, la distance.
+        keys = [(not g.board.passages, tr.next_departure(g.board), g.distance_m) for g in gs]
+        check(f"autour de moi {pid} : des cartes, à {tr.NEARBY_RADIUS_M} m au plus, triées par prochain départ",
+              (bool(gs), all(g.distance_m <= tr.NEARBY_RADIUS_M for g in gs), keys == sorted(keys)),
               (True, True, True))
         check(f"autour de moi {pid} : une carte par ligne et par sens", len({(g.line, g.key) for g in gs}), len(gs))
     try:
