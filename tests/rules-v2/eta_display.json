@@ -4,8 +4,8 @@
   "reference": "tools/reference/v2_eta.py",
   "notes": [
     "input.ms_until = heure de départ − maintenant, en millisecondes ; secondes tronquées vers zéro (division entière, comme la v1).",
-    "expected.kind : minutes (minutes) | hidden (passage retiré de la liste).",
-    "Écart avec la v1 (tests/characterization/eta_display.json) : plus d'« À l'approche » ni d'« À l'arrêt », et aucun seuil fixe propre à l'application (les 25 s du « 0 min » clignotant et les 24 s d'« Imminent » de la première version de D-16 sont abandonnés). Un passage mesuré décompte jusqu'à son heure annoncée, puis affiche « 0 min » jusqu'à ce qu'IDFM confirme son départ (retrait à la fusion, rules-v2/realtime_merge.json) ou le repousse ; sans réponse, il est retiré 59 s après, comme un passage théorique. Le théorique est inchangé."
+    "expected.kind : minutes (minutes, blink : « 0 min » clignotant) | hidden (passage retiré de la liste).",
+    "Écart avec la v1 (tests/characterization/eta_display.json) : plus d'« À l'approche » ni d'« À l'arrêt », et aucun seuil fixe propre à l'application (les 25 s et les 24 s de la première version de D-16 sont abandonnés, avec « Imminent »). Un passage mesuré décompte jusqu'à son heure annoncée, puis affiche « 0 min », qui clignote, jusqu'à ce qu'IDFM confirme son départ (retrait à la fusion, rules-v2/realtime_merge.json) ou le repousse ; sans réponse, il est retiré 59 s après, comme un passage théorique. Le théorique est inchangé et ne clignote jamais."
   ],
   "cases": [
     {
@@ -16,7 +16,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 2
+        "minutes": 2,
+        "blink": false
       }
     },
     {
@@ -27,7 +28,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 1
+        "minutes": 1,
+        "blink": false
       }
     },
     {
@@ -38,7 +40,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 1
+        "minutes": 1,
+        "blink": false
       }
     },
     {
@@ -49,7 +52,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 1
+        "minutes": 1,
+        "blink": false
       }
     },
     {
@@ -60,7 +64,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 1
+        "minutes": 1,
+        "blink": false
       }
     },
     {
@@ -71,7 +76,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 1
+        "minutes": 1,
+        "blink": false
       }
     },
     {
@@ -82,18 +88,20 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 0
+        "minutes": 0,
+        "blink": true
       }
     },
     {
-      "id": "rt-0s-heure-atteinte",
+      "id": "rt-0s-heure-atteinte-clignote",
       "input": {
         "realtime": true,
         "ms_until": 0
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 0
+        "minutes": 0,
+        "blink": true
       }
     },
     {
@@ -104,7 +112,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 0
+        "minutes": 0,
+        "blink": true
       }
     },
     {
@@ -115,7 +124,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 0
+        "minutes": 0,
+        "blink": true
       }
     },
     {
@@ -126,7 +136,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 0
+        "minutes": 0,
+        "blink": true
       }
     },
     {
@@ -137,7 +148,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 0
+        "minutes": 0,
+        "blink": true
       }
     },
     {
@@ -148,7 +160,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 0
+        "minutes": 0,
+        "blink": true
       }
     },
     {
@@ -169,7 +182,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 65
+        "minutes": 65,
+        "blink": false
       }
     },
     {
@@ -180,7 +194,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 1
+        "minutes": 1,
+        "blink": false
       }
     },
     {
@@ -191,7 +206,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 1
+        "minutes": 1,
+        "blink": false
       }
     },
     {
@@ -202,7 +218,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 1
+        "minutes": 1,
+        "blink": false
       }
     },
     {
@@ -213,7 +230,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 1
+        "minutes": 1,
+        "blink": false
       }
     },
     {
@@ -224,7 +242,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 0
+        "minutes": 0,
+        "blink": false
       }
     },
     {
@@ -235,7 +254,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 0
+        "minutes": 0,
+        "blink": false
       }
     },
     {
@@ -246,7 +266,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 0
+        "minutes": 0,
+        "blink": false
       }
     },
     {
@@ -267,7 +288,8 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 2
+        "minutes": 2,
+        "blink": false
       }
     }
   ]

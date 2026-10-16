@@ -48,8 +48,7 @@ def eta() -> None:
 
 
 def eta_v2() -> None:
-    """R-55 corrigée (D-16 révisée) : cas cibles de la v2, et théorique identique à la v1 sur tous les cas de la v1
-    (le champ « blink » de la v1, toujours faux pour un passage théorique, n'existe plus en v2)."""
+    """R-55 corrigée (D-16 révisée) : cas cibles de la v2, et théorique identique à la v1 sur tous les cas de la v1."""
     import v2_eta
     doc = json.loads((ROOT / "tests" / "rules-v2" / "eta_display.json").read_text(encoding="utf-8"))
     for c in doc["cases"]:
@@ -59,8 +58,7 @@ def eta_v2() -> None:
         i = c["input"]
         if i["ms_until"] is None or i["realtime"]:
             continue
-        exp = {k: v for k, v in c["expected"].items() if k != "blink"}
-        check("eta_display.json (théorique jamais clignotant)", c["id"], c["expected"].get("blink", False), False)
+        exp = c["expected"] if c["expected"]["kind"] != "hidden" else {"kind": "hidden"}
         check("rules-v2/eta_display.json (théorique = v1)", c["id"], v2_eta.eta_display(i["ms_until"], False), exp)
 
 
