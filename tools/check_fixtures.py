@@ -139,6 +139,14 @@ def lines_registry() -> None:
         check("lines.json", f"pôle Noctilien {m} présent", m in ids, True)
 
 
+def favorites_v2() -> None:
+    """R-103 (D-8) : favoris automatiques de l'accueil, contre tools/reference/v2_favorites.py."""
+    import v2_favorites
+    doc = json.loads((ROOT / "tests" / "rules-v2" / "favorites.json").read_text(encoding="utf-8"))
+    for c in doc["cases"]:
+        check("rules-v2/favorites.json", c["id"], v2_favorites.run_case(c), c["expected"])
+
+
 def realtime_v2() -> None:
     import v2_realtime as v2
     doc = json.loads((ROOT / "tests" / "rules-v2" / "realtime_merge.json").read_text(encoding="utf-8"))
@@ -502,7 +510,7 @@ def adjustments(ids_lines: dict) -> None:
 
 def main() -> int:
     for fn in (eta, eta_v2, boundary, scope, traffic, traffic_v2, freshness, identity, lines_registry, realtime_v2,
-               data_files):
+               favorites_v2, data_files):
         fn()
     for f in failures:
         print("ÉCHEC", f)

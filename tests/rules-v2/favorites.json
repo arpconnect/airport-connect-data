@@ -1,0 +1,739 @@
+{
+  "schema": "airport-connect/rules-v2@1",
+  "rule": "Favoris automatiques de l'accueil (R-103, D-8)",
+  "reference": "tools/reference/v2_favorites.py",
+  "notes": [
+    "Jours : numéros de jour (jours depuis le 1er janvier 1970), à l'heure de Paris ; T = 20742 (16 octobre 2026).",
+    "ops : [\"trip\", lieu, destination ou null, jour] | [\"line\", code, jour] | [\"hide\", clé], joués dans l'ordre sur « usage » (vide par défaut).",
+    "favorites : favoris attendus à « today », [clé, jours d'usage dans la fenêtre, dernier jour] ; « current » : trajet affiché ; « invalid » : clés inconnues de la base. Sans « favorites », l'usage obtenu est attendu."
+  ],
+  "cases": [
+    {
+      "id": "vide : aucun favori",
+      "favorites": {
+        "today": 20742
+      },
+      "expected": []
+    },
+    {
+      "id": "deux jours : pas encore une habitude",
+      "ops": [
+        [
+          "trip",
+          "paris",
+          "place:orly-4",
+          20739
+        ],
+        [
+          "trip",
+          "paris",
+          "place:orly-4",
+          20742
+        ]
+      ],
+      "favorites": {
+        "today": 20742
+      },
+      "expected": []
+    },
+    {
+      "id": "trois jours : favori",
+      "ops": [
+        [
+          "trip",
+          "paris",
+          "place:orly-4",
+          20732
+        ],
+        [
+          "trip",
+          "paris",
+          "place:orly-4",
+          20739
+        ],
+        [
+          "trip",
+          "paris",
+          "place:orly-4",
+          20742
+        ]
+      ],
+      "favorites": {
+        "today": 20742
+      },
+      "expected": [
+        [
+          "trip:paris|place:orly-4",
+          3,
+          20742
+        ]
+      ]
+    },
+    {
+      "id": "un seul usage par jour",
+      "ops": [
+        [
+          "trip",
+          "paris",
+          "place:orly-4",
+          20742
+        ],
+        [
+          "trip",
+          "paris",
+          "place:orly-4",
+          20742
+        ],
+        [
+          "trip",
+          "paris",
+          "place:orly-4",
+          20742
+        ]
+      ],
+      "favorites": {
+        "today": 20742
+      },
+      "expected": []
+    },
+    {
+      "id": "habitude hebdomadaire : 3 lundis en 4 semaines",
+      "ops": [
+        [
+          "trip",
+          "paris",
+          "airport:ROISSY",
+          20721
+        ],
+        [
+          "trip",
+          "paris",
+          "airport:ROISSY",
+          20728
+        ],
+        [
+          "trip",
+          "paris",
+          "airport:ROISSY",
+          20735
+        ]
+      ],
+      "favorites": {
+        "today": 20742
+      },
+      "expected": [
+        [
+          "trip:paris|airport:ROISSY",
+          3,
+          20735
+        ]
+      ]
+    },
+    {
+      "id": "fenêtre de 28 jours : un usage d'il y a 28 jours ne compte plus",
+      "ops": [
+        [
+          "trip",
+          "paris",
+          "airport:ROISSY",
+          20714
+        ],
+        [
+          "trip",
+          "paris",
+          "airport:ROISSY",
+          20728
+        ],
+        [
+          "trip",
+          "paris",
+          "airport:ROISSY",
+          20735
+        ]
+      ],
+      "favorites": {
+        "today": 20742
+      },
+      "expected": []
+    },
+    {
+      "id": "fenêtre de 28 jours : il y a 27 jours compte encore",
+      "ops": [
+        [
+          "trip",
+          "paris",
+          "airport:ROISSY",
+          20715
+        ],
+        [
+          "trip",
+          "paris",
+          "airport:ROISSY",
+          20728
+        ],
+        [
+          "trip",
+          "paris",
+          "airport:ROISSY",
+          20735
+        ]
+      ],
+      "favorites": {
+        "today": 20742
+      },
+      "expected": [
+        [
+          "trip:paris|airport:ROISSY",
+          3,
+          20735
+        ]
+      ]
+    },
+    {
+      "id": "le trajet affiché n'est pas proposé",
+      "ops": [
+        [
+          "trip",
+          "paris",
+          "place:orly-4",
+          20740
+        ],
+        [
+          "trip",
+          "paris",
+          "place:orly-4",
+          20741
+        ],
+        [
+          "trip",
+          "paris",
+          "place:orly-4",
+          20742
+        ]
+      ],
+      "favorites": {
+        "today": 20742,
+        "current": [
+          "paris",
+          "place:orly-4"
+        ]
+      },
+      "expected": []
+    },
+    {
+      "id": "même lieu, autre destination : trajets distincts ; toutes destinations est un trajet",
+      "ops": [
+        [
+          "trip",
+          "paris",
+          null,
+          20740
+        ],
+        [
+          "trip",
+          "paris",
+          null,
+          20741
+        ],
+        [
+          "trip",
+          "paris",
+          null,
+          20742
+        ],
+        [
+          "trip",
+          "paris",
+          "place:orly-4",
+          20740
+        ],
+        [
+          "trip",
+          "paris",
+          "place:orly-4",
+          20741
+        ],
+        [
+          "trip",
+          "paris",
+          "place:orly-4",
+          20742
+        ]
+      ],
+      "favorites": {
+        "today": 20742,
+        "current": [
+          "paris",
+          "place:orly-4"
+        ]
+      },
+      "expected": [
+        [
+          "trip:paris|",
+          3,
+          20742
+        ]
+      ]
+    },
+    {
+      "id": "ordre : plus de jours, puis plus récent, puis trajets avant lignes, puis clé",
+      "ops": [
+        [
+          "trip",
+          "orly-4",
+          null,
+          20737
+        ],
+        [
+          "trip",
+          "orly-4",
+          null,
+          20738
+        ],
+        [
+          "trip",
+          "orly-4",
+          null,
+          20739
+        ],
+        [
+          "trip",
+          "orly-4",
+          null,
+          20740
+        ],
+        [
+          "line",
+          "RER_B",
+          20739
+        ],
+        [
+          "line",
+          "RER_B",
+          20740
+        ],
+        [
+          "line",
+          "RER_B",
+          20742
+        ],
+        [
+          "trip",
+          "cdg-t2e",
+          "place:paris",
+          20739
+        ],
+        [
+          "trip",
+          "cdg-t2e",
+          "place:paris",
+          20740
+        ],
+        [
+          "trip",
+          "cdg-t2e",
+          "place:paris",
+          20742
+        ],
+        [
+          "line",
+          "BUS_351",
+          20736
+        ],
+        [
+          "line",
+          "BUS_351",
+          20737
+        ],
+        [
+          "line",
+          "BUS_351",
+          20738
+        ]
+      ],
+      "favorites": {
+        "today": 20742
+      },
+      "expected": [
+        [
+          "trip:orly-4|",
+          4,
+          20740
+        ],
+        [
+          "trip:cdg-t2e|place:paris",
+          3,
+          20742
+        ],
+        [
+          "line:RER_B",
+          3,
+          20742
+        ],
+        [
+          "line:BUS_351",
+          3,
+          20738
+        ]
+      ]
+    },
+    {
+      "id": "5 favoris au plus",
+      "ops": [
+        [
+          "line",
+          "BUS_133",
+          20740
+        ],
+        [
+          "line",
+          "BUS_133",
+          20741
+        ],
+        [
+          "line",
+          "BUS_133",
+          20742
+        ],
+        [
+          "line",
+          "BUS_143",
+          20740
+        ],
+        [
+          "line",
+          "BUS_143",
+          20741
+        ],
+        [
+          "line",
+          "BUS_143",
+          20742
+        ],
+        [
+          "line",
+          "BUS_148",
+          20740
+        ],
+        [
+          "line",
+          "BUS_148",
+          20741
+        ],
+        [
+          "line",
+          "BUS_148",
+          20742
+        ],
+        [
+          "line",
+          "BUS_152",
+          20740
+        ],
+        [
+          "line",
+          "BUS_152",
+          20741
+        ],
+        [
+          "line",
+          "BUS_152",
+          20742
+        ],
+        [
+          "line",
+          "BUS_183",
+          20740
+        ],
+        [
+          "line",
+          "BUS_183",
+          20741
+        ],
+        [
+          "line",
+          "BUS_183",
+          20742
+        ],
+        [
+          "line",
+          "BUS_247",
+          20740
+        ],
+        [
+          "line",
+          "BUS_247",
+          20741
+        ],
+        [
+          "line",
+          "BUS_247",
+          20742
+        ]
+      ],
+      "favorites": {
+        "today": 20742
+      },
+      "expected": [
+        [
+          "line:BUS_133",
+          3,
+          20742
+        ],
+        [
+          "line:BUS_143",
+          3,
+          20742
+        ],
+        [
+          "line:BUS_148",
+          3,
+          20742
+        ],
+        [
+          "line:BUS_152",
+          3,
+          20742
+        ],
+        [
+          "line:BUS_183",
+          3,
+          20742
+        ]
+      ]
+    },
+    {
+      "id": "« Ne plus proposer » : écarté pour de bon, même s'il resert",
+      "ops": [
+        [
+          "line",
+          "T7",
+          20739
+        ],
+        [
+          "line",
+          "T7",
+          20740
+        ],
+        [
+          "line",
+          "T7",
+          20741
+        ],
+        [
+          "hide",
+          "line:T7"
+        ],
+        [
+          "line",
+          "T7",
+          20742
+        ]
+      ],
+      "favorites": {
+        "today": 20742
+      },
+      "expected": []
+    },
+    {
+      "id": "élément inconnu de la base : pas proposé (lieu retiré, ligne supprimée)",
+      "ops": [
+        [
+          "trip",
+          "beauvais",
+          null,
+          20740
+        ],
+        [
+          "trip",
+          "beauvais",
+          null,
+          20741
+        ],
+        [
+          "trip",
+          "beauvais",
+          null,
+          20742
+        ],
+        [
+          "line",
+          "BUS_A01",
+          20740
+        ],
+        [
+          "line",
+          "BUS_A01",
+          20741
+        ],
+        [
+          "line",
+          "BUS_A01",
+          20742
+        ]
+      ],
+      "favorites": {
+        "today": 20742,
+        "invalid": [
+          "trip:beauvais|",
+          "line:BUS_A01"
+        ]
+      },
+      "expected": []
+    },
+    {
+      "id": "autour de moi est un lieu de départ comme un autre",
+      "ops": [
+        [
+          "trip",
+          "nearby",
+          "place:orly-4",
+          20740
+        ],
+        [
+          "trip",
+          "nearby",
+          "place:orly-4",
+          20741
+        ],
+        [
+          "trip",
+          "nearby",
+          "place:orly-4",
+          20742
+        ]
+      ],
+      "favorites": {
+        "today": 20742
+      },
+      "expected": [
+        [
+          "trip:nearby|place:orly-4",
+          3,
+          20742
+        ]
+      ]
+    },
+    {
+      "id": "horloge reculée : un jour « futur » est gardé, mais ne compte pas encore",
+      "ops": [
+        [
+          "line",
+          "RER_C",
+          20743
+        ],
+        [
+          "line",
+          "RER_C",
+          20740
+        ],
+        [
+          "line",
+          "RER_C",
+          20741
+        ]
+      ],
+      "favorites": {
+        "today": 20742
+      },
+      "expected": []
+    },
+    {
+      "id": "horloge reculée : le même jour compte une fois revenu dans la fenêtre",
+      "ops": [
+        [
+          "line",
+          "RER_C",
+          20743
+        ],
+        [
+          "line",
+          "RER_C",
+          20740
+        ],
+        [
+          "line",
+          "RER_C",
+          20741
+        ]
+      ],
+      "favorites": {
+        "today": 20743
+      },
+      "expected": [
+        [
+          "line:RER_C",
+          3,
+          20743
+        ]
+      ]
+    },
+    {
+      "id": "usage gardé : jours triés, hors fenêtre oubliés, éléments vides retirés, écartés notés",
+      "usage": {
+        "trips": [
+          {
+            "place": "paris",
+            "destination": "place:orly-4",
+            "days": [
+              20702,
+              20712
+            ]
+          }
+        ],
+        "lines": [
+          {
+            "code": "T7",
+            "days": [
+              20741
+            ]
+          }
+        ],
+        "hidden": []
+      },
+      "ops": [
+        [
+          "line",
+          "RER_B",
+          20742
+        ],
+        [
+          "line",
+          "T7",
+          20742
+        ],
+        [
+          "line",
+          "T7",
+          20740
+        ],
+        [
+          "hide",
+          "trip:x|"
+        ]
+      ],
+      "expected": {
+        "trips": [],
+        "lines": [
+          {
+            "code": "RER_B",
+            "days": [
+              20742
+            ]
+          },
+          {
+            "code": "T7",
+            "days": [
+              20740,
+              20741,
+              20742
+            ]
+          }
+        ],
+        "hidden": [
+          "trip:x|"
+        ]
+      }
+    }
+  ]
+}
