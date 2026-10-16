@@ -1,29 +1,29 @@
 {
   "schema": "airport-connect/timetable-manifest@1",
   "db_schema_version": 4,
-  "version": "20261015-324fee5a4e38",
-  "generated_at": "2026-10-15T19:19:50+00:00",
+  "version": "20261016-d7749890a7f0",
+  "generated_at": "2026-10-16T04:53:34+00:00",
   "source": {
     "url": "https://eu.ftp.opendatasoft.com/stif/GTFS/IDFM-gtfs.zip",
     "sha256": "c22b3b954b39e3d4e7088e062043a4779627ce20b6baeb2fa24aae1f5290076d"
   },
   "inputs": {
-    "sha256": "a6d9a344d7e5adbab505dd859ae2b4229db13a74fccabb1f8593d72bf3f2c33e"
+    "sha256": "a63ae378b76769f1d9d1be4992f98201c8d6ede5da9ea1bd244323bab163ed52"
   },
   "validity": {
-    "start": "2026-10-15",
+    "start": "2026-10-16",
     "end": "2026-11-13",
-    "days": 30,
+    "days": 29,
     "first_service_date": "2026-10-12"
   },
   "file": {
-    "name": "timetable-20261015-324fee5a4e38.sqlite.gz",
-    "url": "https://github.com/arpconnect/airport-connect-data/releases/download/timetable-20261015-324fee5a4e38/timetable-20261015-324fee5a4e38.sqlite.gz",
+    "name": "timetable-20261016-d7749890a7f0.sqlite.gz",
+    "url": "https://github.com/arpconnect/airport-connect-data/releases/download/timetable-20261016-d7749890a7f0/timetable-20261016-d7749890a7f0.sqlite.gz",
     "encoding": "gzip",
     "bytes_gzip": 5437358,
-    "sha256_gzip": "172a47f09a1499f402005f84277c8f4cf29bcfc591d1353d36e6e30b1cbb5b08",
+    "sha256_gzip": "26fe2dbd1adadc6f3652f7bd21ca38e01a9bd4603b796794a4cf2a9a4940cf6d",
     "bytes": 14909440,
-    "sha256": "324fee5a4e3895a677773fabe9425710c5879ab2aedb080bb903275f0cbe9896"
+    "sha256": "d7749890a7f00821e9a961c0dc4193b6895a641e50484d2d8184c5b0353f5987"
   },
   "counts": {
     "lines_active": 48,
@@ -89,20 +89,5 @@
       "T9": 1426
     }
   },
-  "warnings": [
-    {
-      "code": "line_retired",
-      "detail": {
-        "line": "BUS_A01",
-        "before": 112
-      }
-    },
-    {
-      "code": "line_retired",
-      "detail": {
-        "line": "BUS_A04",
-        "before": 30
-      }
-    }
-  ]
+  "warnings": []
 }
