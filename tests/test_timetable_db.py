@@ -61,6 +61,11 @@ def at(iso: str) -> datetime:
     return datetime.fromisoformat(iso).replace(tzinfo=PARIS)
 
 
+def hm_local(epoch) -> str | None:
+    """Instant en date et heure de Paris (« 2026-07-01 21:33 »), None s'il est absent."""
+    return None if epoch is None else datetime.fromtimestamp(epoch, PARIS).strftime("%Y-%m-%d %H:%M")
+
+
 def active_trips(tt: Timetable, line: str, d: date):
     idx = (d - tt.base).days
     return tt.con.execute(
@@ -430,6 +435,9 @@ def home_june(tt: Timetable) -> None:
         ("BUS_N2", "direction:0", "Terminal 2 F", "ok", "service_ended", []),
         ("BUS_N2", "direction:1", "Terminal 2 G", "ok", "service_ended", []),
     ])
+    check("accueil Terminal 5 à 08:00 : la N2 annonce sa reprise à 21:33, dans les deux sens (D-6, R-57)",
+          [hm_local(g.board.next_service_start) for g in tt.place_departures("cdg-t2e", at("2026-07-01T08:00"))
+           if g.line == "BUS_N2"], ["2026-07-01 21:33", "2026-07-01 21:33"])
     # R-55 : un passage théorique reste affiché jusqu'à 59 s après son heure (« 0 min »), puis disparaît
     def first(iso):
         g = [g for g in tt.place_departures("paris", at(iso)) if g.key == "sector:ROISSY" and g.line == "RER_B"][0]
