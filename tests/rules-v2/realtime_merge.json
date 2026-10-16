@@ -15,8 +15,9 @@
     "Contrairement à tests/characterization/ (comportement v1), ces cas décrivent le comportement CIBLE de la v2.",
     "Temps en secondes Unix ; now = 1000000. Ligne demandée : IDFM:C01299 (351), quai demandé : IDFM:10219.",
     "Mission 1 : quai IDFM:10219 au rang 3, puis IDFM:30000 (zone Z2) et IDFM:20000 (zone Z1, Roissypôle). Mission 2 (courte) : IDFM:10219 au rang 2, puis IDFM:30000 (Rond-Point).",
-    "Chaque passage lu est écrit en réponse SIRI (heures ISO 8601 en UTC) par le vérificateur, puis lu et fusionné : « items » = [heure affichée, état, origine, destination].",
-    "Seuils : rattachement à 90 puis 300 s, heure recopiée « mesurée » si enregistrée 10 min au plus avant la réponse, rejet au-delà de 6 h, disjoncteur ouvert 300 s après 3 échecs consécutifs."
+    "Chaque passage lu est écrit en réponse SIRI (heures ISO 8601 en UTC ; réponse datée de « response », sinon de now) par le vérificateur, puis lu et fusionné : « items » = [heure affichée, état, origine, destination].",
+    "Seuils : rattachement à 90 puis 300 s, heure recopiée « mesurée » si enregistrée 10 min au plus avant la réponse, rejet au-delà de 6 h, disjoncteur ouvert 300 s après 3 échecs consécutifs.",
+    "R-55 (D-16 révisée le 16 octobre 2026) : un passage mesuré dont l'heure annoncée est déjà passée à l'heure de la réponse d'IDFM est parti et n'est pas affiché ; sans telle réponse, il reste affiché jusqu'à 59 s après son heure."
   ],
   "context": {
     "route_id": "IDFM:C01299",
@@ -843,7 +844,7 @@
       }
     },
     {
-      "id": "temps-reel-parti-retire-R55",
+      "id": "temps-reel-parti-selon-idfm-retire",
       "visits": [
         {
           "monitoring": "STIF:StopPoint:Q:10219:",
@@ -871,6 +872,102 @@
           ],
           [
             1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0
+      }
+    },
+    {
+      "id": "temps-reel-heure-atteinte-attend-idfm",
+      "response": 999950,
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "onTime",
+          "recorded": 999940,
+          "expected": 999980
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            999980,
+            "realtime",
+            "added",
+            "Roissypôle"
+          ],
+          [
+            1000300,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0
+      }
+    },
+    {
+      "id": "temps-reel-sans-nouvelle-reponse-retire-59s-apres",
+      "response": 999900,
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "onTime",
+          "recorded": 999890,
+          "expected": 999941
+        },
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "destination": "STIF:StopPoint:Q:20000:",
+          "status": "onTime",
+          "recorded": 999890,
+          "expected": 999935
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            999941,
+            "realtime",
+            "added",
+            "Roissypôle"
+          ],
+          [
+            1000300,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
             "theoretical",
             "timetable",
             "Roissypôle"

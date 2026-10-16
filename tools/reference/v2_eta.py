@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """
-Affichage du temps d'attente d'un passage, règle cible de la v2 (spec R-55 corrigée, décision D-16).
+Affichage du temps d'attente d'un passage, règle cible de la v2 (spec R-55 corrigée, décision D-16 révisée le
+16 octobre 2026).
 
 Écart avec la v1 (`v1_rules.eta_ui`, caractérisée par tests/characterization/eta_display.json) : les mentions
-« À l'approche » et « À l'arrêt » disparaissent. Un passage mesuré à 25 s ou moins de son départ affiche « 0 min »
-qui clignote ; de son heure de départ jusqu'à 24 s après, « Imminent ». Le passage théorique est inchangé : il n'est
-jamais « Imminent » et ne clignote jamais, le véhicule n'étant pas suivi.
+« À l'approche » et « À l'arrêt » disparaissent, comme tout seuil fixe propre à l'application (les 25 s du
+« 0 min » clignotant et les 24 s d'« Imminent » de la première version de D-16). Un passage mesuré décompte les
+minutes jusqu'à son heure de départ annoncée, puis affiche « 0 min » : c'est IDFM qui dit ensuite s'il est parti
+(heure passée dans sa réponse suivante, retrait à la fusion, `v2_realtime.merge`) ou repoussé (nouvelle heure). Sans
+réponse, il est retiré 59 s après l'heure annoncée, comme un passage théorique. Le passage théorique est inchangé.
 
 Bibliothèque standard uniquement ; l'application (domain/WaitTime.kt) reproduit cette fonction à l'identique et
 tests/rules-v2/eta_display.json en fixe les cas, vérifiés par tools/check_fixtures.py et par WaitTimeTest.
@@ -13,12 +16,9 @@ tests/rules-v2/eta_display.json en fixe les cas, vérifiés par tools/check_fixt
 
 from __future__ import annotations
 
-# Secondes avant le départ en deçà desquelles un passage mesuré affiche « 0 min » clignotant.
-BLINK_FROM_S = 25
-# Secondes après l'heure de départ pendant lesquelles un passage mesuré reste « Imminent ».
-IMMINENT_UNTIL_S = 24
-# Secondes après l'heure de départ pendant lesquelles un passage théorique reste affiché (« 0 min »).
-PLANNED_RETAIN_S = 59
+# Secondes après l'heure de départ pendant lesquelles un passage reste affiché (« 0 min ») : théorique, ou mesuré
+# sans réponse d'IDFM qui confirme son départ ou le repousse.
+RETAIN_S = 59
 
 
 def _trunc_div(a: int, b: int) -> int:
@@ -30,16 +30,10 @@ def _trunc_div(a: int, b: int) -> int:
 def eta_display(ms_until: int, realtime: bool) -> dict:
     """ms_until = heure de départ − maintenant, en millisecondes ; secondes tronquées vers zéro (R-55)."""
     s = _trunc_div(ms_until, 1000)
-    if not realtime:
-        if s >= 0:
-            return {"kind": "minutes", "minutes": max(1, _trunc_div(s + 59, 60)), "blink": False}
-        if s >= -PLANNED_RETAIN_S:
-            return {"kind": "minutes", "minutes": 0, "blink": False}
+    if s < -RETAIN_S:
         return {"kind": "hidden"}
-    if s > BLINK_FROM_S:
-        return {"kind": "minutes", "minutes": _trunc_div(s + 59, 60), "blink": False}
     if s > 0:
-        return {"kind": "minutes", "minutes": 0, "blink": True}
-    if s >= -IMMINENT_UNTIL_S:
-        return {"kind": "imminent"}
-    return {"kind": "hidden"}
+        return {"kind": "minutes", "minutes": _trunc_div(s + 59, 60)}
+    if s == 0 and not realtime:
+        return {"kind": "minutes", "minutes": 1}      # théorique : jamais « 0 min » avant l'heure (v1)
+    return {"kind": "minutes", "minutes": 0}

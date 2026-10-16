@@ -5,7 +5,8 @@ Le temps réel vient du service « Prochains passages » d'IDFM (SIRI Lite stop-
 PRIM (R-151, décision technique ADR-10) :
 
 - monitoring_ref, parse_stop_monitoring : requête par quai et lecture d'une réponse (R-150, R-151, R-154, R-51) ;
-- merge : fusion des horaires théoriques de la base et des passages lus (R-152, R-158, R-55) ;
+- merge : fusion des horaires théoriques de la base et des passages lus (R-152, R-158, R-55 : un passage mesuré que
+  la réponse d'IDFM donne déjà parti est retiré) ;
 - CircuitBreaker : disjoncteur par quai interrogé (R-155).
 
 L'application Kotlin reproduit ces règles à l'identique (data/realtime/), vérifiée par les cas de
@@ -24,8 +25,7 @@ from typing import Callable, Iterable, Optional
 STALE_AFTER_S = 120          # R-154, proposé : réponse ignorée au-delà de 120 s après sa réception
 BREAKER_FAILURES = 3         # R-155, proposé
 BREAKER_OPEN_S = 300         # R-155, proposé
-RT_HIDE_AFTER_S = 24         # R-55 : temps réel retiré à s < −24
-TH_HIDE_AFTER_S = 59         # R-55 : théorique (et supprimé) retiré à s < −59
+HIDE_AFTER_S = 59            # R-55 : passage retiré à s < −59 (mesuré sans réponse qui le confirme parti, théorique, supprimé)
 PAIR_TIGHT_S = 90            # R-152, mesuré le 9 octobre 2026 : 374 heures prévues sur 418 égales au GTFS, 42 à 29 s au plus
 PAIR_WIDE_S = 300            # R-152 : second passage, horaires adaptés (−170 s vu sur le RER B, −120 s sur le T11)
 RECORDED_FRESH_S = 600       # R-51, proposé : une heure égale à l'heure prévue n'est « mesurée » que si elle date de 10 min au plus
@@ -105,6 +105,7 @@ class Visit:
     recorded: Optional[int]
     cancelled: bool
     measured: bool               # R-51 : heure réellement mesurée (temps réel)
+    departed: bool = False       # R-55 : mesuré, heure annoncée déjà passée à l'heure de la réponse d'IDFM : parti
 
     @property
     def time(self) -> int:
@@ -178,8 +179,9 @@ def parse_stop_monitoring(text: Optional[str], requested_stop: str, now: int) ->
         measured = (expected is not None and status not in ("noReport", "cancelled")
                     and (aimed is None or expected != aimed
                          or (recorded is not None and reference - recorded <= RECORDED_FRESH_S)))
+        departed = measured and expected < reference
         visits.append(Visit(line, requested_stop, stop_id_of_ref(_value(mvj.get("DestinationRef"))),
-                            aimed, expected, status, recorded, cancelled, measured))
+                            aimed, expected, status, recorded, cancelled, measured, departed))
     best = {}
     for v in visits:
         key = (v.line, v.destination, v.aimed if v.aimed is not None else v.expected)
@@ -211,8 +213,7 @@ class MergeResult:
 
 
 def visible(state: str, epoch: int, now: int) -> bool:
-    s = int(epoch - now)
-    return s >= -RT_HIDE_AFTER_S if state == "realtime" else s >= -TH_HIDE_AFTER_S
+    return int(epoch - now) >= -HIDE_AFTER_S
 
 
 def merge(events: list, eligible: frozenset, visits: Iterable[Visit], route_id: str,
@@ -237,8 +238,9 @@ def merge(events: list, eligible: frozenset, visits: Iterable[Visit], route_id: 
     3. Un passage lu non rattaché est ajouté s'il est mesuré ou supprimé, et placé ; sinon il n'est pas affiché.
     4. Un passage rattaché à une heure non mesurée garde l'heure du GTFS et reste théorique. Un passage théorique
        n'est affiché que s'il fait partie de ceux que la base afficherait ; un passage mesuré ou supprimé l'est
-       toujours. Retrait selon R-55, puis les « limit » premiers passages non supprimés et les suppressions qui les
-       précèdent."""
+       toujours, sauf un passage mesuré parti selon IDFM (`departed`) : rattaché ou non, il n'est pas affiché, et le
+       passage théorique auquel il est rattaché non plus. Retrait 59 s après l'heure (R-55), puis les « limit »
+       premiers passages non supprimés et les suppressions qui les précèdent."""
     vs = [v for v in visits if v.line == route_id]
     ev = sorted(events, key=lambda e: (e.epoch, e.stop_point, e.headsign, e.pattern_id, e.seq))
 
@@ -287,6 +289,8 @@ def merge(events: list, eligible: frozenset, visits: Iterable[Visit], route_id: 
                 items.append(Item(int(e.epoch), int(e.epoch), "theoretical", e.stop_point, e.destination,
                                   e.pattern_id, e.seq, "timetable"))
             continue
+        if v.departed:
+            continue
         if v.cancelled or v.measured:
             items.append(Item(v.time, int(e.epoch), "cancelled" if v.cancelled else "realtime", e.stop_point,
                               e.destination, e.pattern_id, e.seq, "paired"))
@@ -298,6 +302,8 @@ def merge(events: list, eligible: frozenset, visits: Iterable[Visit], route_id: 
             continue
         if not placed[vi] or not (v.measured or v.cancelled):
             unplaced += 1
+            continue
+        if v.departed:
             continue
         items.append(Item(v.time, v.aimed, "cancelled" if v.cancelled else "realtime", v.stop_point,
                           stop_name(v.destination), None, None, "added"))
@@ -321,7 +327,7 @@ def iso(epoch: int) -> str:
 
 
 def siri_document(visits: list, now: int, error: bool = False) -> str:
-    """Réponse SIRI Lite écrite à partir des passages compacts d'un cas de règle."""
+    """Réponse SIRI Lite écrite à partir des passages compacts d'un cas de règle ; now : heure de la réponse."""
     delivery = {"ResponseTimestamp": iso(now), "Version": "2.0", "Status": "true"}
     if error:
         delivery["ErrorCondition"] = {"ErrorInformation": {"ErrorText": "La requête contient des identifiants qui sont inconnus"}}
@@ -360,7 +366,9 @@ def run_rule_case(ctx: dict, case: dict) -> dict:
     if "events" in case:
         events = [events[i] for i in case["events"]]
     allowed = frozenset(tuple(x) for x in case["allowed"]) if "allowed" in case else None
-    reading = parse_stop_monitoring(siri_document(case["visits"], now, case.get("error", False)), stop, now)
+    # « response » : heure de la réponse d'IDFM, plus tôt que now quand le cas la relit après coup (R-55)
+    reading = parse_stop_monitoring(siri_document(case["visits"], case.get("response", now), case.get("error", False)),
+                                    stop, now)
     if reading.status != "ok":
         return {"status": reading.status}
 

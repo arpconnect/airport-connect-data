@@ -1,11 +1,11 @@
 {
   "schema": "airport-connect/rules-v2@1",
-  "rule": "Affichage du temps d'attente d'un passage (R-55 corrigée, D-16)",
+  "rule": "Affichage du temps d'attente d'un passage (R-55 corrigée, D-16 révisée le 16 octobre 2026)",
   "reference": "tools/reference/v2_eta.py",
   "notes": [
     "input.ms_until = heure de départ − maintenant, en millisecondes ; secondes tronquées vers zéro (division entière, comme la v1).",
-    "expected.kind : minutes (minutes, blink : « 0 min » clignotant) | imminent (« Imminent ») | hidden (passage retiré de la liste).",
-    "Écart avec la v1 (tests/characterization/eta_display.json) : « À l'approche » devient « 0 min » clignotant sur ses 25 dernières secondes, « À l'arrêt » devient « Imminent ». Le théorique est inchangé."
+    "expected.kind : minutes (minutes) | hidden (passage retiré de la liste).",
+    "Écart avec la v1 (tests/characterization/eta_display.json) : plus d'« À l'approche » ni d'« À l'arrêt », et aucun seuil fixe propre à l'application (les 25 s du « 0 min » clignotant et les 24 s d'« Imminent » de la première version de D-16 sont abandonnés). Un passage mesuré décompte jusqu'à son heure annoncée, puis affiche « 0 min » jusqu'à ce qu'IDFM confirme son départ (retrait à la fusion, rules-v2/realtime_merge.json) ou le repousse ; sans réponse, il est retiré 59 s après, comme un passage théorique. Le théorique est inchangé."
   ],
   "cases": [
     {
@@ -16,8 +16,7 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 2,
-        "blink": false
+        "minutes": 2
       }
     },
     {
@@ -28,8 +27,7 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 1,
-        "blink": false
+        "minutes": 1
       }
     },
     {
@@ -40,32 +38,18 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 1,
-        "blink": false
+        "minutes": 1
       }
     },
     {
-      "id": "rt-25999ms-tronque-a-25s",
-      "input": {
-        "realtime": true,
-        "ms_until": 25999
-      },
-      "expected": {
-        "kind": "minutes",
-        "minutes": 0,
-        "blink": true
-      }
-    },
-    {
-      "id": "rt-25s-zero-clignotant",
+      "id": "rt-25s-plus-de-seuil",
       "input": {
         "realtime": true,
         "ms_until": 25000
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 0,
-        "blink": true
+        "minutes": 1
       }
     },
     {
@@ -76,8 +60,7 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 0,
-        "blink": true
+        "minutes": 1
       }
     },
     {
@@ -88,8 +71,7 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 0,
-        "blink": true
+        "minutes": 1
       }
     },
     {
@@ -99,17 +81,19 @@
         "ms_until": 999
       },
       "expected": {
-        "kind": "imminent"
+        "kind": "minutes",
+        "minutes": 0
       }
     },
     {
-      "id": "rt-0s-imminent",
+      "id": "rt-0s-heure-atteinte",
       "input": {
         "realtime": true,
         "ms_until": 0
       },
       "expected": {
-        "kind": "imminent"
+        "kind": "minutes",
+        "minutes": 0
       }
     },
     {
@@ -119,34 +103,59 @@
         "ms_until": -999
       },
       "expected": {
-        "kind": "imminent"
+        "kind": "minutes",
+        "minutes": 0
       }
     },
     {
-      "id": "rt-moins-24s-limite-imminent",
+      "id": "rt-moins-24s-attend-idfm",
       "input": {
         "realtime": true,
         "ms_until": -24000
       },
       "expected": {
-        "kind": "imminent"
+        "kind": "minutes",
+        "minutes": 0
       }
     },
     {
-      "id": "rt-moins-24999ms-tronque-a-24s",
-      "input": {
-        "realtime": true,
-        "ms_until": -24999
-      },
-      "expected": {
-        "kind": "imminent"
-      }
-    },
-    {
-      "id": "rt-moins-25s-retire",
+      "id": "rt-moins-25s-attend-idfm",
       "input": {
         "realtime": true,
         "ms_until": -25000
+      },
+      "expected": {
+        "kind": "minutes",
+        "minutes": 0
+      }
+    },
+    {
+      "id": "rt-moins-59s-limite",
+      "input": {
+        "realtime": true,
+        "ms_until": -59000
+      },
+      "expected": {
+        "kind": "minutes",
+        "minutes": 0
+      }
+    },
+    {
+      "id": "rt-moins-59999ms-tronque",
+      "input": {
+        "realtime": true,
+        "ms_until": -59999
+      },
+      "expected": {
+        "kind": "minutes",
+        "minutes": 0
+      }
+    },
+    {
+      "id": "rt-moins-60s-retire-sans-reponse",
+      "input": {
+        "realtime": true,
+        "ms_until": -60000
       },
       "expected": {
         "kind": "hidden"
@@ -160,8 +169,7 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 65,
-        "blink": false
+        "minutes": 65
       }
     },
     {
@@ -172,8 +180,7 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 1,
-        "blink": false
+        "minutes": 1
       }
     },
     {
@@ -184,8 +191,7 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 1,
-        "blink": false
+        "minutes": 1
       }
     },
     {
@@ -196,8 +202,7 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 1,
-        "blink": false
+        "minutes": 1
       }
     },
     {
@@ -208,8 +213,7 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 1,
-        "blink": false
+        "minutes": 1
       }
     },
     {
@@ -220,8 +224,7 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 0,
-        "blink": false
+        "minutes": 0
       }
     },
     {
@@ -232,8 +235,7 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 0,
-        "blink": false
+        "minutes": 0
       }
     },
     {
@@ -244,8 +246,7 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 0,
-        "blink": false
+        "minutes": 0
       }
     },
     {
@@ -266,8 +267,7 @@
       },
       "expected": {
         "kind": "minutes",
-        "minutes": 2,
-        "blink": false
+        "minutes": 2
       }
     }
   ]
