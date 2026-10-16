@@ -310,7 +310,7 @@ def design_tokens(lines: dict) -> None:
     check("design/icons", "jeu de pictogrammes complet", icons, sorted([
         "aeroport", "alerte", "bus", "changer", "departs", "direction", "favori", "fermer", "incomplet", "info",
         "lignes", "marche", "metro", "navette", "non-desservi", "nuit", "plan", "position", "prevu", "retour",
-        "temps-reel", "trafic", "train", "tram"]))
+        "reglages", "temps-reel", "trafic", "train", "tram"]))
 
 
 def _iso_required(v) -> bool:
@@ -391,6 +391,49 @@ def android_resources() -> None:
         check("app (généré)", rel, path.exists() and path.read_bytes() == data, True)
     app_timetable()
     app_plans()
+    app_settings()
+
+
+# Points à compléter avant la publication (affichés sans faire échouer la vérification).
+notes: list = []
+
+
+def app_settings() -> None:
+    """Réglages (spec § 21) : langues proposées, textes de licence livrés tels quels, composants tiers déclarés,
+    champs des mentions légales encore à remplir."""
+    import re
+    import xml.etree.ElementTree as ET
+    res = ROOT / "app/src/main/res"
+    locales = [e.get("{http://schemas.android.com/apk/res/android}name")
+               for e in ET.parse(res / "xml/locales_config.xml").getroot()]
+    gradle = (ROOT / "app/build.gradle.kts").read_text(encoding="utf-8")
+    filters = re.search(r'localeFilters \+= listOf\(([^)]*)\)', gradle)
+    check("app (réglages)", "langues proposées = langues livrées (localeFilters)",
+          locales, re.findall(r'"([^"]+)"', filters.group(1)) if filters else None)
+    check("app (réglages)", "langues proposées = dossiers de textes",
+          sorted(locales), sorted(["fr"] + [p.name.removeprefix("values-") for p in res.glob("values-??")]))
+    lic = ROOT / "app/src/main/assets/licences"
+    doc = json.loads((lic / "notices.json").read_text(encoding="utf-8"))
+    check("app (licences)", "schéma", doc["schema"], "airport-connect/open-source@1")
+    for key, l in sorted(doc["licences"].items()):
+        data = (lic / l["file"]).read_bytes() if (lic / l["file"]).exists() else b""
+        check("app (licences)", f"{key} : texte livré tel quel", hashlib.sha256(data).hexdigest(), l["sha256"])
+    check("app (licences)", "OFL de l'écran = OFL de la police (design/fonts)",
+          (lic / "ofl-1.1.txt").read_bytes() == (ROOT / "design/fonts/OFL.txt").read_bytes(), True)
+    ids = [c["id"] for c in doc["components"]]
+    check("app (licences)", "composants uniques", len(ids) == len(set(ids)), True)
+    for c in doc["components"]:
+        check("app (licences)", f"{c['id']} : licence connue, nom, titulaire, lien https",
+              (c["licence"] in doc["licences"], bool(c["name"]), bool(c["holder"]), c["url"].startswith("https://")),
+              (True, True, True, True))
+        if c.get("notice"):
+            check("app (licences)", f"{c['id']} : notice livrée", (lic / c["notice"]).exists(), True)
+    check("app (licences)", "police déclarée", [c["id"] for c in doc["components"] if c["kind"] == "font"], ["source-sans-3"])
+    legal = ET.parse(res / "values/legal.xml").getroot()
+    for e in legal:
+        check("app (mentions)", f"{e.get('name')} : non traduisible", e.get("translatable"), "false")
+        if "À compléter" in (e.text or ""):
+            notes.append(f"mentions légales : {e.get('name')} (res/values/legal.xml)")
 
 
 def app_plans() -> None:
@@ -514,6 +557,8 @@ def main() -> int:
         fn()
     for f in failures:
         print("ÉCHEC", f)
+    for n in notes:
+        print("À COMPLÉTER AVANT PUBLICATION", n)
     print(f"{passed} cas conformes, {len(failures)} échec(s)")
     return 1 if failures else 0
 

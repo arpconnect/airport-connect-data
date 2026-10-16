@@ -1,5 +1,5 @@
 # Historique des incidents de trafic (spec R-86, décision D-17, ADR-14).
-# Toutes les 5 minutes (GitHub décale souvent de quelques minutes), sans secret : l'info trafic est lue à travers le
+# Cron de 5 minutes ; GitHub espace en pratique les passages d'environ 30 min (relevé du 16 octobre 2026, ADR-14). Sans secret : l'info trafic est lue à travers le
 # proxy, qui la garde (aucun appel à PRIM de plus), puis l'état est mis à jour par tools/pipeline/traffic_history.py.
 # Publication : branche « trafic-historique », un seul commit remplacé à chaque passage (history.json, axes.json).
 # Un échec de lecture n'échoue pas le traitement (pas d'alerte toutes les 5 min) : la lacune est notée dans l'état.
