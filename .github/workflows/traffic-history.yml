@@ -1,0 +1,110 @@
+# Historique des incidents de trafic (spec R-86, décision D-17, ADR-14).
+# Toutes les 5 minutes (GitHub décale souvent de quelques minutes), sans secret : l'info trafic est lue à travers le
+# proxy, qui la garde (aucun appel à PRIM de plus), puis l'état est mis à jour par tools/pipeline/traffic_history.py.
+# Publication : branche « trafic-historique », un seul commit remplacé à chaque passage (history.json, axes.json).
+# Un échec de lecture n'échoue pas le traitement (pas d'alerte toutes les 5 min) : la lacune est notée dans l'état.
+name: traffic-history
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: trafic-historique    # un seul passage à la fois : chacun repart de l'état publié par le précédent
+  cancel-in-progress: false
+
+env:
+  PROXY: https://airport-connect-prim-proxy.airportconnect.workers.dev
+  BRANCH: trafic-historique
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Vérifier l'outil
+        run: python3 -I tests/test_traffic_history.py
+
+      - name: Relire l'état publié
+        run: |
+          mkdir -p work
+          if git fetch --quiet --depth 1 origin "$BRANCH" 2>/dev/null; then
+            git show "FETCH_HEAD:history.json" > work/history.json 2>/dev/null || rm -f work/history.json
+            git show "FETCH_HEAD:axes.json" > work/axes.json 2>/dev/null || rm -f work/axes.json
+          fi
+          ls -l work
+
+      - name: Lire l'info trafic à travers le proxy
+        id: bulk
+        run: |
+          if curl --silent --show-error --fail --compressed --max-time 60 -D work/headers.txt -o work/bulk.json \
+               "$PROXY/disruptions_bulk/disruptions/v2"; then
+            observed="$(grep -i '^x-airportconnect-fetched-at:' work/headers.txt | tail -1 | cut -d' ' -f2- | tr -d '\r')"
+            if [ -z "$observed" ]; then
+              observed="$(date -u -d "$(grep -i '^date:' work/headers.txt | tail -1 | cut -d' ' -f2- | tr -d '\r')" +%Y-%m-%dT%H:%M:%SZ)"
+            fi
+            echo "observed=$observed" >> "$GITHUB_OUTPUT"
+            echo "Lecture de l'info trafic : $observed ($(wc -c < work/bulk.json) octets)"
+          else
+            echo "::warning title=Info trafic illisible::Lecture impossible à travers le proxy : passage sauté, lacune notée."
+            echo "observed=" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Missions des RER à axes (nouvelle base seulement)
+        id: axes
+        if: steps.bulk.outputs.observed != ''
+        run: |
+          version="$(python3 -I -c 'import json;print(json.load(open("published/timetable/manifest.json"))["version"])')"
+          known=""
+          if [ -f work/axes.json ]; then
+            known="$(python3 -I -c 'import json;print(json.load(open("work/axes.json")).get("base_version") or "")')"
+          fi
+          if [ "$version" = "$known" ]; then
+            echo "args=" >> "$GITHUB_OUTPUT"
+          else
+            url="$(python3 -I -c 'import json;print(json.load(open("published/timetable/manifest.json"))["file"]["url"])')"
+            sha="$(python3 -I -c 'import json;print(json.load(open("published/timetable/manifest.json"))["file"]["sha256_gzip"])')"
+            curl --silent --show-error --fail --location --max-time 120 -o work/timetable.sqlite.gz "$url"
+            echo "$sha  work/timetable.sqlite.gz" | sha256sum --check --quiet
+            echo "Base $version téléchargée pour les missions des RER (ancienne : ${known:-aucune})"
+            echo "args=--timetable work/timetable.sqlite.gz --base-version $version" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Mettre à jour l'historique
+        id: update
+        if: steps.bulk.outputs.observed != ''
+        run: |
+          cp work/history.json work/history.prev.json 2>/dev/null || : > work/history.prev.json
+          cp work/axes.json work/axes.prev.json 2>/dev/null || : > work/axes.prev.json
+          python3 -I tools/pipeline/traffic_history.py --state work/history.json --bulk work/bulk.json \
+            --observed "${{ steps.bulk.outputs.observed }}" --axes work/axes.json ${{ steps.axes.outputs.args }}
+          if cmp -s work/history.json work/history.prev.json && cmp -s work/axes.json work/axes.prev.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"      # même lecture que le passage précédent
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publier sur la branche « trafic-historique »
+        if: steps.update.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir pub
+          cp work/history.json work/axes.json pub/
+          cd pub
+          git init --quiet --initial-branch "$BRANCH"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add history.json axes.json
+          git commit --quiet -m "Historique des incidents de trafic : lecture du ${{ steps.bulk.outputs.observed }}"
+          git push --quiet --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:$BRANCH"

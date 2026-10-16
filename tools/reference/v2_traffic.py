@@ -287,10 +287,10 @@ def _rank(d: dict) -> int:
     return SEVERITY_RANK.get(d.get("severity"), 1)
 
 
-def line_disruptions(bulk: dict, line_code: str, route_id: str, patterns: list, now_s: int) -> list:
+def attached_disruptions(bulk: dict, line_code: str, route_id: str, patterns: list) -> list:
     """
-    Perturbations affichées d'une ligne (R-81, R-82, R-85), en cours puis à venir ; dans chaque groupe, sévérité
-    décroissante, puis début (en cours : fin la plus proche d'abord ; à venir : début le plus proche), puis identifiant.
+    Perturbations rattachées à une ligne (R-81) et gardées sur son axe (R-82), quel que soit leur moment, dans l'ordre
+    où l'entrée de la ligne les cite : `{"id", "kind": "line" | "stop", "stops": [noms des quais], "disruption"}`.
 
     Rattachement (R-81) : une perturbation citée par l'entrée de la ligne au niveau `line` ou `network`, ou dont un
     tronçon (`impactedSections`) est sur la ligne, est une perturbation **de ligne**. Une perturbation citée seulement
@@ -328,17 +328,31 @@ def line_disruptions(bulk: dict, line_code: str, route_id: str, patterns: list, 
         sps = [s for s, _ in stops[did]]
         if not keep_on_axis(line_code, d, line_id, sps, patterns):
             continue
+        out.append({"id": did, "kind": "line" if on_line else "stop",
+                    "stops": [] if on_line else sorted({n for _, n in stops[did]}), "disruption": d})
+    return out
+
+
+def line_disruptions(bulk: dict, line_code: str, route_id: str, patterns: list, now_s: int) -> list:
+    """
+    Perturbations affichées d'une ligne (R-81, R-82, R-85) : celles d'`attached_disruptions` en cours ou à venir,
+    en cours puis à venir ; dans chaque groupe, sévérité décroissante, puis début (en cours : fin la plus proche
+    d'abord ; à venir : début le plus proche), puis identifiant.
+    """
+    out = []
+    for a in attached_disruptions(bulk, line_code, route_id, patterns):
+        d = a["disruption"]
         t = timing(d, now_s)
         if t["state"] == "hidden":
             continue
         out.append({
-            "id": did,
-            "kind": "line" if on_line else "stop",
+            "id": a["id"],
+            "kind": a["kind"],
             "severity": d.get("severity"),
             "cause": d.get("cause"),
             "title": d.get("title") or "",
             "short_message": d.get("shortMessage"),
-            "stops": [] if on_line else sorted({n for _, n in stops[did]}),
+            "stops": a["stops"],
             **t,
         })
 
