@@ -30,7 +30,7 @@ NEARBY_RADIUS_M = 800        # R-101, D-8 : « autour de moi », quais à 800 m 
 EARTH_RADIUS_M = 6371008.8   # rayon moyen de la Terre (UGGI)
 RETAIN_S = 59            # R-55 : un passage théorique reste affiché (« 0 min ») jusqu'à 59 s après son heure
 SECTORS = ("ROISSY", "ORLY", "BOURGET")
-FAMILY_RANK = {"TRAIN": 0, "METRO": 1, "TRAM_TRAIN": 2, "TRAM": 3, "SHUTTLE": 4, "BUS": 5, "NIGHT_BUS": 6}   # R-160
+FAMILY_RANK = {"TRAIN": 0, "METRO": 1, "TRAM_TRAIN": 2, "TRAM": 3, "SHUTTLE": 4, "BUS": 5, "NIGHT_BUS": 6}   # R-165
 OFFLINE_LIMIT = 3                # R-119 : trajets proposés hors connexion
 OFFLINE_HORIZON_S = 12 * 3600    # R-119 : départs pris en compte, à partir de maintenant
 OFFLINE_SAME_STOP_S = 120        # R-119 : changement de véhicule au même quai, temps minimal
@@ -47,7 +47,7 @@ def _undominated(journeys: list) -> list:
 
 
 def natural_key(name: str) -> tuple:
-    """Ordre naturel d'un numéro de ligne (R-160) : suites de chiffres comparées par valeur, le reste en minuscules,
+    """Ordre naturel d'un numéro de ligne (R-165) : suites de chiffres comparées par valeur, le reste en minuscules,
     un nombre avant un texte à rang égal (« 133 » < « 1601 » < « A01 PPM » ; « N22 » < « N131 »)."""
     return tuple((0, int(t), "") if t.isdigit() else (1, 0, t.lower()) for t in re.findall(r"\d+|\D+", name))
 
@@ -121,6 +121,11 @@ def distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     sp, sl = math.sin(dp / 2), math.sin(dl / 2)
     a = sp * sp + math.cos(p1) * math.cos(p2) * sl * sl
     return 2 * EARTH_RADIUS_M * math.asin(math.sqrt(a))
+
+
+def is_val(app_type: str, category: str) -> bool:
+    """VAL des aéroports (CDGVAL, Orlyval) : navette (`SHUTTLE`) ferroviaire (`RAIL`), en tête de son aéroport (R-165)."""
+    return app_type == "SHUTTLE" and category == "RAIL"
 
 
 def next_departure(board: "StopBoard") -> float:
@@ -660,21 +665,22 @@ class Timetable:
                    WHERE ps.pickup != 1 ORDER BY ps.pattern_id, ps.seq""").fetchall()
         return self._boardings
 
-    # -- onglet Lignes et fiche ligne (R-160 à R-163) ------------------------------------------------
+    # -- lignes des onglets Plans et Trafic (R-165) et fiche ligne (R-161 à R-163) ----------------------------
     def line_catalogue(self) -> list:
-        """Onglet Lignes (R-160) : pour chaque aéroport, dans l'ordre ROISSY, ORLY, BOURGET, ses lignes
-        actives par famille (train, métro, tram-train, tram, navette, bus, Noctilien), puis par numéro dans l'ordre
+        """Lignes des onglets Plans et Trafic (R-165, D-18) : pour chaque aéroport, dans l'ordre ROISSY, ORLY,
+        BOURGET, ses lignes actives, les VAL d'abord (CDGVAL, Orlyval : navettes ferroviaires, `SHUTTLE` et `RAIL`),
+        puis par famille (train, métro, tram-train, tram, navette, bus, Noctilien), puis par numéro dans l'ordre
         naturel (« 133 » avant « 1601 »), puis ses lignes futures. Une ligne qui dessert plusieurs aéroports
         figure sous chacun."""
         rows = self.con.execute(
-            """SELECT s.sector, l.code, l.app_type, l.state, COALESCE(l.short_name, l.display_name)
+            """SELECT s.sector, l.code, l.app_type, l.state, COALESCE(l.short_name, l.display_name), l.category
                FROM line_sector s JOIN line l ON l.id = s.line_id""").fetchall()
         out = []
         for sector in SECTORS:
             items = [r for r in rows if r[0] == sector]
             if not items:
                 continue
-            items.sort(key=lambda r: (r[3] != "active", FAMILY_RANK[r[2]], natural_key(r[4]), r[1]))
+            items.sort(key=lambda r: (r[3] != "active", not is_val(r[2], r[5]), FAMILY_RANK[r[2]], natural_key(r[4]), r[1]))
             out.append({"sector": sector, "lines": [r[1] for r in items]})
         return out
 
