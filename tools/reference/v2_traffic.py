@@ -3,7 +3,7 @@
 Info trafic, règles cibles de la v2 (spec § 9 : R-80 à R-82, R-85 ; docs/modele-donnees.md § 8).
 
 Source : l'info trafic globale de PRIM (`disruptions_bulk/disruptions/v2`, une seule réponse pour tout le réseau,
-gardée 120 s dans le cache du proxy, R-84). Une réponse contient :
+lue toutes les 2 min et partagée 60 s par le proxy, R-84). Une réponse contient :
 
 - `disruptions` : chaque perturbation (`id`, `applicationPeriods` en heure de Paris, `cause`, `severity`, `title`,
   `message` en HTML, `shortMessage` facultatif, `impactedSections` facultatif) ;

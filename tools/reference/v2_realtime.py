@@ -203,6 +203,7 @@ class Item:
     pattern_id: Optional[int]
     seq: Optional[int]
     source: str                  # "timetable" | "paired" | "added"
+    aimed: Optional[int] = None  # heure prévue par l'exploitant (AimedDepartureTime) d'un passage lu ; retard (R-59)
 
 
 @dataclass
@@ -293,7 +294,7 @@ def merge(events: list, eligible: frozenset, visits: Iterable[Visit], route_id: 
             continue
         if v.cancelled or v.measured:
             items.append(Item(v.time, int(e.epoch), "cancelled" if v.cancelled else "realtime", e.stop_point,
-                              e.destination, e.pattern_id, e.seq, "paired"))
+                              e.destination, e.pattern_id, e.seq, "paired", v.aimed))
         elif key in eligible:
             items.append(Item(int(e.epoch), int(e.epoch), "theoretical", e.stop_point, e.destination,
                               e.pattern_id, e.seq, "paired"))
@@ -306,7 +307,7 @@ def merge(events: list, eligible: frozenset, visits: Iterable[Visit], route_id: 
         if v.departed:
             continue
         items.append(Item(v.time, v.aimed, "cancelled" if v.cancelled else "realtime", v.stop_point,
-                          stop_name(v.destination), None, None, "added"))
+                          stop_name(v.destination), None, None, "added", v.aimed))
 
     items = [i for i in items if visible(i.state, i.epoch, now)]
     items.sort(key=lambda i: (i.epoch, i.stop_point, i.destination, i.state, i.base_epoch or 0))
