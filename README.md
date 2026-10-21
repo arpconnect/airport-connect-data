@@ -16,6 +16,8 @@ Adresses publiques :
 - `https://raw.githubusercontent.com/arpconnect/airport-connect-data/main/published/plans/catalogue.json`
 - la base : l'adresse `file.url` du manifeste, toujours vérifiée par son empreinte `file.sha256_gzip`.
 
+Un relevé temporaire du temps réel (workflow `siri-survey`, jusqu'à la date de fin de `data/siri-survey.json`) publie ses mesures sur la branche `releve-siri` : `summary.md` pour la synthèse, `state.json.gz` pour le détail des courses suivies.
+
 Les traitements (`.github/workflows/`) tournent chaque jour sur GitHub Actions. Ils ne publient que si les contrôles bloquants passent ; sinon, la version précédente reste en ligne.
 
 ## Source et licence des données

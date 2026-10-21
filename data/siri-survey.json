@@ -1,0 +1,10 @@
+{
+  "description": "Relevé du service « Prochains passages » d'IDFM (SIRI Lite) pour calibrer la règle stricte du temps réel (R-159, D-4) : lignes dont les passages étaient classés théoriques le 9 octobre 2026, lignes mixtes et deux lignes témoins, bien couvertes ce jour-là. Deux quais par ligne, un par sens si possible, ceux des aéroports d'abord, toutes les 30 min environ, jusqu'à la date de fin incluse (heure de Paris). Outil : tools/pipeline/siri_survey.py ; traitement : workflow siri-survey du dépôt public.",
+  "until": "2026-11-04",
+  "quais_per_line": 2,
+  "groups": {
+    "cible": ["BUS_4121", "BUS_7720", "BUS_9112", "BUS_9501", "BUS_9518", "BUS_EX93", "BUS_R4"],
+    "mixte": ["BUS_5154", "BUS_703", "BUS_247", "BUS_351", "BUS_9509"],
+    "temoin": ["BUS_350", "T9"]
+  }
+}
