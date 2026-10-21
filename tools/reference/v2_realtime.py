@@ -203,7 +203,7 @@ class Item:
     pattern_id: Optional[int]
     seq: Optional[int]
     source: str                  # "timetable" | "paired" | "added"
-    aimed: Optional[int] = None  # heure prévue par l'exploitant (AimedDepartureTime) d'un passage lu ; retard (R-59)
+    aimed: Optional[int] = None  # heure prévue par l'exploitant (AimedDepartureTime) d'un passage lu ; avance ou retard (R-59)
 
 
 @dataclass
