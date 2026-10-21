@@ -1,0 +1,101 @@
+# Relevé temporaire du service « Prochains passages » d'IDFM (SIRI Lite), pour calibrer la règle stricte du temps
+# réel (spec R-159, D-4) : lignes et date de fin dans data/siri-survey.json, outil tools/pipeline/siri_survey.py.
+# Cron de 30 min (GitHub peut espacer davantage) ; 28 quais au plus par passage, une requête par quai à travers le
+# proxy, 1 s d'écart, série arrêtée au premier 429 (R-83) : environ 1 300 requêtes par jour, pour un quota SIRI de
+# 1 000 000. Sans secret. Après la date de fin, chaque passage s'arrête aussitôt (aucune requête).
+# Publication : branche « releve-siri », un seul commit remplacé à chaque passage (state.json.gz, quais.json,
+# summary.json, summary.md). Un échec de lecture n'échoue pas le traitement : il est compté dans l'état.
+name: siri-survey
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: releve-siri          # un seul passage à la fois : chacun repart de l'état publié par le précédent
+  cancel-in-progress: false
+
+env:
+  PROXY: https://airport-connect-prim-proxy.airportconnect.workers.dev
+  BRANCH: releve-siri
+
+jobs:
+  survey:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Relevé en cours ?
+        id: active
+        run: |
+          active="$(python3 -I tools/pipeline/siri_survey.py active --config data/siri-survey.json)"
+          echo "active=$active" >> "$GITHUB_OUTPUT"
+          [ "$active" = "true" ] || echo "::notice title=Relevé SIRI terminé::Date de fin de data/siri-survey.json dépassée : aucune requête."
+
+      - name: Vérifier l'outil
+        if: steps.active.outputs.active == 'true'
+        run: python3 -I tests/test_siri_survey.py
+
+      - name: Relire l'état publié
+        if: steps.active.outputs.active == 'true'
+        run: |
+          mkdir -p work
+          if git fetch --quiet --depth 1 origin "$BRANCH" 2>/dev/null; then
+            git show "FETCH_HEAD:state.json.gz" > work/state.json.gz 2>/dev/null || rm -f work/state.json.gz
+            git show "FETCH_HEAD:quais.json" > work/quais.json 2>/dev/null || rm -f work/quais.json
+          fi
+          ls -l work
+
+      - name: Choisir les quais (nouvelle base ou nouvelle liste seulement)
+        if: steps.active.outputs.active == 'true'
+        run: |
+          version="$(python3 -I -c 'import json;print(json.load(open("published/timetable/manifest.json"))["version"])')"
+          config="$(sha256sum data/siri-survey.json | cut -d' ' -f1)"
+          known=""
+          if [ -f work/quais.json ]; then
+            known="$(python3 -I -c 'import json;d=json.load(open("work/quais.json"));print(d.get("base_version", "") + "/" + d.get("config_sha256", ""))')"
+          fi
+          if [ "$version/$config" != "$known" ]; then
+            url="$(python3 -I -c 'import json;print(json.load(open("published/timetable/manifest.json"))["file"]["url"])')"
+            sha="$(python3 -I -c 'import json;print(json.load(open("published/timetable/manifest.json"))["file"]["sha256_gzip"])')"
+            curl --silent --show-error --fail --location --max-time 120 -o work/timetable.sqlite.gz "$url"
+            echo "$sha  work/timetable.sqlite.gz" | sha256sum --check --quiet
+            python3 -I tools/pipeline/siri_survey.py plan --config data/siri-survey.json \
+              --timetable work/timetable.sqlite.gz --base-version "$version" --out work/quais.json
+            python3 -I -c 'import json,sys;p="work/quais.json";d=json.load(open(p));d["config_sha256"]=sys.argv[1];json.dump(d,open(p,"w"),ensure_ascii=False,indent=1)' "$config"
+          fi
+
+      - name: Lire les quais à travers le proxy
+        if: steps.active.outputs.active == 'true'
+        run: python3 -I tools/pipeline/siri_survey.py fetch --quais work/quais.json --proxy "$PROXY" --out-dir work/responses
+
+      - name: Mettre à jour le relevé
+        if: steps.active.outputs.active == 'true'
+        run: |
+          python3 -I tools/pipeline/siri_survey.py update --quais work/quais.json --responses work/responses \
+            --state work/state.json.gz --summary-json work/summary.json --summary-md work/summary.md
+          cat work/summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publier sur la branche « releve-siri »
+        if: steps.active.outputs.active == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir pub
+          cp work/state.json.gz work/quais.json work/summary.json work/summary.md pub/
+          cd pub
+          git init --quiet --initial-branch "$BRANCH"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state.json.gz quais.json summary.json summary.md
+          git commit --quiet -m "Relevé SIRI : passage du $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push --quiet --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:$BRANCH"
