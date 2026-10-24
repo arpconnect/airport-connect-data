@@ -1,0 +1,204 @@
+{
+ "schema": "airport-connect/siri-survey@1",
+ "base_version": "20261024-1081e26c70be",
+ "quais": [
+  {
+   "group": "cible",
+   "line": "BUS_4121",
+   "route_id": "IDFM:C00379",
+   "stop_point": "IDFM:423013",
+   "name": "Aéroport Orly 4"
+  },
+  {
+   "group": "cible",
+   "line": "BUS_4121",
+   "route_id": "IDFM:C00379",
+   "stop_point": "IDFM:472331",
+   "name": "Aéroport Orly 4 - N7"
+  },
+  {
+   "group": "cible",
+   "line": "BUS_7720",
+   "route_id": "IDFM:C00661",
+   "stop_point": "IDFM:13011",
+   "name": "Cité Aéronautique"
+  },
+  {
+   "group": "cible",
+   "line": "BUS_7720",
+   "route_id": "IDFM:C00661",
+   "stop_point": "IDFM:485088",
+   "name": "Roissypôle Aéroport CDG T3"
+  },
+  {
+   "group": "cible",
+   "line": "BUS_9112",
+   "route_id": "IDFM:C02725",
+   "stop_point": "IDFM:480397",
+   "name": "Aéroport Orly 1-2-3 - C4"
+  },
+  {
+   "group": "cible",
+   "line": "BUS_9112",
+   "route_id": "IDFM:C02725",
+   "stop_point": "IDFM:2887",
+   "name": "Belle Étoile"
+  },
+  {
+   "group": "cible",
+   "line": "BUS_9501",
+   "route_id": "IDFM:C00264",
+   "stop_point": "IDFM:493072",
+   "name": "Gare de Roissypôle - Aéroport CDG 1 (Terminal 3) (D4)"
+  },
+  {
+   "group": "cible",
+   "line": "BUS_9501",
+   "route_id": "IDFM:C00264",
+   "stop_point": "IDFM:38419",
+   "name": "Treize Saules"
+  },
+  {
+   "group": "cible",
+   "line": "BUS_9518",
+   "route_id": "IDFM:C01472",
+   "stop_point": "IDFM:477719",
+   "name": "Gare de Roissypôle - Aéroport CDG1 (F2)"
+  },
+  {
+   "group": "cible",
+   "line": "BUS_9518",
+   "route_id": "IDFM:C01472",
+   "stop_point": "IDFM:35037",
+   "name": "Frépillon"
+  },
+  {
+   "group": "cible",
+   "line": "BUS_EX93",
+   "route_id": "IDFM:C00223",
+   "stop_point": "IDFM:14648",
+   "name": "Tour de Contrôle"
+  },
+  {
+   "group": "cible",
+   "line": "BUS_EX93",
+   "route_id": "IDFM:C00223",
+   "stop_point": "IDFM:38074",
+   "name": "Le Verger"
+  },
+  {
+   "group": "cible",
+   "line": "BUS_R4",
+   "route_id": "IDFM:C00231",
+   "stop_point": "IDFM:495783",
+   "name": "Gare de Roissypôle - Aéroport CDG 1"
+  },
+  {
+   "group": "cible",
+   "line": "BUS_R4",
+   "route_id": "IDFM:C00231",
+   "stop_point": "IDFM:423527",
+   "name": "Parc de Louvres"
+  },
+  {
+   "group": "mixte",
+   "line": "BUS_5154",
+   "route_id": "IDFM:C01571",
+   "stop_point": "IDFM:413250",
+   "name": "Aéroport Orly 4"
+  },
+  {
+   "group": "mixte",
+   "line": "BUS_5154",
+   "route_id": "IDFM:C01571",
+   "stop_point": "IDFM:488234",
+   "name": "Aéroport d'Orly 1-2-3 - A3"
+  },
+  {
+   "group": "mixte",
+   "line": "BUS_703",
+   "route_id": "IDFM:C01550",
+   "stop_point": "IDFM:462939",
+   "name": "Le Bourget RER"
+  },
+  {
+   "group": "mixte",
+   "line": "BUS_703",
+   "route_id": "IDFM:C01550",
+   "stop_point": "IDFM:427652",
+   "name": "Jacques Joly"
+  },
+  {
+   "group": "mixte",
+   "line": "BUS_247",
+   "route_id": "IDFM:C01695",
+   "stop_point": "IDFM:18811",
+   "name": "Anatole Sigonneau - Centre d'Affaires"
+  },
+  {
+   "group": "mixte",
+   "line": "BUS_247",
+   "route_id": "IDFM:C01695",
+   "stop_point": "IDFM:18827",
+   "name": "Altrincham"
+  },
+  {
+   "group": "mixte",
+   "line": "BUS_351",
+   "route_id": "IDFM:C01299",
+   "stop_point": "IDFM:34198",
+   "name": "CDG T1 - RoissyBus (Niveau Arrivées - Porte 32)"
+  },
+  {
+   "group": "mixte",
+   "line": "BUS_351",
+   "route_id": "IDFM:C01299",
+   "stop_point": "IDFM:497134",
+   "name": "Gare de Roissypôle - Aéroport CDG1 (E3)"
+  },
+  {
+   "group": "mixte",
+   "line": "BUS_9509",
+   "route_id": "IDFM:C02832",
+   "stop_point": "IDFM:494600",
+   "name": "Gare de Roissypôle - Aéroport CDG1 (E2)"
+  },
+  {
+   "group": "mixte",
+   "line": "BUS_9509",
+   "route_id": "IDFM:C02832",
+   "stop_point": "IDFM:14243",
+   "name": "Bois Jacques"
+  },
+  {
+   "group": "temoin",
+   "line": "BUS_350",
+   "route_id": "IDFM:C01298",
+   "stop_point": "IDFM:34204",
+   "name": "Terminal 2A-2C"
+  },
+  {
+   "group": "temoin",
+   "line": "BUS_350",
+   "route_id": "IDFM:C01298",
+   "stop_point": "IDFM:14648",
+   "name": "Tour de Contrôle"
+  },
+  {
+   "group": "temoin",
+   "line": "T9",
+   "route_id": "IDFM:C02317",
+   "stop_point": "IDFM:478973",
+   "name": "Watteau - Rondenay"
+  },
+  {
+   "group": "temoin",
+   "line": "T9",
+   "route_id": "IDFM:C02317",
+   "stop_point": "IDFM:478976",
+   "name": "Musée MAC VAL"
+  }
+ ],
+ "missing": [],
+ "config_sha256": "03f3bb8adb9165fb9945655e98cf41f2d1900c4517449124cad7040eefef0cf8"
+}
