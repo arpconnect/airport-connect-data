@@ -1,0 +1,640 @@
+{
+ "schema": "airport-connect/siri-survey@1",
+ "runs": 290,
+ "first_run": 1792583457,
+ "last_run": 1793475193,
+ "requests": {
+  "ok": 7826,
+  "http_error": 0,
+  "network_error": 4,
+  "rate_limited": 0,
+  "skipped": 0,
+  "error_condition": 0
+ },
+ "lines": {
+  "BUS_247": {
+   "group": "mixte",
+   "observations": 159,
+   "empty_reads": 484,
+   "classes": {
+    "ecart": 0,
+    "recent": 0,
+    "sans_prevue": 159,
+    "ancien": 0,
+    "noreport": 0,
+    "supprime": 0
+   },
+   "measured_share": 1.0,
+   "bands": {
+    "5 h – 9 h": {
+     "observations": 58,
+     "measured_share": 1.0
+    },
+    "9 h – 16 h": {
+     "observations": 17,
+     "measured_share": 1.0
+    },
+    "16 h – 20 h": {
+     "observations": 84,
+     "measured_share": 1.0
+    }
+   },
+   "ancien_ages": {},
+   "journeys": 159,
+   "journeys_measured": 159,
+   "journeys_updated": 0,
+   "journeys_ancien_then_ecart": 0
+  },
+  "BUS_350": {
+   "group": "temoin",
+   "observations": 890,
+   "empty_reads": 287,
+   "classes": {
+    "ecart": 684,
+    "recent": 0,
+    "sans_prevue": 0,
+    "ancien": 119,
+    "noreport": 87,
+    "supprime": 0
+   },
+   "measured_share": 0.769,
+   "bands": {
+    "5 h – 9 h": {
+     "observations": 133,
+     "measured_share": 0.857
+    },
+    "9 h – 16 h": {
+     "observations": 375,
+     "measured_share": 0.725
+    },
+    "16 h – 20 h": {
+     "observations": 267,
+     "measured_share": 0.764
+    },
+    "20 h – 24 h": {
+     "observations": 115,
+     "measured_share": 0.817
+    }
+   },
+   "ancien_ages": {
+    "≤ 30 min": 1,
+    "> 120 min": 118
+   },
+   "journeys": 667,
+   "journeys_measured": 554,
+   "journeys_updated": 183,
+   "journeys_ancien_then_ecart": 23
+  },
+  "BUS_351": {
+   "group": "mixte",
+   "observations": 794,
+   "empty_reads": 217,
+   "classes": {
+    "ecart": 454,
+    "recent": 36,
+    "sans_prevue": 0,
+    "ancien": 268,
+    "noreport": 36,
+    "supprime": 0
+   },
+   "measured_share": 0.617,
+   "bands": {
+    "5 h – 9 h": {
+     "observations": 136,
+     "measured_share": 0.662
+    },
+    "9 h – 16 h": {
+     "observations": 365,
+     "measured_share": 0.551
+    },
+    "16 h – 20 h": {
+     "observations": 219,
+     "measured_share": 0.708
+    },
+    "20 h – 24 h": {
+     "observations": 74,
+     "measured_share": 0.595
+    }
+   },
+   "ancien_ages": {
+    "≤ 20 min": 37,
+    "≤ 30 min": 31,
+    "≤ 60 min": 58,
+    "≤ 120 min": 26,
+    "> 120 min": 116
+   },
+   "journeys": 547,
+   "journeys_measured": 395,
+   "journeys_updated": 184,
+   "journeys_ancien_then_ecart": 55
+  },
+  "BUS_4121": {
+   "group": "cible",
+   "observations": 1227,
+   "empty_reads": 219,
+   "classes": {
+    "ecart": 166,
+    "recent": 30,
+    "sans_prevue": 0,
+    "ancien": 957,
+    "noreport": 56,
+    "supprime": 18
+   },
+   "measured_share": 0.16,
+   "bands": {
+    "0 h – 5 h": {
+     "observations": 195,
+     "measured_share": 0.215
+    },
+    "5 h – 9 h": {
+     "observations": 146,
+     "measured_share": 0.13
+    },
+    "9 h – 16 h": {
+     "observations": 428,
+     "measured_share": 0.147
+    },
+    "16 h – 20 h": {
+     "observations": 281,
+     "measured_share": 0.146
+    },
+    "20 h – 24 h": {
+     "observations": 177,
+     "measured_share": 0.175
+    }
+   },
+   "ancien_ages": {
+    "≤ 20 min": 17,
+    "≤ 30 min": 28,
+    "≤ 60 min": 68,
+    "≤ 120 min": 168,
+    "> 120 min": 676
+   },
+   "journeys": 408,
+   "journeys_measured": 148,
+   "journeys_updated": 202,
+   "journeys_ancien_then_ecart": 99
+  },
+  "BUS_5154": {
+   "group": "mixte",
+   "observations": 2405,
+   "empty_reads": 89,
+   "classes": {
+    "ecart": 216,
+    "recent": 315,
+    "sans_prevue": 0,
+    "ancien": 1860,
+    "noreport": 13,
+    "supprime": 1
+   },
+   "measured_share": 0.221,
+   "bands": {
+    "0 h – 5 h": {
+     "observations": 98,
+     "measured_share": 0.173
+    },
+    "5 h – 9 h": {
+     "observations": 485,
+     "measured_share": 0.19
+    },
+    "9 h – 16 h": {
+     "observations": 862,
+     "measured_share": 0.224
+    },
+    "16 h – 20 h": {
+     "observations": 648,
+     "measured_share": 0.211
+    },
+    "20 h – 24 h": {
+     "observations": 312,
+     "measured_share": 0.295
+    }
+   },
+   "ancien_ages": {
+    "≤ 20 min": 188,
+    "≤ 30 min": 266,
+    "≤ 60 min": 564,
+    "≤ 120 min": 628,
+    "> 120 min": 214
+   },
+   "journeys": 722,
+   "journeys_measured": 389,
+   "journeys_updated": 482,
+   "journeys_ancien_then_ecart": 161
+  },
+  "BUS_703": {
+   "group": "mixte",
+   "observations": 582,
+   "empty_reads": 287,
+   "classes": {
+    "ecart": 83,
+    "recent": 56,
+    "sans_prevue": 0,
+    "ancien": 438,
+    "noreport": 5,
+    "supprime": 0
+   },
+   "measured_share": 0.239,
+   "bands": {
+    "5 h – 9 h": {
+     "observations": 88,
+     "measured_share": 0.159
+    },
+    "9 h – 16 h": {
+     "observations": 307,
+     "measured_share": 0.244
+    },
+    "16 h – 20 h": {
+     "observations": 160,
+     "measured_share": 0.281
+    },
+    "20 h – 24 h": {
+     "observations": 27,
+     "measured_share": 0.185
+    }
+   },
+   "ancien_ages": {
+    "≤ 20 min": 63,
+    "≤ 30 min": 46,
+    "≤ 60 min": 93,
+    "≤ 120 min": 23,
+    "> 120 min": 213
+   },
+   "journeys": 409,
+   "journeys_measured": 134,
+   "journeys_updated": 137,
+   "journeys_ancien_then_ecart": 57
+  },
+  "BUS_7720": {
+   "group": "cible",
+   "observations": 941,
+   "empty_reads": 126,
+   "classes": {
+    "ecart": 361,
+    "recent": 104,
+    "sans_prevue": 0,
+    "ancien": 474,
+    "noreport": 2,
+    "supprime": 0
+   },
+   "measured_share": 0.494,
+   "bands": {
+    "0 h – 5 h": {
+     "observations": 34,
+     "measured_share": 0.088
+    },
+    "5 h – 9 h": {
+     "observations": 152,
+     "measured_share": 0.599
+    },
+    "9 h – 16 h": {
+     "observations": 307,
+     "measured_share": 0.472
+    },
+    "16 h – 20 h": {
+     "observations": 277,
+     "measured_share": 0.505
+    },
+    "20 h – 24 h": {
+     "observations": 171,
+     "measured_share": 0.503
+    }
+   },
+   "ancien_ages": {
+    "≤ 20 min": 121,
+    "≤ 30 min": 80,
+    "≤ 60 min": 177,
+    "≤ 120 min": 27,
+    "> 120 min": 69
+   },
+   "journeys": 701,
+   "journeys_measured": 407,
+   "journeys_updated": 154,
+   "journeys_ancien_then_ecart": 31
+  },
+  "BUS_9112": {
+   "group": "cible",
+   "observations": 3012,
+   "empty_reads": 12,
+   "classes": {
+    "ecart": 242,
+    "recent": 26,
+    "sans_prevue": 3,
+    "ancien": 410,
+    "noreport": 2331,
+    "supprime": 0
+   },
+   "measured_share": 0.09,
+   "bands": {
+    "0 h – 5 h": {
+     "observations": 223,
+     "measured_share": 0.256
+    },
+    "5 h – 9 h": {
+     "observations": 598,
+     "measured_share": 0.112
+    },
+    "9 h – 16 h": {
+     "observations": 898,
+     "measured_share": 0.106
+    },
+    "16 h – 20 h": {
+     "observations": 812,
+     "measured_share": 0.048
+    },
+    "20 h – 24 h": {
+     "observations": 481,
+     "measured_share": 0.027
+    }
+   },
+   "ancien_ages": {
+    "≤ 20 min": 18,
+    "≤ 30 min": 23,
+    "≤ 60 min": 53,
+    "≤ 120 min": 73,
+    "> 120 min": 243
+   },
+   "journeys": 840,
+   "journeys_measured": 150,
+   "journeys_updated": 309,
+   "journeys_ancien_then_ecart": 25
+  },
+  "BUS_9501": {
+   "group": "cible",
+   "observations": 1971,
+   "empty_reads": 196,
+   "classes": {
+    "ecart": 40,
+    "recent": 124,
+    "sans_prevue": 0,
+    "ancien": 993,
+    "noreport": 809,
+    "supprime": 5
+   },
+   "measured_share": 0.083,
+   "bands": {
+    "0 h – 5 h": {
+     "observations": 89,
+     "measured_share": 0.236
+    },
+    "5 h – 9 h": {
+     "observations": 465,
+     "measured_share": 0.09
+    },
+    "9 h – 16 h": {
+     "observations": 823,
+     "measured_share": 0.07
+    },
+    "16 h – 20 h": {
+     "observations": 522,
+     "measured_share": 0.069
+    },
+    "20 h – 24 h": {
+     "observations": 72,
+     "measured_share": 0.097
+    }
+   },
+   "ancien_ages": {
+    "≤ 20 min": 113,
+    "≤ 30 min": 86,
+    "≤ 60 min": 241,
+    "≤ 120 min": 268,
+    "> 120 min": 285
+   },
+   "journeys": 988,
+   "journeys_measured": 146,
+   "journeys_updated": 201,
+   "journeys_ancien_then_ecart": 26
+  },
+  "BUS_9509": {
+   "group": "mixte",
+   "observations": 395,
+   "empty_reads": 397,
+   "classes": {
+    "ecart": 224,
+    "recent": 31,
+    "sans_prevue": 0,
+    "ancien": 136,
+    "noreport": 4,
+    "supprime": 0
+   },
+   "measured_share": 0.646,
+   "bands": {
+    "5 h – 9 h": {
+     "observations": 75,
+     "measured_share": 0.587
+    },
+    "9 h – 16 h": {
+     "observations": 154,
+     "measured_share": 0.662
+    },
+    "16 h – 20 h": {
+     "observations": 129,
+     "measured_share": 0.674
+    },
+    "20 h – 24 h": {
+     "observations": 37,
+     "measured_share": 0.595
+    }
+   },
+   "ancien_ages": {
+    "≤ 20 min": 44,
+    "≤ 30 min": 18,
+    "≤ 60 min": 35,
+    "≤ 120 min": 7,
+    "> 120 min": 32
+   },
+   "journeys": 296,
+   "journeys_measured": 213,
+   "journeys_updated": 76,
+   "journeys_ancien_then_ecart": 22
+  },
+  "BUS_9518": {
+   "group": "cible",
+   "observations": 1572,
+   "empty_reads": 290,
+   "classes": {
+    "ecart": 49,
+    "recent": 52,
+    "sans_prevue": 0,
+    "ancien": 1288,
+    "noreport": 180,
+    "supprime": 3
+   },
+   "measured_share": 0.064,
+   "bands": {
+    "0 h – 5 h": {
+     "observations": 47,
+     "measured_share": 0.0
+    },
+    "5 h – 9 h": {
+     "observations": 292,
+     "measured_share": 0.099
+    },
+    "9 h – 16 h": {
+     "observations": 675,
+     "measured_share": 0.053
+    },
+    "16 h – 20 h": {
+     "observations": 457,
+     "measured_share": 0.059
+    },
+    "20 h – 24 h": {
+     "observations": 101,
+     "measured_share": 0.089
+    }
+   },
+   "ancien_ages": {
+    "≤ 20 min": 25,
+    "≤ 30 min": 51,
+    "≤ 60 min": 191,
+    "≤ 120 min": 370,
+    "> 120 min": 651
+   },
+   "journeys": 668,
+   "journeys_measured": 97,
+   "journeys_updated": 147,
+   "journeys_ancien_then_ecart": 35
+  },
+  "BUS_EX93": {
+   "group": "cible",
+   "observations": 1282,
+   "empty_reads": 258,
+   "classes": {
+    "ecart": 42,
+    "recent": 32,
+    "sans_prevue": 0,
+    "ancien": 713,
+    "noreport": 486,
+    "supprime": 9
+   },
+   "measured_share": 0.058,
+   "bands": {
+    "0 h – 5 h": {
+     "observations": 44,
+     "measured_share": 0.114
+    },
+    "5 h – 9 h": {
+     "observations": 281,
+     "measured_share": 0.032
+    },
+    "9 h – 16 h": {
+     "observations": 497,
+     "measured_share": 0.066
+    },
+    "16 h – 20 h": {
+     "observations": 425,
+     "measured_share": 0.054
+    },
+    "20 h – 24 h": {
+     "observations": 35,
+     "measured_share": 0.114
+    }
+   },
+   "ancien_ages": {
+    "≤ 20 min": 43,
+    "≤ 30 min": 44,
+    "≤ 60 min": 124,
+    "≤ 120 min": 195,
+    "> 120 min": 307
+   },
+   "journeys": 601,
+   "journeys_measured": 70,
+   "journeys_updated": 129,
+   "journeys_ancien_then_ecart": 30
+  },
+  "BUS_R4": {
+   "group": "cible",
+   "observations": 1781,
+   "empty_reads": 243,
+   "classes": {
+    "ecart": 14,
+    "recent": 128,
+    "sans_prevue": 0,
+    "ancien": 921,
+    "noreport": 717,
+    "supprime": 1
+   },
+   "measured_share": 0.08,
+   "bands": {
+    "0 h – 5 h": {
+     "observations": 26,
+     "measured_share": 0.038
+    },
+    "5 h – 9 h": {
+     "observations": 342,
+     "measured_share": 0.047
+    },
+    "9 h – 16 h": {
+     "observations": 825,
+     "measured_share": 0.078
+    },
+    "16 h – 20 h": {
+     "observations": 530,
+     "measured_share": 0.106
+    },
+    "20 h – 24 h": {
+     "observations": 58,
+     "measured_share": 0.086
+    }
+   },
+   "ancien_ages": {
+    "≤ 20 min": 110,
+    "≤ 30 min": 76,
+    "≤ 60 min": 214,
+    "≤ 120 min": 235,
+    "> 120 min": 286
+   },
+   "journeys": 1165,
+   "journeys_measured": 119,
+   "journeys_updated": 140,
+   "journeys_ancien_then_ecart": 10
+  },
+  "T9": {
+   "group": "temoin",
+   "observations": 4941,
+   "empty_reads": 81,
+   "classes": {
+    "ecart": 2034,
+    "recent": 327,
+    "sans_prevue": 10,
+    "ancien": 2194,
+    "noreport": 43,
+    "supprime": 333
+   },
+   "measured_share": 0.48,
+   "bands": {
+    "0 h – 5 h": {
+     "observations": 273,
+     "measured_share": 0.223
+    },
+    "5 h – 9 h": {
+     "observations": 801,
+     "measured_share": 0.446
+    },
+    "9 h – 16 h": {
+     "observations": 1650,
+     "measured_share": 0.492
+    },
+    "16 h – 20 h": {
+     "observations": 1231,
+     "measured_share": 0.553
+    },
+    "20 h – 24 h": {
+     "observations": 986,
+     "measured_share": 0.467
+    }
+   },
+   "ancien_ages": {
+    "≤ 20 min": 400,
+    "≤ 30 min": 414,
+    "≤ 60 min": 987,
+    "≤ 120 min": 393
+   },
+   "journeys": 3364,
+   "journeys_measured": 1952,
+   "journeys_updated": 732,
+   "journeys_ancien_then_ecart": 269
+  }
+ }
+}
