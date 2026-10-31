@@ -17,7 +17,8 @@
     "Mission 1 : quai IDFM:10219 au rang 3, puis IDFM:30000 (zone Z2) et IDFM:20000 (zone Z1, Roissypôle). Mission 2 (courte) : IDFM:10219 au rang 2, puis IDFM:30000 (Rond-Point).",
     "Chaque passage lu est écrit en réponse SIRI (heures ISO 8601 en UTC ; réponse datée de « response », sinon de now) par le vérificateur, puis lu et fusionné : « items » = [heure affichée, état, origine, destination].",
     "Seuils : rattachement à 90 puis 300 s, heure recopiée « mesurée » si enregistrée 10 min au plus avant la réponse, rejet au-delà de 6 h, disjoncteur ouvert 300 s après 3 échecs consécutifs.",
-    "R-55 (D-16 révisée le 16 octobre 2026) : un passage mesuré dont l'heure annoncée est déjà passée à l'heure de la réponse d'IDFM est parti et n'est pas affiché ; sans telle réponse, il reste affiché jusqu'à 59 s après son heure."
+    "R-55 (D-16 révisée le 16 octobre 2026) : un passage mesuré dont l'heure annoncée est déjà passée à l'heure de la réponse d'IDFM est parti et n'est pas affiché ; sans telle réponse, il reste affiché jusqu'à 59 s après son heure.",
+    "Terminus modifié (R-152, 31 octobre 2026, 351 limitée à Gallieni) : un terminus annoncé hors de la base (quai provisoire) n'empêche pas le rattachement par quai et heure ; le terminus affiché est celui d'IDFM (nom du quai de la base, sinon DestinationName) et « planned » donne [heure affichée, terminus du GTFS]."
   ],
   "context": {
     "route_id": "IDFM:C01299",
@@ -983,6 +984,153 @@
       "visits": [],
       "expected": {
         "status": "error"
+      }
+    },
+    {
+      "id": "terminus-modifie-quai-provisoire",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "recorded": 999970,
+          "destination": "STIF:StopPoint:Q:497855:",
+          "destination_name": "Gallieni",
+          "status": "onTime",
+          "aimed": 1000300,
+          "expected": 1000330
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000330,
+            "realtime",
+            "paired",
+            "Gallieni"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0,
+        "planned": [
+          [
+            1000330,
+            "Roissypôle"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "terminus-modifie-quai-de-la-base",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "recorded": 999970,
+          "destination": "STIF:StopPoint:Q:30000:",
+          "destination_name": "Rond-Point",
+          "status": "onTime",
+          "aimed": 1000900,
+          "expected": 1000900
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000300,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "realtime",
+            "paired",
+            "Rond-Point"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0,
+        "planned": [
+          [
+            1000900,
+            "Roissypôle"
+          ]
+        ]
+      }
+    },
+    {
+      "id": "terminus-inchange-nom-ecrit-autrement",
+      "visits": [
+        {
+          "monitoring": "STIF:StopPoint:Q:10219:",
+          "line": "STIF:Line::C01299:",
+          "recorded": 999970,
+          "destination": "STIF:StopPoint:Q:497856:",
+          "destination_name": "ROISSYPOLE",
+          "status": "onTime",
+          "aimed": 1000300,
+          "expected": 1000360
+        }
+      ],
+      "expected": {
+        "items": [
+          [
+            1000360,
+            "realtime",
+            "paired",
+            "Roissypôle"
+          ],
+          [
+            1000600,
+            "theoretical",
+            "timetable",
+            "Rond-Point"
+          ],
+          [
+            1000900,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ],
+          [
+            1001500,
+            "theoretical",
+            "timetable",
+            "Roissypôle"
+          ]
+        ],
+        "rejected": 0,
+        "unplaced": 0
       }
     }
   ],

@@ -17,6 +17,7 @@ tests/rules-v2/realtime_merge.json et par les réponses réelles de PRIM du 9 oc
 from __future__ import annotations
 
 import json
+import unicodedata
 import re
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -93,6 +94,15 @@ def _value(obj) -> Optional[str]:
     return None
 
 
+def _first_value(obj) -> Optional[str]:
+    """Texte SIRI Lite : {"value": …} ou liste de tels objets (DestinationName) ; le premier non vide, sans espaces."""
+    for o in (obj if isinstance(obj, list) else [obj]):
+        v = _value(o)
+        if v and v.strip():
+            return v.strip()
+    return None
+
+
 # -- lecture d'une réponse (R-151, R-154, R-51) ------------------------------------------------------
 @dataclass(frozen=True)
 class Visit:
@@ -106,6 +116,7 @@ class Visit:
     cancelled: bool
     measured: bool               # R-51 : heure réellement mesurée (temps réel)
     departed: bool = False       # R-55 : mesuré, heure annoncée déjà passée à l'heure de la réponse d'IDFM : parti
+    destination_name: Optional[str] = None  # DestinationName : nom du terminus annoncé (R-152, terminus modifié)
 
     @property
     def time(self) -> int:
@@ -181,7 +192,8 @@ def parse_stop_monitoring(text: Optional[str], requested_stop: str, now: int) ->
                          or (recorded is not None and reference - recorded <= RECORDED_FRESH_S)))
         departed = measured and expected < reference
         visits.append(Visit(line, requested_stop, stop_id_of_ref(_value(mvj.get("DestinationRef"))),
-                            aimed, expected, status, recorded, cancelled, measured, departed))
+                            aimed, expected, status, recorded, cancelled, measured, departed,
+                            _first_value(mvj.get("DestinationName"))))
     best = {}
     for v in visits:
         key = (v.line, v.destination, v.aimed if v.aimed is not None else v.expected)
@@ -193,6 +205,24 @@ def parse_stop_monitoring(text: Optional[str], requested_stop: str, now: int) ->
 
 
 # -- fusion (R-152, R-158) ----------------------------------------------------------------------------
+def same_place_name(a: str, b: str) -> bool:
+    """Deux noms d'arrêt identiques à la casse, aux accents, aux espaces et à la ponctuation près."""
+    def norm(s: str) -> str:
+        s = unicodedata.normalize("NFKD", s)
+        return "".join(c for c in s.lower() if c.isalnum())
+    return norm(a) == norm(b)
+
+
+def announced_destination(v, planned: str, known, stop_name) -> tuple:
+    """Terminus affiché d'un passage rattaché et terminus du GTFS s'il diffère (sinon None) : le quai annoncé par IDFM
+    quand il est dans la base (son nom GTFS), sinon le DestinationName de la réponse ; à défaut, celui du GTFS."""
+    if v.destination is None:
+        return planned, None
+    name = stop_name(v.destination) if known(v.destination) else v.destination_name
+    if not name or same_place_name(name, planned):
+        return planned, None
+    return name, planned
+
 @dataclass(frozen=True)
 class Item:
     epoch: int                   # heure affichée
@@ -204,6 +234,7 @@ class Item:
     seq: Optional[int]
     source: str                  # "timetable" | "paired" | "added"
     aimed: Optional[int] = None  # heure prévue par l'exploitant (AimedDepartureTime) d'un passage lu ; avance ou retard (R-59)
+    planned_destination: Optional[str] = None  # terminus du GTFS quand IDFM en annonce un autre (R-152, terminus modifié)
 
 
 @dataclass
@@ -219,20 +250,26 @@ def visible(state: str, epoch: int, now: int) -> bool:
 
 def merge(events: list, eligible: frozenset, visits: Iterable[Visit], route_id: str,
           line_patterns_at: Callable[[str], list], serves: Callable[[int, int, str], bool],
-          stop_name: Callable[[str], str], allowed: Optional[frozenset], now: int, limit: int = LIMIT) -> MergeResult:
+          stop_name: Callable[[str], str], allowed: Optional[frozenset], now: int, limit: int = LIMIT,
+          known: Callable[[str], bool] = lambda sp: True) -> MergeResult:
     """Fusion des passages théoriques d'un tableau et des passages lus pour ses quais.
 
     events : passages théoriques candidats (objets à attributs epoch, stop_point, pattern_id, seq, destination,
     headsign), tous jours de service consultés confondus ; eligible : clés (stop_point, epoch, headsign) de ceux que
     la base afficherait (bloc de service retenu, R-56) ; line_patterns_at(quai) : couples (mission, rang) de la ligne
     où l'on peut monter à ce quai ; serves(mission, rang, quai) : la mission dessert-elle ensuite la zone d'arrêt de
-    ce quai ; allowed : couples (mission, rang) du tableau, ou None pour toutes les missions de la ligne.
+    ce quai ; allowed : couples (mission, rang) du tableau, ou None pour toutes les missions de la ligne ; known(quai) :
+    le quai est-il dans la base.
 
     Un passage lu est « placé » si son terminus est connu et que toutes les missions de la ligne qui y mènent depuis
     ce quai appartiennent au tableau (sinon il pourrait appartenir à une autre carte : rien n'est deviné, R-150).
     1. Un passage lu avec une heure prévue est rattaché au passage théorique du même quai dont l'heure du GTFS est à
        90 s au plus, et dont la mission mène à son terminus ; puis, pour ceux qui restent, à 300 s au plus. Au plus
-       proche d'abord, chacun une seule fois.
+       proche d'abord, chacun une seule fois. Un terminus absent de la base (quai provisoire d'une déviation : la 351
+       limitée à Gallieni, 31 octobre 2026) ne peut être vérifié : le rattachement se fait alors sur le quai et l'heure.
+       Terminus modifié : quand IDFM annonce pour un passage rattaché un autre terminus que celui du GTFS (nom du quai
+       de la base, sinon DestinationName), c'est lui qui est affiché, et celui du GTFS est gardé dans
+       planned_destination.
     2. Un passage lu sans heure prévue (heure annoncée seule, réseau RATP), mesuré ou supprimé et placé, fait foi
        pour son terminus : à ce quai, les passages théoriques non rattachés qui mènent à ce terminus, jusqu'à la
        dernière heure annoncée pour lui, sont retirés.
@@ -264,7 +301,8 @@ def merge(events: list, eligible: frozenset, visits: Iterable[Visit], route_id: 
                 if ei in pairs or e.stop_point != v.stop_point:
                     continue
                 d = abs(int(e.epoch) - v.aimed)
-                if d <= tolerance and (v.destination is None or serves(e.pattern_id, e.seq, v.destination)):
+                if d <= tolerance and (v.destination is None or not known(v.destination)
+                                       or serves(e.pattern_id, e.seq, v.destination)):
                     cand.append((d, vi, ei))
         for d, vi, ei in sorted(cand):
             if vi in used or ei in pairs:
@@ -292,12 +330,13 @@ def merge(events: list, eligible: frozenset, visits: Iterable[Visit], route_id: 
             continue
         if v.departed:
             continue
+        dest, planned = announced_destination(v, e.destination, known, stop_name)
         if v.cancelled or v.measured:
             items.append(Item(v.time, int(e.epoch), "cancelled" if v.cancelled else "realtime", e.stop_point,
-                              e.destination, e.pattern_id, e.seq, "paired", v.aimed))
+                              dest, e.pattern_id, e.seq, "paired", v.aimed, planned))
         elif key in eligible:
-            items.append(Item(int(e.epoch), int(e.epoch), "theoretical", e.stop_point, e.destination,
-                              e.pattern_id, e.seq, "paired"))
+            items.append(Item(int(e.epoch), int(e.epoch), "theoretical", e.stop_point, dest,
+                              e.pattern_id, e.seq, "paired", None, planned))
     for vi, v in enumerate(vs):
         if vi in used:
             continue
@@ -340,10 +379,11 @@ def siri_document(visits: list, now: int, error: bool = False) -> str:
                               ("arrival", "ExpectedArrivalTime")):
                 if key in v:
                     call[name] = iso(v[key])
+            mvj = {"LineRef": {"value": v["line"]}, "DestinationRef": {"value": v["destination"]}, "MonitoredCall": call}
+            if "destination_name" in v:
+                mvj["DestinationName"] = [{"value": v["destination_name"]}]
             out.append({"RecordedAtTime": iso(v["recorded"]), "MonitoringRef": {"value": v["monitoring"]},
-                        "MonitoredVehicleJourney": {"LineRef": {"value": v["line"]},
-                                                    "DestinationRef": {"value": v["destination"]},
-                                                    "MonitoredCall": call}})
+                        "MonitoredVehicleJourney": mvj})
         delivery["MonitoredStopVisit"] = out
     return json.dumps({"Siri": {"ServiceDelivery": {"ResponseTimestamp": iso(now), "StopMonitoringDelivery": [delivery]}}})
 
@@ -384,10 +424,15 @@ def run_rule_case(ctx: dict, case: dict) -> dict:
                       and i < len(stops) - 1)
 
     eligible = frozenset((e.stop_point, e.epoch, e.headsign) for e in events)
+    base = set(zones) | {sp for stops in patterns.values() for sp in stops}
     res = merge(events, eligible, reading.visits, ctx["route_id"], at, serves, lambda sp: ctx["names"].get(sp, sp),
-                allowed, now)
-    return {"items": [[i.epoch, i.state, i.source, i.destination] for i in res.items],
-            "rejected": reading.rejected, "unplaced": res.unplaced}
+                allowed, now, known=lambda sp: sp in base)
+    out = {"items": [[i.epoch, i.state, i.source, i.destination] for i in res.items],
+           "rejected": reading.rejected, "unplaced": res.unplaced}
+    planned = [[i.epoch, i.planned_destination] for i in res.items if i.planned_destination is not None]
+    if planned:  # terminus modifié : terminus du GTFS des passages affichés avec celui d'IDFM
+        out["planned"] = planned
+    return out
 
 
 # -- disjoncteur (R-155) ------------------------------------------------------------------------------
