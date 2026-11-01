@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import sys
 from datetime import date, datetime
 from pathlib import Path
@@ -393,6 +394,7 @@ def android_resources() -> None:
     app_plans()
     app_settings()
     app_tickets()
+    app_simulation()
 
 
 # Points à compléter avant la publication (affichés sans faire échouer la vérification).
@@ -469,6 +471,41 @@ def app_tickets() -> None:
     if date.fromisoformat(doc["valid_from"]).year < date.today().year:
         notes.append(f"tarifs de l'onglet Titres en vigueur depuis le {doc['valid_from']} : à revoir pour {date.today().year}"
                      " (app/src/main/assets/tickets/fares.json)")
+
+
+def app_simulation() -> None:
+    """Lignes simulées (spec § 14, R-131 à R-134) : fichier cohérent, lignes futures du référentiel, sources datées ;
+    rappel une fois la mise en service annoncée passée (la ligne doit alors arriver dans le GTFS)."""
+    doc = json.loads((ROOT / "app/src/main/assets/simulation/lines.json").read_text(encoding="utf-8"))
+    lines = {l["id"]: l for l in json.loads((ROOT / "data" / "lines.json").read_text(encoding="utf-8"))["lines"]}
+    f = "app (simulation)"
+    check(f, "schéma", doc["schema"], "airport-connect/simulation@1")
+    check(f, "relevé daté", _iso_required(doc["checked_on"]), True)
+    hhmm = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
+    for ln in doc["lines"]:
+        lid = ln["id"]
+        check(f, f"{lid} : ligne future du référentiel", lines.get(lid, {}).get("state"), "future")
+        check(f, f"{lid} : sources https datées", bool(ln["sources"]) and all(
+            s["url"].startswith("https://") and _iso_required(s["checked_on"]) for s in ln["sources"]), True)
+        check(f, f"{lid} : tracé par défaut connu", ln["default_phase"] in [p["id"] for p in ln["phases"]], True)
+        for ph in ln["phases"]:
+            pid = f"{lid}/{ph['id']}"
+            check(f, f"{pid} : une durée par interstation", len(ph["runs"]), len(ph["stations"]) - 1)
+            check(f, f"{pid} : durées positives", all(isinstance(r, int) and r > 0 for r in ph["runs"]), True)
+            check(f, f"{pid} : heures HH:MM", all(hhmm.match(t) for t in ph["first"] + ph["last"]), True)
+            check(f, f"{pid} : deux sens", (len(ph["first"]), len(ph["last"])), (2, 2))
+            check(f, f"{pid} : intervalle par défaut en dernier",
+                  [k for k in ("days", "from", "to") if k in ph["headways"][-1]], [])
+            check(f, f"{pid} : mise en service AAAA, AAAA-MM ou AAAA-MM-JJ",
+                  bool(re.match(r"^\d{4}(-\d{2}(-\d{2})?)?$", ph["opening"])), True)
+            check(f, f"{pid} : gares d'ancrage IDFM", all(st.get("stop_area") is None or st["stop_area"].startswith("IDFM:")
+                                                           for st in ph["stations"]), True)
+            opening = ph["opening"]
+            end = (date.fromisoformat(opening) if len(opening) == 10 else
+                   date(int(opening[:4]), int(opening[5:7]), 28) if len(opening) == 7 else date(int(opening), 12, 31))
+            if end < date.today():
+                notes.append(f"{pid} : mise en service annoncée ({opening}) passée, vérifier l'arrivée de la ligne dans le GTFS"
+                             " et revoir app/src/main/assets/simulation/lines.json")
 
 
 def app_plans() -> None:
