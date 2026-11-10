@@ -1,0 +1,19 @@
+{
+  "description": "Relevé d'exactitude du temps réel (R-159) : annonces du service « Prochains passages » d'IDFM lues toutes les 30 s pendant 30 min, toutes les deux heures environ, sur deux quais par ligne (un par sens si possible, ceux des aéroports d'abord), jusqu'à la date de fin incluse (heure de Paris). Lignes : les modes ferrés des aéroports et quatre lignes de bus bien suivies. Outil : tools/pipeline/siri_accuracy.py ; traitement : workflow siri-accuracy du dépôt public.",
+  "until": "2026-11-24",
+  "quais_per_line": 2,
+  "groups": {
+    "ferre": [
+      "RER_B",
+      "METRO_14",
+      "ORLYVAL",
+      "T7",
+      "T9"
+    ],
+    "bus": [
+      "BUS_350",
+      "BUS_351",
+      "BUS_183"
+    ]
+  }
+}

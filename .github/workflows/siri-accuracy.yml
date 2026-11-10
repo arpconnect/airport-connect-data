@@ -1,0 +1,103 @@
+# Relevé temporaire d'exactitude du temps réel (spec R-159) : ce que le service « Prochains passages » d'IDFM
+# annonçait 10, 5, 3, 2 et 1 min avant un départ, comparé à la dernière annonce avant que le véhicule quitte le quai ;
+# lignes et date de fin dans data/siri-accuracy.json, outil tools/pipeline/siri_accuracy.py.
+# Toutes les deux heures environ (GitHub peut espacer davantage), une veille de 30 min : 16 quais lus toutes les 30 s à
+# travers le proxy, comme l'application, soit 960 requêtes par veille et 11 520 par jour au plus (réponses partagées
+# 25 s par le proxy, R-84) ; veille arrêtée au premier 429 (R-83). Sans secret. Après la date de fin, aucune requête.
+# Publication : branche « releve-exactitude », un seul commit remplacé à chaque veille (state.json.gz, quais.json,
+# summary.json, summary.md).
+name: siri-accuracy
+
+on:
+  schedule:
+    - cron: "23 */2 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: releve-exactitude    # une seule veille à la fois : chacune repart de l'état publié par la précédente
+  cancel-in-progress: false
+
+env:
+  PROXY: https://airport-connect-prim-proxy.airportconnect.workers.dev
+  BRANCH: releve-exactitude
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Relevé en cours ?
+        id: active
+        run: |
+          active="$(python3 -I tools/pipeline/siri_accuracy.py active --config data/siri-accuracy.json)"
+          echo "active=$active" >> "$GITHUB_OUTPUT"
+          [ "$active" = "true" ] || echo "::notice title=Relevé d'exactitude terminé::Date de fin de data/siri-accuracy.json dépassée : aucune requête."
+
+      - name: Vérifier l'outil
+        if: steps.active.outputs.active == 'true'
+        run: python3 -I tests/test_siri_accuracy.py
+
+      - name: Relire l'état publié
+        if: steps.active.outputs.active == 'true'
+        run: |
+          mkdir -p work
+          if git fetch --quiet --depth 1 origin "$BRANCH" 2>/dev/null; then
+            git show "FETCH_HEAD:state.json.gz" > work/state.json.gz 2>/dev/null || rm -f work/state.json.gz
+            git show "FETCH_HEAD:quais.json" > work/quais.json 2>/dev/null || rm -f work/quais.json
+          fi
+          ls -l work
+
+      - name: Choisir les quais (nouvelle base ou nouvelle liste seulement)
+        if: steps.active.outputs.active == 'true'
+        run: |
+          version="$(python3 -I -c 'import json;print(json.load(open("published/timetable/manifest.json"))["version"])')"
+          config="$(sha256sum data/siri-accuracy.json | cut -d' ' -f1)"
+          known=""
+          if [ -f work/quais.json ]; then
+            known="$(python3 -I -c 'import json;d=json.load(open("work/quais.json"));print(d.get("base_version", "") + "/" + d.get("config_sha256", ""))')"
+          fi
+          if [ "$version/$config" != "$known" ]; then
+            url="$(python3 -I -c 'import json;print(json.load(open("published/timetable/manifest.json"))["file"]["url"])')"
+            sha="$(python3 -I -c 'import json;print(json.load(open("published/timetable/manifest.json"))["file"]["sha256_gzip"])')"
+            curl --silent --show-error --fail --location --max-time 120 -o work/timetable.sqlite.gz "$url"
+            echo "$sha  work/timetable.sqlite.gz" | sha256sum --check --quiet
+            python3 -I tools/pipeline/siri_accuracy.py plan --config data/siri-accuracy.json \
+              --timetable work/timetable.sqlite.gz --base-version "$version" --out work/quais.json
+            python3 -I -c 'import json,sys;p="work/quais.json";d=json.load(open(p));d["config_sha256"]=sys.argv[1];json.dump(d,open(p,"w"),ensure_ascii=False,indent=1)' "$config"
+          fi
+          python3 -I -c 'import json;[print(q["line"], q["stop_point"], q["name"]) for q in json.load(open("work/quais.json"))["quais"]]'
+
+      - name: Veiller 30 min à travers le proxy
+        if: steps.active.outputs.active == 'true'
+        run: python3 -I tools/pipeline/siri_accuracy.py watch --quais work/quais.json --proxy "$PROXY" --minutes 30 --out work/track.json
+
+      - name: Mettre à jour le relevé
+        if: steps.active.outputs.active == 'true'
+        run: |
+          python3 -I tools/pipeline/siri_accuracy.py update --track work/track.json --state work/state.json.gz \
+            --summary-json work/summary.json --summary-md work/summary.md
+          cat work/summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publier sur la branche « releve-exactitude »
+        if: steps.active.outputs.active == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir pub
+          cp work/state.json.gz work/quais.json work/summary.json work/summary.md pub/
+          cd pub
+          git init --quiet --initial-branch "$BRANCH"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state.json.gz quais.json summary.json summary.md
+          git commit --quiet -m "Relevé d'exactitude : veille du $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push --quiet --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:$BRANCH"
