@@ -7,6 +7,7 @@ disparue (stop_missing, place_stop_missing) : on retrouve le quai qui l'a rempla
     python3 tools/pipeline/inspect_gtfs.py IDFM-gtfs.zip --name "CDG T2" --area IDFM:73699
     python3 tools/pipeline/inspect_gtfs.py IDFM-gtfs.zip --stop IDFM:487507
     python3 tools/pipeline/inspect_gtfs.py IDFM-gtfs.zip --route IDFM:C00231   (nom, couleurs, réseau)
+    python3 tools/pipeline/inspect_gtfs.py IDFM-gtfs.zip --calendar IDFM:C01161   (trajets par jour de service)
 
 Les filtres se cumulent (ET). Bibliothèque standard uniquement.
 """
@@ -38,6 +39,47 @@ def distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     return 2 * r * math.asin(math.sqrt(a))
 
 
+def service_dates(z: zipfile.ZipFile) -> dict:
+    """Jours de circulation de chaque service (calendar.txt, puis ajouts et retraits de calendar_dates.txt)."""
+    from datetime import date, timedelta
+    days = ("monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday")
+    out = defaultdict(set)
+    if "calendar.txt" in z.namelist():
+        for c in rows(z, "calendar.txt"):
+            d, end = (date(int(c[k][:4]), int(c[k][4:6]), int(c[k][6:])) for k in ("start_date", "end_date"))
+            while d <= end:
+                if c[days[d.weekday()]] == "1":
+                    out[c["service_id"]].add(d.strftime("%Y%m%d"))
+                d += timedelta(days=1)
+    if "calendar_dates.txt" in z.namelist():
+        for c in rows(z, "calendar_dates.txt"):
+            (out[c["service_id"]].add if c["exception_type"] == "1" else out[c["service_id"]].discard)(c["date"])
+    return out
+
+
+def calendar(z: zipfile.ZipFile, route_ids: list) -> None:
+    """Trajets de chaque ligne demandée : nombre total, nombre par jour de service, et dernier jour publié."""
+    dates = service_dates(z)
+    feed_last = max((d for ds in dates.values() for d in ds), default="-")
+    per_route = defaultdict(lambda: defaultdict(int))
+    for t in rows(z, "trips.txt"):
+        if t["route_id"] in route_ids:
+            per_route[t["route_id"]][t["service_id"]] += 1
+    for rid in route_ids:
+        services = per_route.get(rid)
+        if not services:
+            print(f"AUCUN TRAJET : {rid}")
+            continue
+        per_day = defaultdict(int)
+        for sid, n in services.items():
+            for d in dates.get(sid, ()):
+                per_day[d] += n
+        total = sum(services.values())
+        print(f"{rid} : {total} trajets, {len(services)} services, du {min(per_day)} au {max(per_day)} "
+              f"(dernier jour du GTFS : {feed_last}) ; au plus {max(per_day.values())} trajets par jour")
+        print("  " + " ".join(f"{d[4:]}:{n}" for d, n in sorted(per_day.items())))
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("gtfs_zip", type=Path)
@@ -47,11 +89,17 @@ def main() -> int:
     ap.add_argument("--area", action="append", default=[], help="parent_station (répétable)")
     ap.add_argument("--stop", action="append", default=[], help="stop_id exact (répétable)")
     ap.add_argument("--route", action="append", default=[], help="route_id exact (répétable) : nom et couleurs")
+    ap.add_argument("--calendar", action="append", default=[],
+                    help="route_id exact (répétable) : trajets par jour de service, quand le générateur bloque sur line_trip_drop")
     args = ap.parse_args()
-    if not (args.near or args.name or args.area or args.stop or args.route):
-        ap.error("au moins un filtre : --near, --name, --area, --stop ou --route")
+    if not (args.near or args.name or args.area or args.stop or args.route or args.calendar):
+        ap.error("au moins un filtre : --near, --name, --area, --stop, --route ou --calendar")
 
     z = zipfile.ZipFile(args.gtfs_zip)
+    if args.calendar:
+        calendar(z, args.calendar)
+        if not (args.near or args.name or args.area or args.stop or args.route):
+            return 0
     if args.route:
         agencies = {a["agency_id"]: a["agency_name"] for a in rows(z, "agency.txt")}
         seen = set()
