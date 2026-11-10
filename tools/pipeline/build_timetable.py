@@ -42,7 +42,7 @@ SCHEMA_PATH = ROOT / "schema" / "timetable.sql"
 SCHEMA_VERSION = int(re.search(r"^PRAGMA user_version = (\d+);$", SCHEMA_PATH.read_text(encoding="utf-8"), re.M).group(1))
 MAX_WINDOW_DAYS = 62            # bits utilisables dans un INTEGER SQLite signé (63) avec marge
 MIN_REMAINING_DAYS_WARN = 14    # alerte si la validité restante est plus courte
-MAX_TRIP_LOSS_RATIO = 0.5       # une ligne qui perd plus de la moitié de ses trajets bloque la publication
+MAX_TRIP_LOSS_RATIO = 0.5       # une ligne qui perd plus de la moitié de ses trajets du jour le plus chargé bloque la publication
 SERVICE_END_WARN_DAYS = 7       # D-5 : une ligne qui s'arrête 7 jours ou plus avant son transporteur annonce sa fin
 FUTURE_NAME = re.compile(r"\(\s*futur(?:e)?\s+([^()]+?)\s*\)", re.I)   # « (future 700) » dans route_long_name
 SOURCE_URL = "https://eu.ftp.opendatasoft.com/stif/GTFS/IDFM-gtfs.zip"
@@ -335,6 +335,7 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
     duplicates = 0
     code_of_route = {l["idfm_route_id"]: l["id"] for l in lines_doc["lines"] if l["idfm_route_id"]}
     trips_per_line = defaultdict(int)
+    trips_per_day = defaultdict(lambda: defaultdict(int))   # trajets de chaque ligne, jour par jour (garde-fou)
     last_day = {}                   # dernier jour de service de chaque ligne (D-5)
     for tid in sorted(trips):
         t = trips[tid]
@@ -357,6 +358,8 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
         seen_trips.add(sig)
         trip_rows.append((pid, svc_id[t["service_id"]], times))
         trips_per_line[code] += 1
+        for d in svc_dates.get(t["service_id"], ()):
+            trips_per_day[code][d] += 1
         if svc_dates.get(t["service_id"]):
             last_day[code] = max(last_day.get(code, base), max(svc_dates[t["service_id"]]))
     # tri déterministe des trajets : mission, service, premier départ
@@ -462,6 +465,8 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
             "services": len(svc_id), "patterns": len(patterns), "trips": len(trip_rows), "stop_times": len(st_rows),
             "duplicate_trips_removed": duplicates, "adjustments_published": published, "transfers": len(transfers),
             "trips_per_line": dict(sorted(trips_per_line.items())),
+            # Trajets du jour le plus chargé de chaque ligne : la mesure du garde-fou (compare_previous).
+            "peak_day_trips_per_line": {code: max(days.values()) for code, days in sorted(trips_per_day.items())},
         },
     }
 
@@ -581,16 +586,23 @@ def apply_adjustments(cur, adjustments: list, line_id: dict, area_id: dict, poin
 
 
 def compare_previous(prev_manifest: dict, counts: dict, report: Report, active: set) -> None:
-    """Une ligne active qui perd plus de la moitié de ses trajets bloque la publication ; une ligne retirée du
-    référentiel (décision produit, par exemple D-3) est seulement signalée."""
-    prev = prev_manifest.get("counts", {}).get("trips_per_line", {})
-    for code, before in prev.items():
+    """Une ligne active dont le jour le plus chargé perd plus de la moitié de ses trajets bloque la publication ; une
+    ligne retirée du référentiel (décision produit, par exemple D-3) est seulement signalée.
+
+    La mesure est le nombre de trajets du jour le plus chargé (`peak_day_trips_per_line`), pas le nombre de trajets de
+    la base : celui-ci chute de moitié sans que le service change quand une période d'horaires (vacances, ancienne
+    grille) sort de la fenêtre publiée. Ce faux positif a bloqué la publication du 3 au 10 novembre 2026 (250, 7708,
+    puis 133, 143 et 249, toutes à service constant). Un manifeste antérieur à cette mesure n'est pas comparé."""
+    prev_counts = prev_manifest.get("counts", {})
+    for code, before in prev_counts.get("trips_per_line", {}).items():
         if code not in active:
             report.warn("line_retired", {"line": code, "before": before})
+    for code, before in prev_counts.get("peak_day_trips_per_line", {}).items():
+        if code not in active:
             continue
-        now = counts["trips_per_line"].get(code, 0)
+        now = counts["peak_day_trips_per_line"].get(code, 0)
         if before and (before - now) / before > MAX_TRIP_LOSS_RATIO:
-            report.error("line_trip_drop", {"line": code, "before": before, "now": now})
+            report.error("line_trip_drop", {"line": code, "peak_day_before": before, "peak_day_now": now})
 
 
 def file_url(base_url: str, version: str, name: str) -> str:
@@ -673,7 +685,9 @@ def main() -> int:
                 "counts": result["counts"],
                 "warnings": report.warnings,
             }
-    report_doc = {"ok": not report.errors, "errors": report.errors, "warnings": report.warnings}
+    # « built » : la base a été construite jusqu'au bout ; les alertes de ligne s'en servent pour refermer une alerte
+    # qui n'a plus lieu d'être (line_alerts.py).
+    report_doc = {"ok": not report.errors, "built": result is not None, "errors": report.errors, "warnings": report.warnings}
     (args.out / "report.json").write_text(json.dumps(report_doc, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     if report.errors or manifest is None:
         if manifest is not None:

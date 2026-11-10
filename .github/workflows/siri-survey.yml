@@ -7,9 +7,9 @@
 # summary.json, summary.md). Un échec de lecture n'échoue pas le traitement : il est compté dans l'état.
 name: siri-survey
 
+# Campagne terminée le 4 novembre 2026 : la planification est retirée le 10 novembre 2026 (les passages ne faisaient
+# plus aucune requête, mais occupaient un traitement toutes les 30 min). Relance à la main seulement.
 on:
-  schedule:
-    - cron: "*/30 * * * *"
   workflow_dispatch: {}
 
 permissions:

@@ -95,6 +95,35 @@ check("API : étiquette et clé dans le corps",
 check("API : lecture des issues ouvertes de l'étiquette", api.calls[0],
       ("GET", "https://api.github.com/repos/arpconnect/airport-connect-data/issues?state=open&labels=alerte-ligne&per_page=100&page=1"))
 
+# 4. Alertes refermées d'elles-mêmes : seulement « fin de service », seulement après une base construite jusqu'au bout
+bodies = [f"x\n\n{la.KEY_PREFIX}line_service_ends:T11 -->", f"x\n\n{la.KEY_PREFIX}line_service_ends:T9 -->",
+          f"x\n\n{la.KEY_PREFIX}route_missing:BUS_350 -->"]
+api = FakeApi(bodies)
+closed = la.resolve(got, [{"built": True, "errors": [], "warnings": []}], la.GitHub("o/r", "jeton", opener=api))
+check("refermée : la fin de service du T11 n'est plus signalée (celle du T9 l'est encore, route_missing reste)", closed,
+      ["line_service_ends:T11"])
+check("refermée : un commentaire puis la fermeture de l'issue n° 1", [(m, u.rsplit("/issues/", 1)[1]) for m, u in api.calls[1:]],
+      [("POST", "1/comments"), ("PATCH", "1")])
+check("refermée : état « closed »", api.created[-1].get("state"), "closed")
+api = FakeApi(bodies)
+check("non refermée sans base construite jusqu'au bout",
+      la.resolve([], [{"built": False, "errors": [], "warnings": []}], la.GitHub("o/r", "jeton", opener=api)), [])
+check("non refermée : aucun appel", api.calls, [])
+
+# 5. Panne de la chaîne : une issue au premier échec, refermée au premier succès
+api = FakeApi([])
+gh = la.GitHub("o/r", "jeton", opener=api)
+check("panne : issue ouverte au premier échec", la.pipeline_status("timetable", "failure", "https://run/1", gh), "opened")
+check("panne : titre et clé", (api.created[0]["title"], f"{la.KEY_PREFIX}pipeline_failure:timetable -->" in api.created[0]["body"]),
+      ("Publication des horaires en panne", True))
+api = FakeApi([f"x\n\n{la.KEY_PREFIX}pipeline_failure:timetable -->"])
+gh = la.GitHub("o/r", "jeton", opener=api)
+check("panne : pas de doublon tant que l'issue est ouverte", la.pipeline_status("timetable", "failure", "", gh), "unchanged")
+check("panne : l'échec des plans a sa propre issue", la.pipeline_status("plans", "failure", "", gh), "opened")
+check("panne : refermée au premier succès", la.pipeline_status("timetable", "success", "https://run/2", gh), "closed")
+check("panne : un succès sans issue ouverte ne fait rien", la.pipeline_status("plans", "success", "", la.GitHub("o/r", "jeton", opener=FakeApi([]))), "unchanged")
+check("panne : un traitement annulé ne change rien", la.pipeline_status("timetable", "cancelled", "", gh), "unchanged")
+
 for f in failures:
     print("ÉCHEC", f)
 print(f"{passed} contrôles conformes, {len(failures)} échec(s)")

@@ -86,3 +86,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: python3 -I tools/pipeline/line_alerts.py --report dist-plans/report.json --repo "${{ github.repository }}"
+
+      - name: Signaler une panne de la chaîne
+        # Une issue au premier échec, refermée au premier succès (line_alerts.py) : GitHub prévient par courriel.
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 -I tools/pipeline/line_alerts.py --pipeline plans --status "${{ job.status }}" \
+            --repo "${{ github.repository }}" \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"

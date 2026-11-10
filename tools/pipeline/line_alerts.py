@@ -17,6 +17,14 @@ Motifs lus dans les rapports des traitements quotidiens :
   - `line_service_ends` : la ligne s'arrête 7 jours ou plus avant les autres lignes de son transporteur ;
 - catalogue des plans (`fetch_plans.py`) : `line_name_differs`, le référentiel IDFM nomme la ligne autrement.
 
+Une alerte `line_service_ends` se referme d'elle-même, avec un commentaire, dès qu'une base construite jusqu'au bout
+ne la signale plus (le transporteur a publié la suite des horaires) ; les autres motifs demandent une décision et
+restent ouverts jusqu'à ce qu'une personne les ferme.
+
+Panne de la chaîne (10 novembre 2026) : `--pipeline NOM --status failure|success [--run-url URL]`, dernière étape de
+chaque traitement quotidien, ouvre une issue « Publication en panne » au premier échec (une seule tant qu'elle reste
+ouverte) et la referme au premier succès. Dix jours de publication bloquée étaient passés inaperçus.
+
 Sans `--repo` ou avec `--dry-run`, les alertes sont seulement affichées. Le jeton vient de `GITHUB_TOKEN`
 (droit `issues: write`). Bibliothèque standard uniquement.
 """
@@ -108,17 +116,25 @@ class GitHub:
         with self.opener(req, timeout=30) as r:
             return json.loads(r.read().decode("utf-8") or "null")
 
-    def open_keys(self) -> set:
-        keys, page = set(), 1
+    def open_issues(self) -> dict:
+        """Clé d'alerte → numéro de l'issue ouverte."""
+        keys, page = {}, 1
         while True:
             items = self._call("GET", f"/repos/{self.repo}/issues?state=open&labels={LABEL}&per_page=100&page={page}")
             for it in items:
                 body = it.get("body") or ""
                 if KEY_PREFIX in body:
-                    keys.add(body.split(KEY_PREFIX, 1)[1].split(" -->", 1)[0].strip())
+                    keys[body.split(KEY_PREFIX, 1)[1].split(" -->", 1)[0].strip()] = it["number"]
             if len(items) < 100:
                 return keys
             page += 1
+
+    def open_keys(self) -> set:
+        return set(self.open_issues())
+
+    def close(self, number: int, comment: str) -> None:
+        self._call("POST", f"/repos/{self.repo}/issues/{number}/comments", {"body": comment})
+        self._call("PATCH", f"/repos/{self.repo}/issues/{number}", {"state": "closed", "state_reason": "completed"})
 
     def create(self, a: dict) -> int:
         body = f"{a['body']}\n\n{KEY_PREFIX}{a['key']} -->"
@@ -137,31 +153,89 @@ def publish(found: list, gh: GitHub) -> list:
     return opened
 
 
+PIPELINE_TITLES = {"timetable": "Publication des horaires en panne", "plans": "Publication des plans en panne"}
+
+
+def pipeline_status(name: str, status: str, run_url: str, gh: GitHub) -> str:
+    """Ouvre l'issue de panne du traitement [name] à son premier échec, la referme à son premier succès ; rend
+    « opened », « closed » ou « unchanged ». Un traitement annulé ne change rien."""
+    key = f"pipeline_failure:{name}"
+    number = gh.open_issues().get(key)
+    if status == "failure" and number is None:
+        title = PIPELINE_TITLES.get(name, f"Traitement {name} en panne")
+        body = (f"Le traitement quotidien « {name} » a échoué : rien n'est publié tant qu'il échoue, et la base "
+                f"d'horaires publiée n'est valable qu'une trentaine de jours.\n\nPremier échec : {run_url or 'voir Actions'}\n\n"
+                "Cette alerte se referme d'elle-même au premier succès.")
+        gh.create({"title": title, "body": body, "key": key})
+        return "opened"
+    if status == "success" and number is not None:
+        gh.close(number, f"Le traitement « {name} » a de nouveau réussi : {run_url or 'voir Actions'}. Alerte refermée automatiquement.")
+        return "closed"
+    return "unchanged"
+
+
+AUTO_CLOSE = ("line_service_ends:",)
+CLOSE_COMMENT = ("La base d'horaires du jour ne signale plus cette fin de service : le transporteur a publié la suite "
+                 "des horaires de la ligne. Alerte refermée automatiquement.")
+
+
+def resolve(found: list, reports: list, gh: GitHub) -> list:
+    """Referme les alertes qui se résolvent d'elles-mêmes (AUTO_CLOSE) et que plus aucun rapport ne signale, à
+    condition qu'une base ait été construite jusqu'au bout (« built ») : sans elle, on ne sait rien. Rend les clés
+    refermées."""
+    if not any(r.get("built") for r in reports):
+        return []
+    current = {a["key"] for a in found}
+    closed = []
+    for key, number in sorted(gh.open_issues().items()):
+        if key.startswith(AUTO_CLOSE) and key not in current:
+            gh.close(number, CLOSE_COMMENT)
+            closed.append(key)
+    return closed
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--report", action="append", type=Path, default=[])
     ap.add_argument("--repo")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--pipeline", help="nom du traitement dont on signale l'état (timetable, plans)")
+    ap.add_argument("--status", choices=("success", "failure", "cancelled", "skipped"))
+    ap.add_argument("--run-url", default="")
     args = ap.parse_args()
+    if args.pipeline:
+        token = os.environ.get("GITHUB_TOKEN")
+        if args.dry_run or not args.repo or not token:
+            print(f"traitement {args.pipeline} : {args.status} (affichage seulement)")
+            return 0
+        try:
+            print(f"traitement {args.pipeline} : {args.status}, alerte {pipeline_status(args.pipeline, args.status, args.run_url, GitHub(args.repo, token))}")
+        except (urllib.error.URLError, OSError, ValueError) as e:
+            print(f"État du traitement non signalé : {e}", file=sys.stderr)
+        return 0
     reports = [json.loads(p.read_text(encoding="utf-8")) for p in args.report if p.exists()]
     found = alerts(reports)
     for a in found:
         print(f"alerte {a['key']} : {a['title']}")
-    if not found or args.dry_run or not args.repo:
-        print(f"{len(found)} alerte(s) de ligne{'' if args.repo and not args.dry_run else ' (affichage seulement)'}")
+    if args.dry_run or not args.repo:
+        print(f"{len(found)} alerte(s) de ligne (affichage seulement)")
         return 0
     token = os.environ.get("GITHUB_TOKEN")
     if not token:
         print("GITHUB_TOKEN absent : alertes non publiées", file=sys.stderr)
         return 1
     try:
-        opened = publish(found, GitHub(args.repo, token))
+        gh = GitHub(args.repo, token)
+        opened = publish(found, gh) if found else []
+        closed = resolve(found, reports, gh)
     except (urllib.error.URLError, OSError, ValueError) as e:
         print(f"Alertes non publiées : {e}", file=sys.stderr)
         return 1
     for a in opened:
         print(f"issue #{a['number']} ouverte : {a['title']}")
-    print(f"{len(found)} alerte(s) de ligne, {len(opened)} nouvelle(s) issue(s)")
+    for key in closed:
+        print(f"alerte refermée : {key}")
+    print(f"{len(found)} alerte(s) de ligne, {len(opened)} nouvelle(s) issue(s), {len(closed)} refermée(s)")
     return 0
 
 

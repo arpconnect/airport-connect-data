@@ -35,6 +35,7 @@ jobs:
           python3 -I tests/test_places_pipeline.py
           python3 -I tests/test_offline_router.py
           python3 -I tests/test_line_alerts.py
+          python3 -I tests/test_trip_drop.py
 
       - name: Télécharger le GTFS IDFM
         run: |
@@ -100,14 +101,16 @@ jobs:
       - name: Battement mensuel
         # GitHub suspend les traitements planifiés d'un dépôt public sans activité depuis 60 jours.
         # Un commit au moins par mois, même si rien n'a changé, les garde actifs.
-        if: success()
+        # Même quand la base du jour est refusée (always) : c'est alors que les traitements doivent rester actifs.
+        # Pas de « git pull » avant le commit (il échouait sur le fichier modifié, du 1er au 10 novembre 2026) :
+        # commit_and_push rejoue sur la version distante si la poussée est refusée.
+        if: always()
         run: |
           . tools/pipeline/git_publish.sh
           month="$(date -u +%Y-%m)"
           mkdir -p published
           if [ "$(cat published/heartbeat 2>/dev/null || true)" != "$month" ]; then
             echo "$month" > published/heartbeat
-            git pull --quiet --rebase origin "${{ github.ref_name }}"
             commit_and_push "Battement mensuel $month" published/heartbeat
           fi
 
@@ -116,3 +119,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: python3 -I tools/pipeline/line_alerts.py --report dist/report.json --repo "${{ github.repository }}"
+
+      - name: Signaler une panne de la chaîne
+        # Une issue au premier échec, refermée au premier succès (line_alerts.py) : GitHub prévient par courriel.
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 -I tools/pipeline/line_alerts.py --pipeline timetable --status "${{ job.status }}" \
+            --repo "${{ github.repository }}" \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
