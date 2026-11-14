@@ -1,0 +1,120 @@
+{
+ "schema": "airport-connect/siri-accuracy@1",
+ "base_version": "20261114-5dea9926eccb",
+ "quais": [
+  {
+   "group": "ferre",
+   "line": "RER_B",
+   "route_id": "IDFM:C01743",
+   "stop_point": "IDFM:monomodalStopPlace:43231",
+   "name": "Le Bourget"
+  },
+  {
+   "group": "ferre",
+   "line": "RER_B",
+   "route_id": "IDFM:C01743",
+   "stop_point": "IDFM:monomodalStopPlace:462398",
+   "name": "Aéroport CDG 1 (Terminal 3) - RER"
+  },
+  {
+   "group": "ferre",
+   "line": "METRO_14",
+   "route_id": "IDFM:C01384",
+   "stop_point": "IDFM:490917",
+   "name": "Aéroport d'Orly"
+  },
+  {
+   "group": "ferre",
+   "line": "METRO_14",
+   "route_id": "IDFM:C01384",
+   "stop_point": "IDFM:490833",
+   "name": "Thiais - Orly (Pont de Rungis)"
+  },
+  {
+   "group": "ferre",
+   "line": "ORLYVAL",
+   "route_id": "IDFM:C01388",
+   "stop_point": "IDFM:473827",
+   "name": "Orly 1-2-3"
+  },
+  {
+   "group": "ferre",
+   "line": "ORLYVAL",
+   "route_id": "IDFM:C01388",
+   "stop_point": "IDFM:492974",
+   "name": "Orly 1-2-3"
+  },
+  {
+   "group": "ferre",
+   "line": "T7",
+   "route_id": "IDFM:C01774",
+   "stop_point": "IDFM:29894",
+   "name": "Aéroport d'Orly"
+  },
+  {
+   "group": "ferre",
+   "line": "T7",
+   "route_id": "IDFM:C01774",
+   "stop_point": "IDFM:35927",
+   "name": "Aéroport d'Orly"
+  },
+  {
+   "group": "ferre",
+   "line": "T9",
+   "route_id": "IDFM:C02317",
+   "stop_point": "IDFM:478973",
+   "name": "Watteau - Rondenay"
+  },
+  {
+   "group": "ferre",
+   "line": "T9",
+   "route_id": "IDFM:C02317",
+   "stop_point": "IDFM:478976",
+   "name": "Musée MAC VAL"
+  },
+  {
+   "group": "bus",
+   "line": "BUS_350",
+   "route_id": "IDFM:C01298",
+   "stop_point": "IDFM:34204",
+   "name": "Terminal 2A-2C"
+  },
+  {
+   "group": "bus",
+   "line": "BUS_350",
+   "route_id": "IDFM:C01298",
+   "stop_point": "IDFM:14648",
+   "name": "Tour de Contrôle"
+  },
+  {
+   "group": "bus",
+   "line": "BUS_351",
+   "route_id": "IDFM:C01299",
+   "stop_point": "IDFM:34198",
+   "name": "CDG T1 - RoissyBus (Niveau Arrivées - Porte 32)"
+  },
+  {
+   "group": "bus",
+   "line": "BUS_351",
+   "route_id": "IDFM:C01299",
+   "stop_point": "IDFM:497134",
+   "name": "Gare de Roissypôle - Aéroport CDG1 (E3)"
+  },
+  {
+   "group": "bus",
+   "line": "BUS_183",
+   "route_id": "IDFM:C01204",
+   "stop_point": "IDFM:26929",
+   "name": "Aéroport Orly 4"
+  },
+  {
+   "group": "bus",
+   "line": "BUS_183",
+   "route_id": "IDFM:C01204",
+   "stop_point": "IDFM:413123",
+   "name": "Coeur d'Orly"
+  }
+ ],
+ "missing": [],
+ "config_sha256": "5a520c8a41045a9bc5cccc8570ae784e5de7bd4fc25e09cbe02c27099465a208"
+}
