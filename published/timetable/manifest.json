@@ -1,29 +1,29 @@
 {
   "schema": "airport-connect/timetable-manifest@1",
   "db_schema_version": 4,
-  "version": "20261114-5dea9926eccb",
-  "generated_at": "2026-11-14T11:35:30+00:00",
+  "version": "20261115-d10c6d8e5b97",
+  "generated_at": "2026-11-15T12:00:29+00:00",
   "source": {
     "url": "https://eu.ftp.opendatasoft.com/stif/GTFS/IDFM-gtfs.zip",
-    "sha256": "22a4d647ec9a4a5f2403d24f186677aecea0bc8de0efbdb624e0ff7b5c515d25"
+    "sha256": "f02e0025e75eb32e29e258c623b948a35a4e5979c279d7bfe56e310e86b1196f"
   },
   "inputs": {
     "sha256": "7aa6affdf392e2a5d20fdb4af941aae4b8db5656ad6179e7609e2be764a51d8f"
   },
   "validity": {
-    "start": "2026-11-14",
-    "end": "2026-12-13",
+    "start": "2026-11-15",
+    "end": "2026-12-14",
     "days": 30,
-    "first_service_date": "2026-11-11"
+    "first_service_date": "2026-11-12"
   },
   "file": {
-    "name": "timetable-20261114-5dea9926eccb.sqlite.gz",
-    "url": "https://github.com/arpconnect/airport-connect-data/releases/download/timetable-20261114-5dea9926eccb/timetable-20261114-5dea9926eccb.sqlite.gz",
+    "name": "timetable-20261115-d10c6d8e5b97.sqlite.gz",
+    "url": "https://github.com/arpconnect/airport-connect-data/releases/download/timetable-20261115-d10c6d8e5b97/timetable-20261115-d10c6d8e5b97.sqlite.gz",
     "encoding": "gzip",
-    "bytes_gzip": 3578183,
-    "sha256_gzip": "531dfdd2557d5e9e8eab0fe1778786ffdc89879f4b6b17232176a7a1663a2564",
-    "bytes": 9572352,
-    "sha256": "5dea9926eccb9868b1aeb5b08af89fe3b91569d8d9d88bf43f44cc82b505f7dc"
+    "bytes_gzip": 3628849,
+    "sha256_gzip": "4f9ed41ac3b1cfe562a733eaf6df781dc137e7ec826d74880b5150a521d2b680",
+    "bytes": 9756672,
+    "sha256": "d10c6d8e5b97fbbd85845e29391e453ff95a47cac37b4e616b13a095b19cc795"
   },
   "counts": {
     "lines_active": 48,
@@ -31,10 +31,10 @@
     "stop_areas": 800,
     "stop_points": 1691,
     "places": 18,
-    "services": 125,
-    "patterns": 559,
-    "trips": 26135,
-    "stop_times": 576478,
+    "services": 130,
+    "patterns": 565,
+    "trips": 26345,
+    "stop_times": 587950,
     "duplicate_trips_removed": 1,
     "adjustments_published": 0,
     "transfers": 5194,
@@ -82,8 +82,8 @@
       "CDGVAL": 572,
       "METRO_14": 3206,
       "ORLYVAL": 433,
-      "RER_B": 3822,
-      "RER_C": 4269,
+      "RER_B": 4070,
+      "RER_C": 4231,
       "T11": 775,
       "T7": 549,
       "T9": 1426
