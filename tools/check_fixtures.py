@@ -342,6 +342,26 @@ def terminal_names(meta, places: list, ids: list) -> None:
         if gtfs_label:
             check("places.json", f"{p['id']} : libellé GTFS sans ancien nom", bool(p.get("former_fr") or p.get("former_en")), False)
             check("places.json", f"{p['id']} : libellé GTFS déclaré", p["id"] in (meta.get("gtfs_labels") or {}), True)
+    # Messages d'information (R-108) : schéma, champs complets, dates de Paris sans fuseau, fin après le début.
+    npath = ROOT / "data" / "notices.json"
+    if npath.exists():
+        ndoc = json.loads(npath.read_text(encoding="utf-8"))
+        check("notices.json", "schéma", ndoc.get("schema"), "airport-connect/notices@1")
+        nids = [n.get("id") for n in ndoc.get("notices", [])]
+        check("notices.json", "identifiants uniques", len(set(nids)), len(nids))
+        for n in ndoc.get("notices", []):
+            f = f"notices.json {n.get('id')}"
+            check(f, "secteurs connus", bool(n.get("sectors")) and set(n["sectors"]) <= {"ROISSY", "ORLY", "BOURGET"}, True)
+            check(f, "écrans connus", bool(n.get("screens")) and set(n["screens"]) <= {"home", "search", "plan"}, True)
+            check(f, "titre et texte en français et en anglais",
+                  all((n.get(k) or {}).get(l, "").strip() for k in ("title", "body") for l in ("fr", "en")), True)
+            try:
+                s_, e_ = datetime.fromisoformat(n["start"]), datetime.fromisoformat(n["end"])
+                dates_ok = s_ < e_ and s_.tzinfo is None and e_.tzinfo is None
+            except (KeyError, ValueError):
+                dates_ok = False
+            check(f, "début et fin lisibles, heures de Paris, fin après le début", dates_ok, True)
+            check(f, "décision datée et source", bool(_iso_required(n.get("decided_on")) and n.get("source")), True)
     # Noms d'arrêts corrigés (exception datée à R-30) : quai, ancien nom, nouveau nom, raison et date ; un quai une fois.
     fixes = (json.loads((ROOT / "data" / "places.json").read_text(encoding="utf-8")).get("stop_name_overrides") or {}).get("stops", [])
     for o in fixes:

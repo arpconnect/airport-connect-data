@@ -89,7 +89,40 @@ def load_inputs(data_dir: Path):
     lines = json.loads((data_dir / "lines.json").read_text(encoding="utf-8"))
     places = json.loads((data_dir / "places.json").read_text(encoding="utf-8"))
     adjustments = json.loads((data_dir / "adjustments.json").read_text(encoding="utf-8"))
+    # Messages d'information (R-108) : portés par le document des lieux pour la construction, fichier à part.
+    notices_path = data_dir / "notices.json"
+    if notices_path.exists():
+        places["_notices"] = json.loads(notices_path.read_text(encoding="utf-8")).get("notices", [])
     return lines, places, adjustments
+
+
+NOTICE_SCREENS = {"home", "search", "plan"}
+NOTICE_SECTORS = {"ROISSY", "ORLY", "BOURGET"}
+
+
+def notices_for_base(notices: list, today: date | None, report: Report) -> list:
+    """Messages d'information à publier (R-108) : complets, valides, pas encore terminés ce jour (heure de Paris).
+    Un message mal formé bloque la publication (erreur `notice_invalid`) plutôt que de s'afficher de travers."""
+    out, seen = [], set()
+    for n in notices:
+        nid = n.get("id")
+        try:
+            start = datetime.fromisoformat(n["start"]) if n.get("start") else None
+            end = datetime.fromisoformat(n["end"])
+            ok = (bool(nid) and nid not in seen and set(n.get("sectors") or []) <= NOTICE_SECTORS and n.get("sectors")
+                  and set(n.get("screens") or []) <= NOTICE_SCREENS and n.get("screens")
+                  and all((n.get(k) or {}).get(lang, "").strip() for k in ("title", "body") for lang in ("fr", "en"))
+                  and (start is None or start < end) and end.tzinfo is None and (start is None or start.tzinfo is None))
+        except (KeyError, TypeError, ValueError):
+            ok = False
+        if not ok:
+            report.error("notice_invalid", nid)
+            continue
+        seen.add(nid)
+        if today and end.date() < today:
+            continue
+        out.append({k: n[k] for k in ("id", "sectors", "screens", "title", "body", "end") } | ({"start": n["start"]} if n.get("start") else {}))
+    return out
 
 
 def read_feed(zip_path: Path, lines_doc: dict, places_doc: dict, report: Report):
@@ -203,6 +236,10 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
         "validity_start": start.isoformat(), "validity_end": last.isoformat(),
         "source_sha256": sha256_file(zip_path), "source_url": SOURCE_URL, "timezone": TIMEZONE,
     }
+    # Messages d'information (R-108), publiés avec la base : ceux qui ne sont pas encore terminés à la construction.
+    notices = notices_for_base(places_doc.get("_notices") or [], today, report)
+    if notices:
+        meta["notices"] = json.dumps(notices, ensure_ascii=False, separators=(",", ":"), sort_keys=True)
     cur.executemany("INSERT INTO meta VALUES (?,?)", sorted(meta.items()))
 
     # Lignes (ordre déterministe : code)
@@ -644,7 +681,9 @@ def inputs_sha256(data_dir: Path) -> str:
     Le traitement quotidien reconstruit la base quand elle change, même si le GTFS n'a pas bougé."""
     h = hashlib.sha256()
     for path in (data_dir / "lines.json", data_dir / "places.json", data_dir / "adjustments.json",
-                 SCHEMA_PATH, Path(__file__).resolve()):
+                 data_dir / "notices.json", SCHEMA_PATH, Path(__file__).resolve()):
+        if not path.exists():
+            continue
         h.update(path.name.encode("utf-8") + b"\0" + path.read_bytes() + b"\0")
     return h.hexdigest()
 

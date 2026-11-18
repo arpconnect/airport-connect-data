@@ -17,6 +17,7 @@ Teste le générateur sur les lieux et les correspondances (schéma 4) avec un G
 from __future__ import annotations
 
 import copy
+import json
 import csv
 import io
 import sqlite3
@@ -174,6 +175,25 @@ def main() -> int:
         p["stop_name_overrides"]["stops"][0]["stop"] = "INCONNU"
         errs, warns, got = stop_name(p, "fixmissing")
         check("nom corrigé : quai disparu, alerte sans bloquer", (errs, "stop_name_override_missing" in warns), ([], True))
+
+        # Messages d'information (R-108) : publiés dans meta tant qu'ils ne sont pas terminés ; mal formés, ils bloquent.
+        notice = {"id": "n1", "sectors": ["ROISSY"], "screens": ["home", "plan"], "title": {"fr": "Titre", "en": "Title"},
+                  "body": {"fr": "Texte", "en": "Text"}, "start": "2026-07-01T00:00", "end": "2026-07-31T23:59"}
+        p = copy.deepcopy(PLACES)
+        p["_notices"] = [notice, dict(notice, id="old", end="2026-06-30T23:59", start="2026-06-01T00:00")]
+        dbn, errs, _ = build(tmp, gtfs, p, "notices", today=date(2026, 7, 2))
+        conn = sqlite3.connect(dbn)
+        row = conn.execute("SELECT value FROM meta WHERE key = 'notices'").fetchone()
+        conn.close()
+        check("messages : publiés sans ceux déjà terminés", (errs, [n["id"] for n in json.loads(row[0])]), ([], ["n1"]))
+        p["_notices"] = [dict(notice, screens=["partout"])]
+        check("message mal formé : erreur", build(tmp, gtfs, p, "noticebad")[1], ["notice_invalid"])
+        p["_notices"] = [dict(notice, end="2026-06-01T00:00")]
+        check("message qui finit avant de commencer : erreur", build(tmp, gtfs, p, "noticebad2")[1], ["notice_invalid"])
+        dbn, _, _ = build(tmp, gtfs, PLACES, "nonotice")
+        conn = sqlite3.connect(dbn)
+        check("sans message : pas de clé notices", conn.execute("SELECT COUNT(*) FROM meta WHERE key = 'notices'").fetchone()[0], 0)
+        conn.close()
 
         # Libellé repris du GTFS : nom de la zone d'arrêt, le même dans les deux langues, sans ancien nom.
         p = copy.deepcopy(PLACES)
