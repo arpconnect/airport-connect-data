@@ -32,7 +32,7 @@
     {"id": "cdg-t2", "kind": "airport", "sector": "ROISSY", "label_fr": "Terminaux 3 à 7", "label_en": "Terminals 3 to 7", "short_label": "T3-T7", "former_fr": "ex-Terminal 2", "former_en": "formerly Terminal 2",
      "stop_areas": ["IDFM:73699", "IDFM:74080"], "stop_points": []},
     {"id": "cdg-t2-gare", "kind": "airport", "parent": "cdg-t2", "sector": "ROISSY", "label_fr": "Gare TGV / RER", "label_en": "TGV / RER station", "short_label": "Gare TGV", "former_fr": "ex-gare du Terminal 2", "former_en": "formerly Terminal 2 station",
-     "stop_areas": [], "stop_points": ["IDFM:10218", "IDFM:10219", "IDFM:monomodalStopPlace:473364", "IDFM:10221", "IDFM:10226", "IDFM:497054", "IDFM:9989"]},
+     "stop_areas": [], "stop_points": ["IDFM:10218", "IDFM:10219", "IDFM:monomodalStopPlace:473364", "IDFM:10226", "IDFM:497054", "IDFM:9989"]},
     {"id": "cdg-t2ac", "kind": "airport", "parent": "cdg-t2", "sector": "ROISSY", "label_fr": "Terminal 3", "label_en": "Terminal 3", "short_label": "T3", "former_fr": "ex-Terminaux 2A et 2C", "former_en": "formerly Terminals 2A and 2C",
      "stop_areas": [], "stop_points": ["IDFM:34204", "IDFM:10224", "IDFM:10225"]},
     {"id": "cdg-t2bd", "kind": "airport", "parent": "cdg-t2", "sector": "ROISSY", "label_fr": "Terminal 4", "label_en": "Terminal 4", "short_label": "T4", "former_fr": "ex-Terminaux 2B et 2D", "former_en": "formerly Terminals 2B and 2D",
