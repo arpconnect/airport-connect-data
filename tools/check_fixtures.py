@@ -332,8 +332,18 @@ def terminal_names(meta, places: list, ids: list) -> None:
     for p in places:
         check("places.json", f"{p['id']} ancien nom en français et en anglais, ou aucun",
               bool(p.get("former_fr")) == bool(p.get("former_en")), True)
+    for pid in meta.get("gtfs_labels") or {}:
+        check("places.json", f"libellé GTFS {pid} : lieu connu", pid in ids, True)
+    for p in places:
+        # Un lieu a soit son libellé fixe (français et anglais), soit le nom GTFS d'une zone d'arrêt, sans ancien nom.
+        gtfs_label = bool(p.get("label_from_stop_area"))
+        check("places.json", f"{p['id']} : libellé fixe ou libellé GTFS, pas les deux",
+              (gtfs_label, bool(p.get("label_fr")), bool(p.get("label_en"))) in ((True, False, False), (False, True, True)), True)
+        if gtfs_label:
+            check("places.json", f"{p['id']} : libellé GTFS sans ancien nom", bool(p.get("former_fr") or p.get("former_en")), False)
+            check("places.json", f"{p['id']} : libellé GTFS déclaré", p["id"] in (meta.get("gtfs_labels") or {}), True)
     for key in ("label_fr", "label_en", "short_label"):
-        values = [p[key] for p in places]
+        values = [p[key] for p in places if key in p]
         dup = sorted({v for v in values if values.count(v) > 1})
         check("places.json", f"{key} uniques", dup, [])
 
@@ -395,6 +405,9 @@ def android_resources() -> None:
     app_settings()
     app_tickets()
     app_simulation()
+    app_archives()
+    app_operators()
+    app_plans_client()
 
 
 # Points à compléter avant la publication (affichés sans faire échouer la vérification).
@@ -474,8 +487,9 @@ def app_tickets() -> None:
 
 
 def app_simulation() -> None:
-    """Lignes simulées (spec § 14, R-131 à R-134) : fichier cohérent, lignes futures du référentiel, sources datées ;
-    rappel une fois la mise en service annoncée passée (la ligne doit alors arriver dans le GTFS)."""
+    """Lignes simulées (spec § 14, R-131 à R-134) : fichier cohérent, lignes du référentiel encore futures (une ligne peut
+    en être absente, comme la 15), nom et mode, sources datées ; rappel une fois la mise en service annoncée passée (la
+    ligne doit alors arriver dans le GTFS)."""
     doc = json.loads((ROOT / "app/src/main/assets/simulation/lines.json").read_text(encoding="utf-8"))
     lines = {l["id"]: l for l in json.loads((ROOT / "data" / "lines.json").read_text(encoding="utf-8"))["lines"]}
     f = "app (simulation)"
@@ -484,7 +498,12 @@ def app_simulation() -> None:
     hhmm = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
     for ln in doc["lines"]:
         lid = ln["id"]
-        check(f, f"{lid} : ligne future du référentiel", lines.get(lid, {}).get("state"), "future")
+        check(f, f"{lid} : ligne future du référentiel ou absente", lines.get(lid, {}).get("state", "future"), "future")
+        check(f, f"{lid} : nom et mode", bool(ln.get("name")) and ln.get("app_type") in {l["app_type"] for l in lines.values()}, True)
+        check(f, f"{lid} : groupe", ln.get("group"), "GPE" if lid.startswith("METRO_") else None)
+        check(f, f"{lid} : note de l'onglet Trafic en français et en anglais",
+              all((ln.get("note") or {}).get(k, "").strip() for k in ("fr", "en")), True)
+        check(f, f"{lid} : couleur #RRGGBB ou aucune", ln.get("color") is None or bool(re.match(r"^#[0-9A-F]{6}$", ln["color"])), True)
         check(f, f"{lid} : sources https datées", bool(ln["sources"]) and all(
             s["url"].startswith("https://") and _iso_required(s["checked_on"]) for s in ln["sources"]), True)
         check(f, f"{lid} : tracé par défaut connu", ln["default_phase"] in [p["id"] for p in ln["phases"]], True)
@@ -496,16 +515,92 @@ def app_simulation() -> None:
             check(f, f"{pid} : deux sens", (len(ph["first"]), len(ph["last"])), (2, 2))
             check(f, f"{pid} : intervalle par défaut en dernier",
                   [k for k in ("days", "from", "to") if k in ph["headways"][-1]], [])
-            check(f, f"{pid} : mise en service AAAA, AAAA-MM ou AAAA-MM-JJ",
-                  bool(re.match(r"^\d{4}(-\d{2}(-\d{2})?)?$", ph["opening"])), True)
+            check(f, f"{pid} : mise en service AAAA, AAAA-MM, AAAA-MM-JJ, AAAA-saison ou AAAA-end",
+                  bool(re.match(r"^\d{4}(-\d{2}(-\d{2})?|-(spring|summer|autumn|winter|end))?$", ph["opening"])), True)
             check(f, f"{pid} : gares d'ancrage IDFM", all(st.get("stop_area") is None or st["stop_area"].startswith("IDFM:")
                                                            for st in ph["stations"]), True)
             opening = ph["opening"]
+            year = int(opening[:4])
+            # Fin de la période annoncée : la date, le mois, la saison (hiver : jusqu'au 20 mars suivant) ou l'année.
+            seasons = {"spring": date(year, 6, 20), "summer": date(year, 9, 22), "autumn": date(year, 12, 21),
+                       "winter": date(year + 1, 3, 20), "end": date(year, 12, 31)}
             end = (date.fromisoformat(opening) if len(opening) == 10 else
-                   date(int(opening[:4]), int(opening[5:7]), 28) if len(opening) == 7 else date(int(opening), 12, 31))
+                   seasons[opening[5:]] if opening[5:] in seasons else
+                   date(year, int(opening[5:7]), 28) if len(opening) == 7 else date(year, 12, 31))
             if end < date.today():
                 notes.append(f"{pid} : mise en service annoncée ({opening}) passée, vérifier l'arrivée de la ligne dans le GTFS"
                              " et revoir app/src/main/assets/simulation/lines.json")
+
+
+def app_operators() -> None:
+    """Exploitants (spec § 2, R-16) : un par ligne en service, relevé daté dans le référentiel des lignes d'IDFM ;
+    rappel au-delà de trois mois (les contrats de bus changent d'exploitant)."""
+    doc = json.loads((ROOT / "app/src/main/assets/lines/operators.json").read_text(encoding="utf-8"))
+    active = {l["id"] for l in json.loads((ROOT / "data" / "lines.json").read_text(encoding="utf-8"))["lines"] if l["state"] == "active"}
+    f = "app (exploitants)"
+    check(f, "schéma", doc["schema"], "airport-connect/operators@1")
+    check(f, "relevé daté", _iso_required(doc["checked_on"]), True)
+    check(f, "lignes en service sans exploitant", sorted(active - set(doc["operators"])), [])
+    check(f, "exploitants non vides", all(names and all(n.strip() for n in names) for names in doc["operators"].values()), True)
+    named = {n for names in doc["operators"].values() for n in names}
+    check(f, "noms courts d'exploitants relevés", sorted(set(doc.get("short_names", {})) - named), [])
+    if (date.today() - date.fromisoformat(doc["checked_on"])).days > 92:
+        notes.append("exploitants relevés il y a plus de trois mois : refaire le relevé du référentiel des lignes d'IDFM"
+                     " (app/src/main/assets/lines/operators.json)")
+
+
+def app_archives() -> None:
+    """Lignes disparues (spec § 21, R-195) : fichier complet en français et en anglais, sources https datées, ligne
+    d'entrée aux archives connue du référentiel."""
+    doc = json.loads((ROOT / "app/src/main/assets/archives/lines.json").read_text(encoding="utf-8"))
+    known = {l["id"] for l in json.loads((ROOT / "data" / "lines.json").read_text(encoding="utf-8"))["lines"]}
+    f = "app (archives)"
+    check(f, "schéma", doc["schema"], "airport-connect/archives@1")
+    check(f, "relevé daté", _iso_required(doc["checked_on"]), True)
+
+    def texts(node):
+        if isinstance(node, dict):
+            if set(node) == {"fr", "en"}:
+                yield node
+            else:
+                for v in node.values():
+                    yield from texts(v)
+        elif isinstance(node, list):
+            for v in node:
+                yield from texts(v)
+
+    for ln in doc["lines"]:
+        lid = ln["id"]
+        check(f, f"{lid} : textes en français et en anglais",
+              all(t["fr"].strip() and t["en"].strip() for t in texts(ln)), True)
+        check(f, f"{lid} : itinéraires d'au moins deux arrêts", bool(ln["routes"]) and all(len(r["stops"]) >= 2 for r in ln["routes"]), True)
+        check(f, f"{lid} : matériel, histoire et sources", bool(ln["rolling_stock"] and ln["history"] and ln["sources"]), True)
+        check(f, f"{lid} : sources https datées", all(
+            s["url"].startswith("https://") and _iso_required(s["checked_on"]) for s in ln["sources"]), True)
+        if ln.get("shown_when_active"):
+            check(f, f"{lid} : ligne d'entrée aux archives connue", ln["shown_when_active"] in known, True)
+        # Lecture immersive : genres de chapitre connus, matériel et itinéraires montrés une fois, dessin embarqué,
+        # ligne qui a pris la suite connue du référentiel.
+        chapters = ln.get("chapters", [])
+        check(f, f"{lid} : genres de chapitre", sorted({c.get("kind", "story") for c in chapters} - {"story", "history", "fleet", "routes"}), [])
+        if chapters:
+            check(f, f"{lid} : chapitres titrés", all(c.get("title") for c in chapters), True)
+            check(f, f"{lid} : matériel et itinéraires montrés une fois",
+                  [sum(c.get("kind") == k for c in chapters) for k in ("fleet", "routes")], [1, 1])
+        if ln.get("drawing"):
+            image = ROOT / "app/src/main/res/drawable-nodpi" / f"archive_{ln['drawing']['image']}.webp"
+            check(f, f"{lid} : dessin embarqué", image.is_file(), True)
+        if ln.get("successor"):
+            check(f, f"{lid} : ligne qui a pris la suite connue", ln["successor"]["line"] in known, True)
+
+
+def app_plans_client() -> None:
+    """R-186 : l'application télécharge les plans avec le client déclaré du relevé quotidien, pour recevoir le document
+    dont le catalogue porte l'empreinte."""
+    pipeline = re.search(r'^USER_AGENT = "([^"]+)"', (ROOT / "tools/pipeline/fetch_plans.py").read_text(encoding="utf-8"), re.M)
+    app = re.search(r'const val USER_AGENT = "([^"]+)"', (ROOT / "app/src/main/java/com/airportconnect/app/data/plans/PlansRepository.kt")
+                    .read_text(encoding="utf-8"))
+    check("app (plans)", "client déclaré identique à celui du relevé", app and app.group(1), pipeline and pipeline.group(1))
 
 
 def app_plans() -> None:

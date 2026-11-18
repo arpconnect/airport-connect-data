@@ -4,11 +4,18 @@
   "terminal_names": {
     "description": "Noms des terminaux de Paris-CDG en vigueur le 16 mars 2027, appliqués dès la première version (décision D-11 : l'application n'est pas publiée avant 2027). Un lieu renommé porte son ancien nom en mention secondaire (former_fr, former_en) ; retirer ces deux champs suffit à l'effacer, par une nouvelle base d'horaires. Les noms d'arrêts des transports restent ceux du GTFS (R-30). Les identifiants de lieux sont des clés internes figées, indépendantes des libellés.",
     "effective": "2027-03-16",
-    "sources": ["https://www.roissypole.info/news/paris-cdg-change", "https://airvipparis.fr/cdg-nouveaux-terminaux-2027", "https://moodiedavittreport.com/groupe-adp-to-rename-all-terminals-at-paris-charles-de-gaulle-airport/", "https://www.presse-citron.net/laeroport-roissy-cdg-passe-de-3-a-7-terminaux-toute-la-signaletique-change/"],
+    "sources": [
+      "https://www.roissypole.info/news/paris-cdg-change",
+      "https://airvipparis.fr/cdg-nouveaux-terminaux-2027",
+      "https://moodiedavittreport.com/groupe-adp-to-rename-all-terminals-at-paris-charles-de-gaulle-airport/",
+      "https://www.presse-citron.net/laeroport-roissy-cdg-passe-de-3-a-7-terminaux-toute-la-signaletique-change/"
+    ],
     "checked_on": "2026-10-08",
     "descriptive_labels": {
-      "cdg-t2": "Aucun nom collectif publié pour l'ancien ensemble du Terminal 2, dont les halls deviennent les terminaux 3 à 7 : libellé descriptif.",
-      "cdg-t2-gare": "La gare « Aéroport CDG 2 TGV » doit aussi être renommée, par décision de la SNCF (Presse-citron, 8 décembre 2025) ; nouveau nom non publié au 8 octobre 2026 : libellé descriptif, à remplacer par le nom officiel."
+      "cdg-t2": "Aucun nom collectif publié pour l'ancien ensemble du Terminal 2, dont les halls deviennent les terminaux 3 à 7 : libellé descriptif."
+    },
+    "gtfs_labels": {
+      "cdg-t2-gare": "Nom de la zone d'arrêt GTFS IDFM:73699, repris tel quel chaque jour (demande de Julien du 18 novembre 2026) : la gare suit IDFM quand elle sera renommée, sans mise à jour du référentiel ; pas d'ancien nom en mention secondaire."
     }
   },
   "places": [
@@ -31,7 +38,7 @@
      "stop_areas": ["IDFM:69212"], "stop_points": []},
     {"id": "cdg-t2", "kind": "airport", "sector": "ROISSY", "label_fr": "Terminaux 3 à 7", "label_en": "Terminals 3 to 7", "short_label": "T3-T7", "former_fr": "ex-Terminal 2", "former_en": "formerly Terminal 2",
      "stop_areas": ["IDFM:73699", "IDFM:74080"], "stop_points": []},
-    {"id": "cdg-t2-gare", "kind": "airport", "parent": "cdg-t2", "sector": "ROISSY", "label_fr": "Gare TGV / RER", "label_en": "TGV / RER station", "short_label": "Gare TGV", "former_fr": "ex-gare du Terminal 2", "former_en": "formerly Terminal 2 station",
+    {"id": "cdg-t2-gare", "kind": "airport", "parent": "cdg-t2", "sector": "ROISSY", "label_from_stop_area": "IDFM:73699", "short_label": "Gare TGV",
      "stop_areas": [], "stop_points": ["IDFM:10218", "IDFM:10219", "IDFM:monomodalStopPlace:473364", "IDFM:10226", "IDFM:497054", "IDFM:9989"]},
     {"id": "cdg-t2ac", "kind": "airport", "parent": "cdg-t2", "sector": "ROISSY", "label_fr": "Terminal 3", "label_en": "Terminal 3", "short_label": "T3", "former_fr": "ex-Terminaux 2A et 2C", "former_en": "formerly Terminals 2A and 2C",
      "stop_areas": [], "stop_points": ["IDFM:34204", "IDFM:10224", "IDFM:10225"]},

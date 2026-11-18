@@ -154,6 +154,19 @@ def main() -> int:
         check("Paris : aucun quai propre", con.execute("SELECT COUNT(*) FROM place_stop_point WHERE place_id = 'paris'").fetchone()[0], 0)
         con.close()
 
+        # Libellé repris du GTFS : nom de la zone d'arrêt, le même dans les deux langues, sans ancien nom.
+        p = copy.deepcopy(PLACES)
+        aero = p["places"][1]
+        aero.pop("label_fr"), aero.pop("label_en")
+        aero.update(label_from_stop_area="ZA")
+        db2, errors2, _ = build(tmp, gtfs, p, "gtfslabel")
+        check("libellé GTFS : aucune erreur", errors2, [])
+        con2 = sqlite3.connect(db2)
+        check("libellé GTFS : nom de la zone d'arrêt",
+              con2.execute("SELECT label_fr, label_en, former_fr, former_en FROM place WHERE id = 'aero'").fetchone(),
+              ("Aéroport Terminal", "Aéroport Terminal", None, None))
+        con2.close()
+
         tt = Timetable(str(db))
         g = [(x.line, x.key, x.title, x.board.status, [datetime.fromtimestamp(p.epoch, PARIS).strftime("%H:%M") for p in x.board.passages])
              for x in tt.place_departures("paris", datetime(2026, 7, 2, 7, 50, tzinfo=PARIS))]
@@ -212,6 +225,11 @@ def main() -> int:
             ("ville avec un secteur : erreur", lambda q: q["places"][0].update(sector="ROISSY"), ["place_city_invalid"], None),
             ("aéroport sans secteur : erreur", lambda q: q["places"][1].pop("sector"), ["place_airport_invalid"], None),
             ("sorte inconnue : erreur", lambda q: q["places"][1].update(kind="port"), ["place_kind_invalid"], None),
+            ("libellé GTFS d'une zone absente : erreur", lambda q: (q["places"][1].pop("label_fr"), q["places"][1].pop("label_en"),
+                                                                   q["places"][1].update(label_from_stop_area="ZZ")),
+             ["place_label_area_missing"], None),
+            ("libellé GTFS et libellé fixe : erreur", lambda q: q["places"][1].update(label_from_stop_area="ZA"),
+             ["place_label_ambiguous"], None),
         ]
         for i, (name, mutate, exp_errors, exp_warn) in enumerate(cases):
             q = copy.deepcopy(PLACES)

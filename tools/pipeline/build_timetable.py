@@ -286,9 +286,22 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
         if kind == "airport" and (not p.get("sector") or p.get("boarding")):
             report.error("place_airport_invalid", {"place": p["id"], "detail": "un lieu aéroportuaire a un secteur et pas de point de montée"})
             continue
+        # Libellé repris du GTFS (nom de la zone d'arrêt, le même en français et en anglais) ou fixé par le référentiel.
+        label_area = p.get("label_from_stop_area")
+        if label_area:
+            if p.get("label_fr") or p.get("label_en") or former[0]:
+                report.error("place_label_ambiguous", p["id"])     # libellé GTFS et libellé fixe : on garde le GTFS
+                former = (None, None)
+            area = stops_all.get(label_area)
+            if not area or area.get("location_type") != "1":
+                report.error("place_label_area_missing", {"place": p["id"], "stop_area": label_area})
+                continue
+            label_fr = label_en = area["stop_name"].strip()
+        else:
+            label_fr, label_en = p["label_fr"], p["label_en"]
         cur.execute("INSERT INTO place VALUES (?,?,?,?,?,?,?,?,?,?)", (
             p["id"], p.get("parent"), kind, p.get("sector") if kind == "airport" else None, order[p["id"]],
-            p["label_fr"], p["label_en"], p["short_label"], *former))
+            label_fr, label_en, p["short_label"], *former))
         if kind == "city":
             boarding = p.get("boarding") or []
             if not boarding:
