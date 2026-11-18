@@ -154,6 +154,27 @@ def main() -> int:
         check("Paris : aucun quai propre", con.execute("SELECT COUNT(*) FROM place_stop_point WHERE place_id = 'paris'").fetchone()[0], 0)
         con.close()
 
+        # Nom d'arrêt corrigé (exception à R-30) : appliqué tant que le GTFS garde l'ancien nom, alerte sinon.
+        def stop_name(places, name):
+            dbx, errs, warns = build(tmp, gtfs, places, name)
+            conx = sqlite3.connect(dbx)
+            got = conx.execute("SELECT name FROM stop_point WHERE gtfs_id = 'A1'").fetchone()[0]
+            conx.close()
+            return errs, warns, got
+        p = copy.deepcopy(PLACES)
+        p["stop_name_overrides"] = {"stops": [{"stop": "A1", "gtfs_name": "Aéroport Terminal", "name": "Aérogare",
+                                               "reason": "essai", "decided_on": "2026-11-18"}]}
+        errs, warns, got = stop_name(p, "fix")
+        check("nom corrigé : appliqué tant que le GTFS garde l'ancien nom", (errs, got, [w for w in warns if w.startswith("stop_name")]),
+              ([], "Aérogare", []))
+        p["stop_name_overrides"]["stops"][0]["gtfs_name"] = "Ancien nom"
+        errs, warns, got = stop_name(p, "fixstale")
+        check("nom corrigé : IDFM a changé le nom, son nom reprend la main, alerte", (errs, got, "stop_name_override_stale" in warns),
+              ([], "Aéroport Terminal", True))
+        p["stop_name_overrides"]["stops"][0]["stop"] = "INCONNU"
+        errs, warns, got = stop_name(p, "fixmissing")
+        check("nom corrigé : quai disparu, alerte sans bloquer", (errs, "stop_name_override_missing" in warns), ([], True))
+
         # Libellé repris du GTFS : nom de la zone d'arrêt, le même dans les deux langues, sans ancien nom.
         p = copy.deepcopy(PLACES)
         aero = p["places"][1]

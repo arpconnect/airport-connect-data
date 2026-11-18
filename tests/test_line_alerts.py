@@ -106,6 +106,19 @@ check("refermée : un commentaire puis la fermeture de l'issue n° 1", [(m, u.rs
       [("POST", "1/comments"), ("PATCH", "1")])
 check("refermée : état « closed »", api.created[-1].get("state"), "closed")
 api = FakeApi(bodies)
+# 5. Nom d'arrêt corrigé : IDFM a changé le nom ; refermée d'elle-même une fois la correction retirée
+stale = {"errors": [], "warnings": [{"code": "stop_name_override_stale", "detail": {
+    "stop": "IDFM:34198", "line": "IDFM:34198", "expected": "CDG T1 - RoissyBus (Niveau Arrivées - Porte 32)",
+    "now": "CDG T1 (Niveau Arrivées - Porte 32)", "name": "CDG T1 - Porte 32 (arrivées)"}}]}
+got5 = la.alerts([stale])
+check("nom corrigé : une alerte par quai", [a["key"] for a in got5], ["stop_name_override_stale:IDFM:34198"])
+check("nom corrigé : ancien et nouveau noms dans le corps",
+      all(x in got5[0]["body"] for x in ("CDG T1 (Niveau Arrivées - Porte 32)", "stop_name_overrides")), True)
+api5 = FakeApi([f"x\n\n{la.KEY_PREFIX}stop_name_override_stale:IDFM:34198 -->"])
+check("nom corrigé : refermée quand la correction n'est plus signalée",
+      la.resolve([], [{"built": True, "errors": [], "warnings": []}], la.GitHub("o/r", "jeton", opener=api5)),
+      ["stop_name_override_stale:IDFM:34198"])
+api = FakeApi(bodies)
 check("non refermée sans base construite jusqu'au bout",
       la.resolve([], [{"built": False, "errors": [], "warnings": []}], la.GitHub("o/r", "jeton", opener=api)), [])
 check("non refermée : aucun appel", api.calls, [])

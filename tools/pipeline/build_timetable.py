@@ -256,6 +256,17 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
             children[s["parent_station"]].append(sid)
     place_area_points = {sp for p in places_doc["places"] for a in p.get("stop_areas", []) for sp in children.get(a, [])
                          if sp in wanted_points}
+    # Noms d'arrêts corrigés en attendant IDFM (exception à R-30) : appliqués seulement tant que le GTFS garde l'ancien nom.
+    overrides = {}
+    for o in (places_doc.get("stop_name_overrides") or {}).get("stops", []):
+        s = stops_all.get(o["stop"])
+        if not s:
+            report.warn("stop_name_override_missing", {"stop": o["stop"], "line": o["stop"], "name": o["name"]})
+        elif s["stop_name"] != o["gtfs_name"]:
+            report.warn("stop_name_override_stale", {"stop": o["stop"], "line": o["stop"], "expected": o["gtfs_name"],
+                                                     "now": s["stop_name"], "name": o["name"]})
+        else:
+            overrides[o["stop"]] = o["name"]
     for i, sp in enumerate(sorted(wanted_points | place_area_points), start=1):
         s = stops_all.get(sp)
         if not s:
@@ -265,7 +276,8 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
             report.error("stop_point_without_area", sp)
             continue
         point_id[sp] = i
-        cur.execute("INSERT INTO stop_point VALUES (?,?,?,?,?,?)", (i, sp, area_id[parent], s["stop_name"], float(s["stop_lat"]), float(s["stop_lon"])))
+        cur.execute("INSERT INTO stop_point VALUES (?,?,?,?,?,?)",
+                    (i, sp, area_id[parent], overrides.get(sp, s["stop_name"]), float(s["stop_lat"]), float(s["stop_lon"])))
 
     # Lieux : « airport » (quais propres) ou « city » (Paris : un point de montée par ligne, R-100, D-13).
     # L'ordre de data/places.json est celui du sélecteur de l'accueil (sort_order).

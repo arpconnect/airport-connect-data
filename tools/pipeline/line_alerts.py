@@ -77,7 +77,16 @@ def alerts(reports: list) -> list:
             line = _line(d)
             if not line or not isinstance(d, dict):
                 continue
-            if w["code"] == "route_renamed":
+            if w["code"] in ("stop_name_override_stale", "stop_name_override_missing"):
+                stale = w["code"] == "stop_name_override_stale"
+                add(w["code"], d.get("stop"),
+                    f"Arrêt {d.get('stop')} : " + ("IDFM a changé son nom" if stale else "absent du GTFS d'IDFM"),
+                    (f"Le GTFS du jour nomme ce quai « {d.get('now')} » au lieu de « {d.get('expected')} » : c'est ce nom "
+                     "qui s'affiche désormais. Retirer la correction « " + str(d.get("name")) + " » de `data/places.json` "
+                     "(`stop_name_overrides`), ou l'adapter si le nom d'IDFM ne convient toujours pas.") if stale else
+                    ("Ce quai n'existe plus dans le GTFS du jour : retirer sa correction de nom de `data/places.json` "
+                     "(`stop_name_overrides`)."))
+            elif w["code"] == "route_renamed":
                 add("route_renamed", line, f"Ligne {line} : renumérotée « {d.get('before')} » → « {d.get('now')} »",
                     "Le numéro de la ligne a changé dans le GTFS du jour. L'application affiche déjà le nouveau numéro "
                     "(R-14) ; aligner `data/lines.json` (nom, couleurs, plans) et vérifier ses points de montée.")
@@ -174,9 +183,16 @@ def pipeline_status(name: str, status: str, run_url: str, gh: GitHub) -> str:
     return "unchanged"
 
 
-AUTO_CLOSE = ("line_service_ends:",)
-CLOSE_COMMENT = ("La base d'horaires du jour ne signale plus cette fin de service : le transporteur a publié la suite "
-                 "des horaires de la ligne. Alerte refermée automatiquement.")
+CLOSE_COMMENTS = {
+    "line_service_ends:": "La base d'horaires du jour ne signale plus cette fin de service : le transporteur a publié la "
+                          "suite des horaires de la ligne. Alerte refermée automatiquement.",
+    "stop_name_override_stale:": "La correction de nom de cet arrêt a été retirée ou adaptée : la base d'horaires du jour "
+                                 "ne la signale plus. Alerte refermée automatiquement.",
+    "stop_name_override_missing:": "La correction de nom de cet arrêt a été retirée : la base d'horaires du jour ne la "
+                                   "signale plus. Alerte refermée automatiquement.",
+}
+AUTO_CLOSE = tuple(CLOSE_COMMENTS)
+CLOSE_COMMENT = CLOSE_COMMENTS["line_service_ends:"]
 
 
 def resolve(found: list, reports: list, gh: GitHub) -> list:
@@ -189,7 +205,7 @@ def resolve(found: list, reports: list, gh: GitHub) -> list:
     closed = []
     for key, number in sorted(gh.open_issues().items()):
         if key.startswith(AUTO_CLOSE) and key not in current:
-            gh.close(number, CLOSE_COMMENT)
+            gh.close(number, next(c for k, c in CLOSE_COMMENTS.items() if key.startswith(k)))
             closed.append(key)
     return closed
 

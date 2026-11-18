@@ -18,7 +18,15 @@
       "cdg-t2-gare": "Nom de la zone d'arrêt GTFS IDFM:73699, repris tel quel chaque jour (demande de Julien du 18 novembre 2026) : la gare suit IDFM quand elle sera renommée, sans mise à jour du référentiel ; pas d'ancien nom en mention secondaire."
     }
   },
-  "places": [
+  "stop_name_overrides": {
+  "description": "Noms d'arrêts corrigés en attendant qu'IDFM les corrige dans son GTFS (exception datée à R-30). Une correction ne s'applique que tant que le quai porte exactement l'ancien nom (gtfs_name) dans le GTFS du jour ; dès qu'IDFM change ce nom, son nom reprend la main et une alerte demande de retirer la correction.",
+  "stops": [
+   {"stop": "IDFM:34198", "gtfs_name": "CDG T1 - RoissyBus (Niveau Arrivées - Porte 32)", "name": "CDG T1 - Porte 32 (arrivées)",
+    "reason": "Le RoissyBus est supprimé depuis le 1er mars 2026 ; l'arrêt, repris par les 350 et 351, porte encore son nom dans le GTFS du 18 novembre 2026.",
+    "decided_on": "2026-11-18"}
+  ]
+ },
+ "places": [
     {"id": "paris", "kind": "city", "label_fr": "Paris", "label_en": "Paris", "short_label": "Paris",
      "boarding": [
        {"line": "RER_B", "stop_area": "IDFM:71410", "name": "Gare du Nord"},

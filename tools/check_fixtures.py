@@ -342,6 +342,13 @@ def terminal_names(meta, places: list, ids: list) -> None:
         if gtfs_label:
             check("places.json", f"{p['id']} : libellé GTFS sans ancien nom", bool(p.get("former_fr") or p.get("former_en")), False)
             check("places.json", f"{p['id']} : libellé GTFS déclaré", p["id"] in (meta.get("gtfs_labels") or {}), True)
+    # Noms d'arrêts corrigés (exception datée à R-30) : quai, ancien nom, nouveau nom, raison et date ; un quai une fois.
+    fixes = (json.loads((ROOT / "data" / "places.json").read_text(encoding="utf-8")).get("stop_name_overrides") or {}).get("stops", [])
+    for o in fixes:
+        check("places.json", f"nom corrigé {o.get('stop')} : quai, ancien et nouveau noms, raison, date",
+              all(o.get(k) for k in ("stop", "gtfs_name", "name", "reason")) and _iso_required(o.get("decided_on")), True)
+        check("places.json", f"nom corrigé {o.get('stop')} : différent de l'ancien", o.get("name") != o.get("gtfs_name"), True)
+    check("places.json", "noms corrigés : un quai une fois", len({o.get("stop") for o in fixes}), len(fixes))
     for key in ("label_fr", "label_en", "short_label"):
         values = [p[key] for p in places if key in p]
         dup = sorted({v for v in values if values.count(v) > 1})
