@@ -7,8 +7,12 @@ on:
   workflow_dispatch:
     inputs:
       args:
-        description: "Arguments de inspect_gtfs.py (--near LAT,LON, --radius, --name, --area, --stop)"
+        description: "Arguments de l'outil (inspect_gtfs.py : --near LAT,LON, --radius, --name, --area, --stop, --line ; inspect_idfm.py : --line, --mode, --id)"
         required: true
+      outil:
+        description: "gtfs (GTFS du jour) ou idfm (référentiels des lignes et des plans)"
+        required: false
+        default: gtfs
 
 permissions:
   contents: read
@@ -25,12 +29,26 @@ jobs:
           python-version: "3.12"
 
       - name: Télécharger le GTFS IDFM
+        if: inputs.outil != 'idfm'
         run: |
           curl --fail --location --retry 3 --retry-delay 20 -o IDFM-gtfs.zip \
             https://eu.ftp.opendatasoft.com/stif/GTFS/IDFM-gtfs.zip
           sha256sum IDFM-gtfs.zip
 
+      - name: Inspecter les référentiels d'IDFM
+        if: inputs.outil == 'idfm'
+        env:
+          INSPECT_ARGS: ${{ inputs.args }}
+        run: |
+          set -o pipefail
+          python3 -I -c 'import os, runpy, shlex, sys
+          sys.argv = ["inspect_idfm.py", *shlex.split(os.environ["INSPECT_ARGS"])]
+          sys.path.insert(0, "tools/pipeline")
+          runpy.run_path("tools/pipeline/inspect_idfm.py", run_name="__main__")' | tee inspect.txt
+          { echo '```'; cat inspect.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Inspecter
+        if: inputs.outil != 'idfm'
         env:
           INSPECT_ARGS: ${{ inputs.args }}
         run: |
