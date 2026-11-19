@@ -320,6 +320,8 @@
         "ORLY"
       ],
       "idfm_route_id": null,
+      "expected_route_id": "IDFM:C02833",
+      "expected_route_note": "Code du référentiel des lignes d'IDFM (statut « prochainement active », exploitant « Keolis Compagnie du Métro Grand Paris L18 », couleur 00a092), relevé le 19 novembre 2026 ; absent du GTFS ce jour-là. Le générateur signale son arrivée dans le GTFS (future_line_published).",
       "navitia_line_id": null,
       "gtfs": null,
       "state": "future",

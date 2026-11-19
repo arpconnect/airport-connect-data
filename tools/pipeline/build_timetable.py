@@ -131,9 +131,15 @@ def read_feed(zip_path: Path, lines_doc: dict, places_doc: dict, report: Report)
     route_to_code = {l["idfm_route_id"]: l["id"] for l in active}
 
     routes, agencies = {}, {a["agency_id"]: a["agency_name"] for a in _rows(z, "agency.txt")}
+    # Ligne à venir dont IDFM a déjà donné le code C : son arrivée dans le GTFS est signalée (future_line_published),
+    # pour basculer la ligne de simulée à réelle (R-131).
+    expected = {l["expected_route_id"]: l["id"] for l in lines_doc["lines"] if l["state"] != "active" and l.get("expected_route_id")}
+    expected_routes = {}
     for r in _rows(z, "routes.txt"):
         if r["route_id"] in route_to_code:
             routes[r["route_id"]] = r
+        if r["route_id"] in expected:
+            expected_routes[r["route_id"]] = r
     for rid, code in sorted(route_to_code.items(), key=lambda x: x[1]):
         if rid not in routes:
             report.error("route_missing", {"line": code, "route_id": rid})
@@ -152,12 +158,20 @@ def read_feed(zip_path: Path, lines_doc: dict, places_doc: dict, report: Report)
     agency_of_route = {r["route_id"]: r["agency_id"] for r in _rows(z, "routes.txt") if r["agency_id"] in our_agencies}
     agency_services = defaultdict(set)
     trips = {}
+    expected_trips = defaultdict(int)
     for t in _rows(z, "trips.txt"):
         if t["route_id"] in routes:
             trips[t["trip_id"]] = t
+        if t["route_id"] in expected_routes:
+            expected_trips[t["route_id"]] += 1
         ag = agency_of_route.get(t["route_id"])
         if ag is not None:
             agency_services[ag].add(t["service_id"])
+
+    for rid, r in sorted(expected_routes.items()):
+        report.warn("future_line_published", {"line": expected[rid], "route_id": rid, "short_name": r["route_short_name"],
+                                              "long_name": r["route_long_name"], "color": r.get("route_color"),
+                                              "trips": expected_trips.get(rid, 0)})
 
     stop_times = defaultdict(list)
     for s in _rows(z, "stop_times.txt"):

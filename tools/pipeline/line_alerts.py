@@ -77,7 +77,14 @@ def alerts(reports: list) -> list:
             line = _line(d)
             if not line or not isinstance(d, dict):
                 continue
-            if w["code"] in ("stop_name_override_stale", "stop_name_override_missing"):
+            if w["code"] == "future_line_published":
+                add(w["code"], line, f"Ligne {d.get('short_name') or line} : publiée par IDFM dans le GTFS",
+                    f"Le GTFS du jour contient la ligne à venir {line} (`{d.get('route_id')}`, « {d.get('long_name')} », "
+                    f"couleur #{d.get('color')}) avec {d.get('trips')} trajet(s). Pour qu'elle quitte la simulation (R-131) : "
+                    "renseigner `idfm_route_id`, `navitia_line_id` et `gtfs` dans `data/lines.json`, passer son état à "
+                    "`active` et la rattacher à ses lieux ; la base suivante la donne en service et l'application bascule "
+                    "d'elle-même sur ses horaires réels.")
+            elif w["code"] in ("stop_name_override_stale", "stop_name_override_missing"):
                 stale = w["code"] == "stop_name_override_stale"
                 add(w["code"], d.get("stop"),
                     f"Arrêt {d.get('stop')} : " + ("IDFM a changé son nom" if stale else "absent du GTFS d'IDFM"),
