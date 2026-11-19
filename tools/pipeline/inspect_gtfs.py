@@ -80,6 +80,41 @@ def calendar(z: zipfile.ZipFile, route_ids: list) -> None:
         print("  " + " ".join(f"{d[4:]}:{n}" for d, n in sorted(per_day.items())))
 
 
+def find_lines(z: zipfile.ZipFile, names: list, route_type) -> None:
+    """Lignes d'un numéro (nouvelle ligne à ajouter au référentiel) : code C, noms, couleurs, réseau, puis pour
+    chacune ses trajets par jour de service et les arrêts de sa mission la plus longue dans chaque sens."""
+    agencies = {a["agency_id"]: a["agency_name"] for a in rows(z, "agency.txt")}
+    routes = [r for r in rows(z, "routes.txt")
+              if r["route_short_name"] in names and (route_type is None or r["route_type"] == str(route_type))]
+    if not routes:
+        print(f"AUCUNE LIGNE {names} (type {route_type}) dans le GTFS")
+        return
+    for r in routes:
+        print(f"{r['route_id']:<14} court={r['route_short_name']!r} long={r['route_long_name']!r} type={r['route_type']} "
+              f"couleur=#{r.get('route_color', '')} texte=#{r.get('route_text_color', '')} "
+              f"réseau={agencies.get(r.get('agency_id'), '?')!r}")
+    ids = {r["route_id"] for r in routes}
+    calendar(z, sorted(ids))
+    trips = {t["trip_id"]: t for t in rows(z, "trips.txt") if t["route_id"] in ids}
+    seqs = defaultdict(list)
+    for st in rows(z, "stop_times.txt"):
+        if st["trip_id"] in trips:
+            seqs[st["trip_id"]].append((int(st["stop_sequence"]), st["stop_id"], st["departure_time"]))
+    names_by_stop = {s["stop_id"]: (s["stop_name"], s.get("parent_station", "")) for s in rows(z, "stops.txt")}
+    for rid in sorted(ids):
+        for direction in ("0", "1"):
+            best = max((sorted(v) for k, v in seqs.items()
+                        if trips[k]["route_id"] == rid and trips[k].get("direction_id", "0") == direction),
+                       key=len, default=None)
+            if not best:
+                continue
+            first = best[0][2]
+            print(f"  {rid} sens {direction} ({len(best)} arrêts, départ {first}) :")
+            for _, sid, dep in best:
+                name, parent = names_by_stop.get(sid, ("?", ""))
+                print(f"    {dep}  {sid:<16} {parent:<16} {name}")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("gtfs_zip", type=Path)
@@ -91,11 +126,18 @@ def main() -> int:
     ap.add_argument("--route", action="append", default=[], help="route_id exact (répétable) : nom et couleurs")
     ap.add_argument("--calendar", action="append", default=[],
                     help="route_id exact (répétable) : trajets par jour de service, quand le générateur bloque sur line_trip_drop")
+    ap.add_argument("--line", action="append", default=[],
+                    help="route_short_name exact (répétable), avec --type : lignes trouvées, trajets par jour et arrêts")
+    ap.add_argument("--type", type=int, help="route_type GTFS pour --line (1 métro, 0 tramway, 2 train, 3 bus)")
     args = ap.parse_args()
-    if not (args.near or args.name or args.area or args.stop or args.route or args.calendar):
-        ap.error("au moins un filtre : --near, --name, --area, --stop, --route ou --calendar")
+    if not (args.near or args.name or args.area or args.stop or args.route or args.calendar or args.line):
+        ap.error("au moins un filtre : --near, --name, --area, --stop, --route, --calendar ou --line")
 
     z = zipfile.ZipFile(args.gtfs_zip)
+    if args.line:
+        find_lines(z, args.line, args.type)
+        if not (args.near or args.name or args.area or args.stop or args.route or args.calendar):
+            return 0
     if args.calendar:
         calendar(z, args.calendar)
         if not (args.near or args.name or args.area or args.stop or args.route):
