@@ -15,6 +15,34 @@
    "end": "2026-12-31T23:59",
    "decided_on": "2026-11-18",
    "source": "Constat de Julien sur le terrain (changements de quai à Roissy, mi-novembre 2026) ; aucune annonce officielle relevée le 18 novembre 2026."
+  },
+  {
+   "id": "roissy-terminaux-2027-avant",
+   "sectors": ["ROISSY"],
+   "screens": ["home", "search", "plan"],
+   "title": {"fr": "Modification des terminaux", "en": "Terminal changes"},
+   "body": {
+    "fr": "À compter du 16 mars 2027, les terminaux de l'aéroport changent de nom : 2A et 2C deviennent le Terminal 3, 2B et 2D le 4, 2E le 5, 2F le 6, 2G le 7, et le Terminal 3 (Roissypôle) devient le 2. Les modifications sont déjà disponibles dans l'application.",
+    "en": "From 16 March 2027, the airport terminals are renamed: 2A and 2C become Terminal 3, 2B and 2D become 4, 2E becomes 5, 2F becomes 6, 2G becomes 7, and Terminal 3 (Roissypôle) becomes 2. The changes are already available in the app."
+   },
+   "start": "2026-11-24T00:00",
+   "end": "2027-03-16T00:00",
+   "decided_on": "2026-11-24",
+   "source": "Changement de nom des terminaux de Paris-Charles de Gaulle le 16 mars 2027 (Air France, https://wwws.airfrance.fr/information/aeroport/changement-noms-terminaux-cdg, et cdgfacile.com, relevés le 24 novembre 2026 ; spec R-35). Texte de Julien, 24 novembre 2026."
+  },
+  {
+   "id": "roissy-terminaux-2027-apres",
+   "sectors": ["ROISSY"],
+   "screens": ["home", "search", "plan"],
+   "title": {"fr": "Modification des terminaux", "en": "Terminal changes"},
+   "body": {
+    "fr": "Depuis le 16 mars 2027, les terminaux de l'aéroport sont désormais numérotés de 1 à 7. Plus d'informations sur les pages associées.",
+    "en": "Since 16 March 2027, the airport terminals have been numbered from 1 to 7. More information on the related pages."
+   },
+   "start": "2027-03-16T00:00",
+   "end": "2027-04-16T00:00",
+   "decided_on": "2026-11-24",
+   "source": "Suite du message précédent, au moins un mois après le changement (demande de Julien du 24 novembre 2026)."
   }
  ]
 }
