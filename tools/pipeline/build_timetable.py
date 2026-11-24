@@ -98,6 +98,8 @@ def load_inputs(data_dir: Path):
 
 NOTICE_SCREENS = {"home", "search", "plan"}
 NOTICE_SECTORS = {"ROISSY", "ORLY", "BOURGET"}
+# Sorte d'un message (R-108) : « disruption » (perturbation : le bandeau s'appelle « Perturbations ») ou « info ».
+NOTICE_KINDS = {"disruption", "info"}
 
 
 def notices_for_base(notices: list, today: date | None, report: Report) -> list:
@@ -111,6 +113,7 @@ def notices_for_base(notices: list, today: date | None, report: Report) -> list:
             end = datetime.fromisoformat(n["end"])
             ok = (bool(nid) and nid not in seen and set(n.get("sectors") or []) <= NOTICE_SECTORS and n.get("sectors")
                   and set(n.get("screens") or []) <= NOTICE_SCREENS and n.get("screens")
+                  and n.get("kind", "info") in NOTICE_KINDS
                   and all((n.get(k) or {}).get(lang, "").strip() for k in ("title", "body") for lang in ("fr", "en"))
                   and (start is None or start < end) and end.tzinfo is None and (start is None or start.tzinfo is None))
         except (KeyError, TypeError, ValueError):
@@ -121,7 +124,8 @@ def notices_for_base(notices: list, today: date | None, report: Report) -> list:
         seen.add(nid)
         if today and end.date() < today:
             continue
-        out.append({k: n[k] for k in ("id", "sectors", "screens", "title", "body", "end") } | ({"start": n["start"]} if n.get("start") else {}))
+        out.append({k: n[k] for k in ("id", "sectors", "screens", "title", "body", "end") } | {"kind": n.get("kind", "info")}
+                   | ({"start": n["start"]} if n.get("start") else {}))
     return out
 
 

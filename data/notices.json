@@ -1,9 +1,10 @@
 {
  "schema": "airport-connect/notices@1",
- "description": "Messages d'information affichés par l'application sur un secteur (spec R-108), publiés avec la base d'horaires (clé « notices » de la table meta) : modifier ou retirer un message ne demande pas de nouvelle version de l'application. Un message s'affiche de « start » (inclus) à « end » (exclu), heures de Paris, sur les écrans listés : « home » (accueil : lieu du secteur, groupe « Vers … » depuis Paris, destination du secteur), « search » (recherche de destination qui porte sur le secteur), « plan » (page du plan d'une ligne du secteur, depuis l'onglet Plans).",
+ "description": "Messages d'information affichés par l'application sur un secteur (spec R-108), publiés avec la base d'horaires (clé « notices » de la table meta) : modifier ou retirer un message ne demande pas de nouvelle version de l'application. Un message s'affiche de « start » (inclus) à « end » (exclu), heures de Paris, sur les écrans listés : « home » (accueil : lieu du secteur, groupe « Vers … » depuis Paris, destination du secteur), « search » (recherche de destination qui porte sur le secteur), « plan » (page du plan d'une ligne du secteur, depuis l'onglet Plans). Sorte (« kind ») : « disruption » pour une perturbation, « info » sinon (par défaut) ; les messages d'un écran sont réunis dans un bandeau dépliant, « Perturbations » tant qu'une perturbation est en vigueur, « Information » sinon.",
  "notices": [
   {
    "id": "roissy-quais-travaux-2026",
+   "kind": "disruption",
    "sectors": ["ROISSY"],
    "screens": ["home", "search", "plan"],
    "title": {"fr": "Travaux en cours", "en": "Works in progress"},
@@ -18,6 +19,7 @@
   },
   {
    "id": "roissy-terminaux-2027-avant",
+   "kind": "info",
    "sectors": ["ROISSY"],
    "screens": ["home", "search", "plan"],
    "title": {"fr": "Modification des terminaux", "en": "Terminal changes"},
@@ -32,6 +34,7 @@
   },
   {
    "id": "roissy-terminaux-2027-apres",
+   "kind": "info",
    "sectors": ["ROISSY"],
    "screens": ["home", "search", "plan"],
    "title": {"fr": "Modification des terminaux", "en": "Terminal changes"},

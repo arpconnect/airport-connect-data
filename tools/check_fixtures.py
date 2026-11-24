@@ -353,6 +353,7 @@ def terminal_names(meta, places: list, ids: list) -> None:
             f = f"notices.json {n.get('id')}"
             check(f, "secteurs connus", bool(n.get("sectors")) and set(n["sectors"]) <= {"ROISSY", "ORLY", "BOURGET"}, True)
             check(f, "écrans connus", bool(n.get("screens")) and set(n["screens"]) <= {"home", "search", "plan"}, True)
+            check(f, "sorte connue (perturbation ou information)", n.get("kind") in {"disruption", "info"}, True)
             check(f, "titre et texte en français et en anglais",
                   all((n.get(k) or {}).get(l, "").strip() for k in ("title", "body") for l in ("fr", "en")), True)
             try:
