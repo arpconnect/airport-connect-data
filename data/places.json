@@ -19,7 +19,7 @@
     }
   },
   "stop_name_overrides": {
-  "description": "Noms d'arrêts corrigés en attendant qu'IDFM les corrige dans son GTFS (exception datée à R-30). Une correction ne s'applique que tant que le quai porte exactement l'ancien nom (gtfs_name) dans le GTFS du jour ; dès qu'IDFM change ce nom, son nom reprend la main et une alerte demande de retirer la correction.",
+  "description": "Noms d'arrêts (quai ou zone d'arrêt) corrigés en attendant qu'IDFM les corrige dans son GTFS (exception datée à R-30). Une correction ne s'applique que tant que le quai porte exactement l'ancien nom (gtfs_name) dans le GTFS du jour ; dès qu'IDFM change ce nom, son nom reprend la main et une alerte demande de retirer la correction.",
   "stops": [
    {"stop": "IDFM:34198", "gtfs_name": "CDG T1 - RoissyBus (Niveau Arrivées - Porte 32)", "name": "CDG T1 - Porte 32 (arrivées)",
     "reason": "Le RoissyBus est supprimé depuis le 1er mars 2026 ; l'arrêt, repris par les 350 et 351, porte encore son nom dans le GTFS du 18 novembre 2026.",
@@ -71,7 +71,31 @@
     "decided_on": "2026-11-18"},
    {"stop": "IDFM:497134", "gtfs_name": "Gare de Roissypôle - Aéroport CDG1 (E3)", "name": "Gare de Roissypôle - E3",
     "reason": "Ancienne appellation du temps de la RATP, présente dans aucun plan ni référentiel officiel (Julien, 18 novembre 2026) : le quai s'appelle « Gare de Roissypôle », suivi de sa lettre de quai quand le GTFS la donne (« Gare de Roissypôle - E3 »).",
-    "decided_on": "2026-11-18"}
+    "decided_on": "2026-11-18"},
+   {"stop": "IDFM:10214", "gtfs_name": "Parking Pr", "name": "Parking PR",
+    "reason": "Graphie du CDGVal : sigles des parkings en capitales et station de la gare nommée « Terminal 2 », comme sur la signalétique (demande de Julien du 24 novembre 2026).",
+    "decided_on": "2026-11-24"},
+   {"stop": "IDFM:10215", "gtfs_name": "Parking Pr", "name": "Parking PR",
+    "reason": "Graphie du CDGVal : sigles des parkings en capitales et station de la gare nommée « Terminal 2 », comme sur la signalétique (demande de Julien du 24 novembre 2026).",
+    "decided_on": "2026-11-24"},
+   {"stop": "IDFM:10216", "gtfs_name": "Parking Px", "name": "Parking PX",
+    "reason": "Graphie du CDGVal : sigles des parkings en capitales et station de la gare nommée « Terminal 2 », comme sur la signalétique (demande de Julien du 24 novembre 2026).",
+    "decided_on": "2026-11-24"},
+   {"stop": "IDFM:10217", "gtfs_name": "Parking Px", "name": "Parking PX",
+    "reason": "Graphie du CDGVal : sigles des parkings en capitales et station de la gare nommée « Terminal 2 », comme sur la signalétique (demande de Julien du 24 novembre 2026).",
+    "decided_on": "2026-11-24"},
+   {"stop": "IDFM:10218", "gtfs_name": "Terminal 2 Gare", "name": "Terminal 2",
+    "reason": "Graphie du CDGVal : sigles des parkings en capitales et station de la gare nommée « Terminal 2 », comme sur la signalétique (demande de Julien du 24 novembre 2026).",
+    "decided_on": "2026-11-24"},
+   {"stop": "IDFM:10219", "gtfs_name": "Terminal 2 Gare", "name": "Terminal 2",
+    "reason": "Graphie du CDGVal : sigles des parkings en capitales et station de la gare nommée « Terminal 2 », comme sur la signalétique (demande de Julien du 24 novembre 2026).",
+    "decided_on": "2026-11-24"},
+   {"stop": "IDFM:74162", "gtfs_name": "Tour de Contrôle / Parking Pr", "name": "Tour de Contrôle / Parking PR",
+    "reason": "Graphie du CDGVal : sigles des parkings en capitales et station de la gare nommée « Terminal 2 », comme sur la signalétique (demande de Julien du 24 novembre 2026).",
+    "decided_on": "2026-11-24"},
+   {"stop": "IDFM:73595", "gtfs_name": "Parking Px", "name": "Parking PX",
+    "reason": "Graphie du CDGVal : sigles des parkings en capitales et station de la gare nommée « Terminal 2 », comme sur la signalétique (demande de Julien du 24 novembre 2026).",
+    "decided_on": "2026-11-24"}
   ]
  },
  "places": [
@@ -112,7 +136,7 @@
      "stop_areas": ["IDFM:74162"], "stop_points": []},
     {"id": "cdg-parking-px", "kind": "airport", "sector": "ROISSY", "label_fr": "Parking PX", "label_en": "PX car park", "short_label": "PX",
      "stop_areas": ["IDFM:73595"], "stop_points": []},
-    {"id": "cdg-parking-pw", "kind": "airport", "sector": "ROISSY", "label_fr": "Parking PW (Résa Parking Eco)", "label_en": "PW car park (Eco booking)", "short_label": "PW",
+    {"id": "cdg-parking-pw", "kind": "airport", "sector": "ROISSY", "label_fr": "Parking PW", "label_en": "PW car park", "short_label": "PW",
      "stop_areas": ["IDFM:74081"], "stop_points": []},
     {"id": "orly-123", "kind": "airport", "sector": "ORLY", "label_fr": "Orly 1-2-3", "label_en": "Orly 1-2-3", "short_label": "Orly 1-2-3",
      "stop_areas": ["IDFM:63284"], "stop_points": []},
@@ -120,9 +144,11 @@
      "stop_areas": ["IDFM:63278"], "stop_points": []},
     {"id": "orly-coeur", "kind": "airport", "sector": "ORLY", "label_fr": "Cœur d'Orly", "label_en": "Cœur d'Orly", "short_label": "Cœur d'Orly",
      "stop_areas": ["IDFM:69577"], "stop_points": []},
-    {"id": "bourget-gare", "kind": "airport", "sector": "BOURGET", "label_fr": "Le Bourget (gare RER B / T11)", "label_en": "Le Bourget (RER B / T11 station)", "short_label": "Le Bourget",
+    {"id": "bourget-gare", "kind": "airport", "sector": "BOURGET", "label_fr": "Gare du Bourget", "label_en": "Le Bourget station", "short_label": "Le Bourget",
      "stop_areas": ["IDFM:72641"], "stop_points": []},
-    {"id": "bourget-musee", "kind": "airport", "sector": "BOURGET", "label_fr": "Musée de l'Air et de l'Espace (côté aéroport)", "label_en": "Air and Space Museum (airport side)", "short_label": "Musée de l'Air",
+    {"id": "bourget-musee", "kind": "airport", "sector": "BOURGET", "label_fr": "Musée de l'Air et de l'Espace", "label_en": "Air and Space Museum", "short_label": "Musée de l'Air",
+     "stop_areas": ["IDFM:72732"], "stop_points": []},
+    {"id": "bourget-aeroport", "kind": "airport", "sector": "BOURGET", "label_fr": "Le Bourget - Aéroport", "label_en": "Le Bourget - Aéroport", "short_label": "Le Bourget - Aéroport",
      "stop_areas": ["IDFM:72732"], "stop_points": []}
   ]
 }

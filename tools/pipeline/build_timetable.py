@@ -292,22 +292,8 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
         for ns in a["not_served"]:
             if ns.get("replacement_stop_area") in stops_all:
                 areas_needed.add(ns["replacement_stop_area"])
-    area_id, point_id = {}, {}
-    for i, a in enumerate(sorted(areas_needed), start=1):
-        s = stops_all.get(a)
-        if not s:
-            report.error("stop_area_missing", a)
-            continue
-        area_id[a] = i
-        cur.execute("INSERT INTO stop_area VALUES (?,?,?,?,?)", (i, a, s["stop_name"], float(s["stop_lat"]), float(s["stop_lon"])))
-    # quais : tous ceux desservis + tous les quais enfants des zones citées par les lieux
-    children = defaultdict(list)
-    for sid, s in stops_all.items():
-        if s.get("parent_station"):
-            children[s["parent_station"]].append(sid)
-    place_area_points = {sp for p in places_doc["places"] for a in p.get("stop_areas", []) for sp in children.get(a, [])
-                         if sp in wanted_points}
-    # Noms d'arrêts corrigés en attendant IDFM (exception à R-30) : appliqués seulement tant que le GTFS garde l'ancien nom.
+    # Noms d'arrêts corrigés en attendant IDFM (exception à R-30), d'un quai ou d'une zone d'arrêt : appliqués seulement tant
+    # que le GTFS garde l'ancien nom.
     overrides = {}
     for o in (places_doc.get("stop_name_overrides") or {}).get("stops", []):
         s = stops_all.get(o["stop"])
@@ -318,6 +304,22 @@ def build_db(db_path: Path, zip_path: Path, lines_doc, places_doc, adjustments_d
                                                      "now": s["stop_name"], "name": o["name"]})
         else:
             overrides[o["stop"]] = o["name"]
+    area_id, point_id = {}, {}
+    for i, a in enumerate(sorted(areas_needed), start=1):
+        s = stops_all.get(a)
+        if not s:
+            report.error("stop_area_missing", a)
+            continue
+        area_id[a] = i
+        cur.execute("INSERT INTO stop_area VALUES (?,?,?,?,?)",
+                    (i, a, overrides.get(a, s["stop_name"]), float(s["stop_lat"]), float(s["stop_lon"])))
+    # quais : tous ceux desservis + tous les quais enfants des zones citées par les lieux
+    children = defaultdict(list)
+    for sid, s in stops_all.items():
+        if s.get("parent_station"):
+            children[s["parent_station"]].append(sid)
+    place_area_points = {sp for p in places_doc["places"] for a in p.get("stop_areas", []) for sp in children.get(a, [])
+                         if sp in wanted_points}
     for i, sp in enumerate(sorted(wanted_points | place_area_points), start=1):
         s = stops_all.get(sp)
         if not s:

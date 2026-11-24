@@ -8,8 +8,8 @@
    "screens": ["home", "search", "plan"],
    "title": {"fr": "Travaux en cours", "en": "Works in progress"},
    "body": {
-    "fr": "Le quai de réception et de départ de certaines lignes de bus peut changer. Soyez attentifs à la signalétique mise en place.",
-    "en": "The arrival and departure stop of some bus lines may change. Please pay attention to the signs in place."
+    "fr": "Le quai de réception et de départ de certaines lignes de bus peut changer. Soyez attentifs à la signalétique aux abords des arrêts.",
+    "en": "The arrival and departure stop of some bus lines may change. Please pay attention to the signs near the stops."
    },
    "start": "2026-11-18T00:00",
    "end": "2026-12-31T23:59",
