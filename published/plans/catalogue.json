@@ -1,12 +1,12 @@
 {
   "schema": "airport-connect/plans-catalogue@1",
-  "version": "b48dbc4c494cbac1",
-  "generated_at": "2026-10-15T19:26:13+00:00",
+  "version": "5a65d9ae7ea8e7fd",
+  "generated_at": "2026-11-24T15:19:37+00:00",
   "distribution": "link",
   "counts": {
-    "ok": 45,
+    "ok": 46,
     "kept_previous": 0,
-    "device": 4,
+    "device": 3,
     "error": 0,
     "no_plan": 0
   },
@@ -45,7 +45,7 @@
         "last_modified": "Wed, 22 Apr 2026 11:28:05 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_143",
@@ -81,7 +81,7 @@
         "last_modified": "Wed, 22 Apr 2026 11:30:01 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_148",
@@ -117,7 +117,7 @@
         "last_modified": "Wed, 22 Apr 2026 11:36:56 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_152",
@@ -153,7 +153,7 @@
         "last_modified": "Wed, 22 Apr 2026 11:41:23 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_183",
@@ -189,7 +189,7 @@
         "last_modified": "Tue, 18 Aug 2026 14:12:57 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_247",
@@ -225,7 +225,7 @@
         "last_modified": "Wed, 22 Apr 2026 11:44:09 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_249",
@@ -261,7 +261,7 @@
         "last_modified": "Wed, 22 Apr 2026 11:48:28 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_250",
@@ -297,7 +297,7 @@
         "last_modified": "Mon, 31 Aug 2026 08:03:06 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_350",
@@ -333,7 +333,7 @@
         "last_modified": "Wed, 19 Aug 2026 07:13:45 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_351",
@@ -369,7 +369,7 @@
         "last_modified": "Mon, 24 Aug 2026 07:07:17 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_4121",
@@ -405,7 +405,7 @@
         "last_modified": "Fri, 24 Jul 2026 10:13:08 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_480",
@@ -441,7 +441,7 @@
         "last_modified": "Thu, 30 Apr 2026 10:41:46 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_5154",
@@ -477,7 +477,7 @@
         "last_modified": "Thu, 20 Aug 2026 09:13:58 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_607",
@@ -513,7 +513,7 @@
         "last_modified": "Thu, 29 Feb 2024 11:40:01 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_609",
@@ -549,7 +549,7 @@
         "last_modified": "Thu, 29 Feb 2024 11:40:41 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_610",
@@ -585,7 +585,7 @@
         "last_modified": "Sun, 02 Jun 2024 14:19:36 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_703",
@@ -621,7 +621,7 @@
         "last_modified": "Mon, 11 Sep 2023 09:07:48 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_7708",
@@ -657,7 +657,7 @@
         "last_modified": "Wed, 01 Oct 2025 09:07:17 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_7720",
@@ -693,7 +693,7 @@
         "last_modified": "Wed, 26 Aug 2026 08:15:24 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_9112",
@@ -729,7 +729,7 @@
         "last_modified": "Mon, 06 Jul 2026 08:47:35 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_9501",
@@ -765,7 +765,7 @@
         "last_modified": "Fri, 21 Aug 2026 12:46:12 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_9502",
@@ -801,7 +801,7 @@
         "last_modified": "Fri, 21 Aug 2026 12:47:18 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_9504",
@@ -837,7 +837,7 @@
         "last_modified": "Mon, 15 Dec 2025 15:37:52 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_9509",
@@ -873,7 +873,7 @@
         "last_modified": "Mon, 03 Nov 2025 16:23:33 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_9517",
@@ -909,7 +909,7 @@
         "last_modified": "Fri, 30 Jan 2026 17:03:27 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_9518",
@@ -945,7 +945,7 @@
         "last_modified": "Mon, 02 Sep 2024 15:58:52 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_EX100",
@@ -981,7 +981,7 @@
         "last_modified": "Fri, 10 Jul 2026 09:11:34 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_EX19",
@@ -1017,7 +1017,7 @@
         "last_modified": "Fri, 10 Jul 2026 08:49:33 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_EX93",
@@ -1053,7 +1053,7 @@
         "last_modified": "Fri, 21 Aug 2026 12:23:13 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_N1",
@@ -1089,7 +1089,7 @@
         "last_modified": "Thu, 22 Nov 2018 13:32:55 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_N131",
@@ -1125,7 +1125,7 @@
         "last_modified": "Thu, 11 Dec 2025 14:43:32 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_N139",
@@ -1161,7 +1161,7 @@
         "last_modified": "Mon, 06 Jul 2026 08:26:56 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_N140",
@@ -1197,7 +1197,7 @@
         "last_modified": "Fri, 21 Aug 2026 13:12:07 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_N143",
@@ -1233,7 +1233,7 @@
         "last_modified": "Fri, 21 Aug 2026 13:16:31 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_N2",
@@ -1269,7 +1269,7 @@
         "last_modified": "Thu, 22 Nov 2018 13:32:55 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_N22",
@@ -1305,7 +1305,7 @@
         "last_modified": "Sat, 01 Aug 2026 17:32:44 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_N31",
@@ -1341,7 +1341,7 @@
         "last_modified": "Sat, 01 Aug 2026 17:29:52 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_N42",
@@ -1377,7 +1377,7 @@
         "last_modified": "Thu, 01 Oct 2026 08:53:47 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_R4",
@@ -1413,7 +1413,7 @@
         "last_modified": "Fri, 21 Aug 2026 12:37:28 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "BUS_TBUS1",
@@ -1449,7 +1449,7 @@
         "last_modified": "Mon, 11 Sep 2023 08:55:24 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "CDGVAL",
@@ -1485,7 +1485,7 @@
         "last_modified": "Thu, 22 Nov 2018 13:32:55 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "METRO_14",
@@ -1493,27 +1493,35 @@
       "lines": [
         "METRO_14"
       ],
-      "status": "device",
-      "title": "Plan Métro 14",
+      "status": "ok",
+      "title": "Plan Métro Ligne 14",
       "source": {
-        "url": "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/metro/plan-de-ligne_metro_ligne-14.pdf",
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20261123T095443Z-7f66fcd4-4c11-4fdb-ad39-6aac4cad01d2.pdf",
         "via": "idfm",
-        "provider": "www.ratp.fr",
+        "provider": "ilico.iledefrance-mobilites.fr",
         "dataset": "liens-fiches-horaires-et-plans-des-lignes-de-transport-en-commun-dile-de-france",
         "dataset_licence": "Licence Ouverte v2.0 (Etalab)"
       },
       "document": {
-        "media_type": "application/pdf"
+        "media_type": "application/pdf",
+        "bytes": 587165,
+        "sha256": "b108b6b65f89950f2e024cf4789dd83de732cf5b991edb0e51e4ac70862d8b93",
+        "pages": null,
+        "width": null,
+        "height": null,
+        "unit": "pt",
+        "date": "2026-11-23",
+        "date_source": "url"
       },
       "file": {
-        "url": "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/metro/plan-de-ligne_metro_ligne-14.pdf"
+        "url": "https://ilico.iledefrance-mobilites.fr/uploads/plans/20261123T095443Z-7f66fcd4-4c11-4fdb-ad39-6aac4cad01d2.pdf"
       },
-      "problems": [
-        {
-          "url": "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/metro/plan-de-ligne_metro_ligne-14.pdf",
-          "error": "HTTP 403"
-        }
-      ]
+      "http": {
+        "etag": null,
+        "last_modified": "Mon, 23 Nov 2026 09:54:43 GMT"
+      },
+      "first_seen": "2026-11-24",
+      "checked_on": "2026-11-24"
     },
     {
       "id": "ORLYVAL",
@@ -1549,7 +1557,7 @@
         "last_modified": "Mon, 02 Feb 2026 14:45:24 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "RER_B",
@@ -1607,7 +1615,8 @@
       "problems": [
         {
           "url": "https://www.transilien.com/fr/page-lignes/ligne-c",
-          "error": "HTTP 403"
+          "error": "pas un document (page web ou format inconnu)",
+          "content_type": "text/html; charset=utf-8"
         },
         {
           "url": "https://www.ratp.fr/sites/default/files/lines-assets/plan-de-ligne/rer/plan-de-ligne_rer_ligne-c.pdf",
@@ -1649,7 +1658,7 @@
         "last_modified": "Fri, 14 Mar 2025 07:58:59 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "T7",
@@ -1713,7 +1722,7 @@
         "last_modified": "Mon, 20 Jul 2026 06:13:31 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     },
     {
       "id": "NOCTILIEN",
@@ -1755,7 +1764,7 @@
         "last_modified": "Fri, 04 Sep 2026 15:16:21 GMT"
       },
       "first_seen": "2026-10-08",
-      "checked_on": "2026-10-15"
+      "checked_on": "2026-11-24"
     }
   ]
 }
