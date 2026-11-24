@@ -1,14 +1,14 @@
 {
   "schema": "airport-connect/timetable-manifest@1",
   "db_schema_version": 4,
-  "version": "20261124-d6c599a14bb0",
-  "generated_at": "2026-11-24T16:30:05+00:00",
+  "version": "20261124-609dc80ef5fb",
+  "generated_at": "2026-11-24T17:01:50+00:00",
   "source": {
     "url": "https://eu.ftp.opendatasoft.com/stif/GTFS/IDFM-gtfs.zip",
     "sha256": "9d3df2bf82fdbbe61d60a4d25fdf0e536b15cccc5e8a174abf3f8a43e012f0a6"
   },
   "inputs": {
-    "sha256": "b8ac96750d6e9abd2cefe139375640bf3e64dccd7c69d3c3e2cf3b36a228c6ff"
+    "sha256": "814443d5596910daab7a79891aad05839648b6ee95a561fb8518fd85cdc01a2a"
   },
   "validity": {
     "start": "2026-11-24",
@@ -17,13 +17,13 @@
     "first_service_date": "2026-11-21"
   },
   "file": {
-    "name": "timetable-20261124-d6c599a14bb0.sqlite.gz",
-    "url": "https://github.com/arpconnect/airport-connect-data/releases/download/timetable-20261124-d6c599a14bb0/timetable-20261124-d6c599a14bb0.sqlite.gz",
+    "name": "timetable-20261124-609dc80ef5fb.sqlite.gz",
+    "url": "https://github.com/arpconnect/airport-connect-data/releases/download/timetable-20261124-609dc80ef5fb/timetable-20261124-609dc80ef5fb.sqlite.gz",
     "encoding": "gzip",
-    "bytes_gzip": 4132656,
-    "sha256_gzip": "e2bd69a46fb05a762d73309564945a95c02902a9d2d3a92eb7e6fd060d225d25",
-    "bytes": 11206656,
-    "sha256": "d6c599a14bb070ffb11851df5567152b3fe0bc991fa3e88d754acc14dff59259"
+    "bytes_gzip": 4133427,
+    "sha256_gzip": "fc24d7197220febce710155b6dfb66fa44f427fd9e193429b6f0e273f3fe76bb",
+    "bytes": 11210752,
+    "sha256": "609dc80ef5fbdfc746c82236b056434bbaf571e0ce8bb04fc2ca4b18b3edc64b"
   },
   "counts": {
     "lines_active": 48,
